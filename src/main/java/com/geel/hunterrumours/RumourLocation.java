@@ -131,7 +131,7 @@ public enum RumourLocation
 	SPOTTED_KEBBIT_PISCATORIS_FALCONRY_AREA_4(SPOTTED_KEBBIT, "Piscatoris falconry area", new WorldPoint(2384, 3586, 0)),
 	SPOTTED_KEBBIT_PISCATORIS_FALCONRY_AREA_5(SPOTTED_KEBBIT, "Piscatoris falconry area", new WorldPoint(2379, 3585, 0)),
 	SPOTTED_KEBBIT_PISCATORIS_FALCONRY_AREA_6(SPOTTED_KEBBIT, "Piscatoris falconry area", new WorldPoint(2372, 3584, 0)),
-	SPOTTED_KEBBIT_PISCATORIS_FALCONRY_AREA_7(SPOTTED_KEBBIT, "Piscatoris falconry area", new WorldPoint(2382, 0, 0)),
+	SPOTTED_KEBBIT_PISCATORIS_FALCONRY_AREA_7(SPOTTED_KEBBIT, "Piscatoris falconry area", new WorldPoint(2382, 3584, 0)),
 
 	BLACK_WARLOCK_FELDIP_HUNTER_AREA_1(BLACK_WARLOCK, "Feldip Hunter area", new WorldPoint(2563, 2920, 0)),
 	BLACK_WARLOCK_FELDIP_HUNTER_AREA_2(BLACK_WARLOCK, "Feldip Hunter area", new WorldPoint(2551, 2915, 0)),
