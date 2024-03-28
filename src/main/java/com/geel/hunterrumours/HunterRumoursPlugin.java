@@ -24,6 +24,7 @@ import net.runelite.client.util.ImageUtil;
 import javax.inject.Inject;
 import java.awt.*;
 import java.util.*;
+import net.runelite.client.util.Text;
 
 @PluginDescriptor(
 	name = "Hunter Rumours",
@@ -78,6 +79,7 @@ public class HunterRumoursPlugin extends Plugin
 
 	private BufferedImage mapArrow;
 	private final Set<HunterRumourWorldMapPoint> currentMapPoints = new HashSet<>();
+	private boolean hasFinishedCurrentRumour = false;
 
 	@Provides
 	HunterRumoursConfig provideConfig(ConfigManager configManager)
@@ -127,6 +129,23 @@ public class HunterRumoursPlugin extends Plugin
 	{
 		handleBurrowsHunterDialog(event);
 		handleQuetzalWhistleChatMessage(event);
+		handleRumourFinishedChatMessage(event);
+	}
+
+	private void handleRumourFinishedChatMessage(ChatMessage event)
+	{
+		String message = event.getMessage();
+
+		if (event.getType() != ChatMessageType.GAMEMESSAGE)
+		{
+			return;
+		}
+
+		if (Text.standardize(message).equalsIgnoreCase("You find a rare piece of the creature! You should take it back to the Hunter Guild."))
+		{
+			setHunterRumourState(true);
+			handleInfoBox();
+		}
 	}
 
 	private void handleQuetzalWhistleChatMessage(ChatMessage event)
@@ -171,6 +190,7 @@ public class HunterRumoursPlugin extends Plugin
 		// Current rumour DOES NOT match the whistle rumour -- reset things
 		hunterRumours.put(currentHunter, Rumour.NONE);
 		currentHunter = Hunter.NONE;
+		setHunterRumourState(false);
 	}
 
 	private void handleBurrowsHunterDialog(ChatMessage event)
@@ -219,6 +239,7 @@ public class HunterRumoursPlugin extends Plugin
 			dialogHunter = hunter;
 		}
 
+		setHunterRumourState(false);
 		setHunterRumour(dialogHunter, dialogRumour);
 
 		// Set the current hunter to whoever we now know the current hunter to be.
@@ -241,6 +262,12 @@ public class HunterRumoursPlugin extends Plugin
 	public Hunter[] getEnabledHunters()
 	{
 		return Arrays.stream(Hunter.allValues()).filter(this::isHunterEnabled).toArray(Hunter[]::new);
+	}
+
+	private void setHunterRumourState(boolean hasFinishedCurrentRumour)
+	{
+		configManager.setRSProfileConfiguration(HunterRumoursConfig.GROUP, "has.finished.rumour", hasFinishedCurrentRumour);
+		this.hasFinishedCurrentRumour = hasFinishedCurrentRumour;
 	}
 
 	public void setCurrentHunter(Hunter hunter)
@@ -277,6 +304,11 @@ public class HunterRumoursPlugin extends Plugin
 			default:
 				return false;
 		}
+	}
+
+	public boolean hasFinishedCurrentRumour()
+	{
+		return this.hasFinishedCurrentRumour;
 	}
 
 	private RumourInfoBox infoBox = null;
@@ -374,7 +406,7 @@ public class HunterRumoursPlugin extends Plugin
 		if (config.highlightHunterNPCs())
 		{
 			Rumour currentRumour = getCurrentRumour();
-			if (npc.getId() != currentRumour.getNpcId())
+			if (npc.getId() != currentRumour.getNpcId() || hasFinishedCurrentRumour)
 			{
 				return null;
 			}
@@ -436,6 +468,17 @@ public class HunterRumoursPlugin extends Plugin
 			loadedDetachedRumour = Rumour.NONE;
 		}
 		currentDetachedRumour = loadedDetachedRumour;
+
+		// Load has finished current rumour
+		try
+		{
+			hasFinishedCurrentRumour = configManager.getRSProfileConfiguration(HunterRumoursConfig.GROUP, "has.finished.rumour", boolean.class);
+		}
+		catch (NullPointerException ex)
+		{
+			// Catch null pointer execption and set to false so it doesn't happen again
+			setHunterRumourState(false);
+		}
 
 		// Reset overlay
 		npcOverlayService.rebuild();

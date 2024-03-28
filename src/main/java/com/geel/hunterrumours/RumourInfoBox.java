@@ -9,33 +9,52 @@ import net.runelite.client.ui.overlay.infobox.InfoBox;
 import javax.annotation.Nonnull;
 import java.awt.*;
 
-public class RumourInfoBox extends InfoBox {
-    public RumourInfoBox(Rumour rumour, @Nonnull Plugin plugin, @Nonnull ItemManager itemManager) {
-        super(itemManager.getImage(rumour.getItemId()), plugin);
+public class RumourInfoBox extends InfoBox
+{
+	private HunterRumoursPlugin plugin;
+
+	public RumourInfoBox(Rumour rumour, @Nonnull HunterRumoursPlugin plugin, @Nonnull ItemManager itemManager)
+	{
+		super(itemManager.getImage(rumour.getItemId()), plugin);
+
+		this.plugin = plugin;
 
 		Map<String, List<RumourLocation>> locations = RumourLocation.getGroupedLocationsForRumour(rumour);
 
 		StringBuilder sb = new StringBuilder();
 
-		locations.keySet().forEach(location ->  {
-			sb.append("</br>" + location + " (" + locations.get(location).size() +" spawns)");
+		locations.keySet().forEach(location -> {
+			sb.append("</br>" + location + " (" + locations.get(location).size() + " spawns)");
 		});
 
+		String hasFinishedRumourText = plugin.hasFinishedCurrentRumour() ? "Yes" : "No";
+
 		this.setTooltip(
-                "Rumour: " + rumour.getFullName() +
-                "</br>Item: " + itemManager.getItemComposition(rumour.getItemId()).getName() +
+			"Rumour: " + rumour.getFullName() +
+				"</br>Finished: " + hasFinishedRumourText +
+				"</br>Item: " + itemManager.getItemComposition(rumour.getItemId()).getName() +
 				"</br>Locations:" + sb
 
-        );
-    }
+		);
+	}
 
-    @Override
-    public String getText() {
-        return "Rumour";
-    }
+	@Override
+	public String getText()
+	{
+		return "Rumour";
+	}
 
-    @Override
-    public Color getTextColor() {
-        return Color.WHITE;
-    }
+	@Override
+	public Color getTextColor()
+	{
+		if (plugin.hasFinishedCurrentRumour())
+		{
+			return Color.GREEN;
+		}
+		else
+		{
+			return Color.WHITE;
+		}
+	}
+
 }
