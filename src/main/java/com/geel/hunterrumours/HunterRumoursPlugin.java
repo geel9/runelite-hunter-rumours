@@ -6,6 +6,7 @@ import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.*;
 import net.runelite.api.coords.WorldPoint;
 import net.runelite.api.events.*;
+import net.runelite.client.callback.ClientThread;
 import net.runelite.client.config.ConfigManager;
 import net.runelite.client.eventbus.Subscribe;
 import net.runelite.client.events.ConfigChanged;
@@ -70,6 +71,9 @@ public class HunterRumoursPlugin extends Plugin
 	private Client client;
 
 	@Inject
+	private ClientThread clientThread;
+
+	@Inject
 	private WorldMapPointManager worldMapPointManager;
 
 	private BufferedImage mapArrow;
@@ -86,7 +90,7 @@ public class HunterRumoursPlugin extends Plugin
 	{
 		overlayManager.add(overlay);
 		npcOverlayService.registerHighlighter(this::highlighterFn);
-		loadFromConfig();
+		clientThread.invoke(this::loadFromConfig);
 	}
 
 	@Override
@@ -94,7 +98,7 @@ public class HunterRumoursPlugin extends Plugin
 	{
 		overlayManager.remove(overlay);
 		npcOverlayService.unregisterHighlighter(this::highlighterFn);
-		resetParams();
+		clientThread.invoke(this::resetParams);
 	}
 
 	@Subscribe
@@ -102,7 +106,7 @@ public class HunterRumoursPlugin extends Plugin
 	{
 		if (gameStateChanged.getGameState() == GameState.LOGGED_IN)
 		{
-			loadFromConfig();
+			clientThread.invoke(this::loadFromConfig);
 		}
 	}
 
@@ -114,10 +118,8 @@ public class HunterRumoursPlugin extends Plugin
 			return;
 		}
 
-		loadFromConfig();
-		handleInfoBox();
-		handleWorldMap();
-		npcOverlayService.rebuild();
+		clientThread.invoke(this::loadFromConfig);
+		clientThread.invoke(npcOverlayService::rebuild);
 	}
 
 	@Subscribe
@@ -304,16 +306,16 @@ public class HunterRumoursPlugin extends Plugin
 
 	private void handleWorldMap()
 	{
-		if (!config.showWorldMapLocations())
-		{
-			return;
-		}
-
 		for (HunterRumourWorldMapPoint location : currentMapPoints)
 		{
 			worldMapPointManager.remove(location);
 		}
 		currentMapPoints.clear();
+
+		if (!config.showWorldMapLocations())
+		{
+			return;
+		}
 
 		var rumour = getCurrentRumour();
 		if (rumour == Rumour.NONE)
@@ -523,5 +525,8 @@ public class HunterRumoursPlugin extends Plugin
 		}
 
 		currentHunter = Hunter.NONE;
+		currentDetachedRumour = Rumour.NONE;
+		handleInfoBox();
+		handleWorldMap();
 	}
 }
