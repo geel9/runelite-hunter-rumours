@@ -312,7 +312,6 @@ public class HunterRumoursPlugin extends Plugin
 	}
 
 	private RumourInfoBox infoBox = null;
-
 	private void handleInfoBox()
 	{
 		if (infoBox != null)
@@ -359,7 +358,7 @@ public class HunterRumoursPlugin extends Plugin
 		for (RumourLocation location :
 			locations)
 		{
-			HunterRumourWorldMapPoint worldMapPoint = new HunterRumourWorldMapPoint(location.getWorldPoint(), this, location);
+			HunterRumourWorldMapPoint worldMapPoint = new HunterRumourWorldMapPoint(location.getWorldPoint(), itemManager, location);
 			currentMapPoints.add(worldMapPoint);
 			worldMapPointManager.add(worldMapPoint);
 		}
@@ -420,22 +419,6 @@ public class HunterRumoursPlugin extends Plugin
 		}
 
 		return null;
-	}
-
-	BufferedImage getMapArrow()
-	{
-		if (mapArrow != null)
-		{
-			return mapArrow;
-		}
-
-		mapArrow = ImageUtil.loadImageResource(getClass(), "/util/hunter_rumour_arrow.png");
-		return mapArrow;
-	}
-
-	public BufferedImage getHunterRumourImage()
-	{
-		return itemManager.getImage(getCurrentRumour().getItemId());
 	}
 
 	private void loadFromConfig()
