@@ -266,7 +266,7 @@ public class HunterRumoursPlugin extends Plugin
 
 	private void setHunterRumourState(boolean hasFinishedCurrentRumour)
 	{
-		configManager.setRSProfileConfiguration(HunterRumoursConfig.GROUP, "has.finished.rumour", hasFinishedCurrentRumour);
+		configManager.setRSProfileConfiguration(HunterRumoursConfig.GROUP, "current.rumour.finished", hasFinishedCurrentRumour);
 		this.hasFinishedCurrentRumour = hasFinishedCurrentRumour;
 	}
 
@@ -455,7 +455,7 @@ public class HunterRumoursPlugin extends Plugin
 		// Load has finished current rumour
 		try
 		{
-			hasFinishedCurrentRumour = configManager.getRSProfileConfiguration(HunterRumoursConfig.GROUP, "has.finished.rumour", boolean.class);
+			hasFinishedCurrentRumour = configManager.getRSProfileConfiguration(HunterRumoursConfig.GROUP, "current.rumour.finished", boolean.class);
 		}
 		catch (NullPointerException ex)
 		{
