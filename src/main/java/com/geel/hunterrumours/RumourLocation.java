@@ -6,6 +6,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import net.runelite.api.coords.WorldPoint;
@@ -383,11 +385,15 @@ public enum RumourLocation
 
 	public static Set<RumourLocation> getLocationsForRumour(Rumour rumour)
 	{
-		return Arrays.stream(RumourLocation.values()).filter(loc -> loc.getRumour() == rumour).collect(Collectors.toSet());
+		return getLocationsStreamForRumour(rumour).collect(Collectors.toSet());
 	}
 
 	public static Map<String, List<RumourLocation>> getGroupedLocationsForRumour(Rumour rumour)
 	{
-		return Arrays.stream(RumourLocation.values()).filter(loc -> loc.getRumour() == rumour).collect(Collectors.groupingBy(x-> x.getLocationName()));
+		return getLocationsStreamForRumour(rumour).collect(Collectors.groupingBy(RumourLocation::getLocationName));
+	}
+
+	private static Stream<RumourLocation> getLocationsStreamForRumour(Rumour rumour) {
+		return Arrays.stream(RumourLocation.values()).filter(loc -> loc.getRumour() == rumour);
 	}
 }
