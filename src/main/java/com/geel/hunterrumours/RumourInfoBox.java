@@ -3,7 +3,6 @@ package com.geel.hunterrumours;
 import java.util.List;
 import java.util.Map;
 import net.runelite.client.game.ItemManager;
-import net.runelite.client.plugins.Plugin;
 import net.runelite.client.ui.overlay.infobox.InfoBox;
 
 import javax.annotation.Nonnull;
@@ -27,7 +26,7 @@ public class RumourInfoBox extends InfoBox
 			sb.append("</br>" + location + " (" + locations.get(location).size() + " spawns)");
 		});
 
-		String hasFinishedRumourText = plugin.hasFinishedCurrentRumour() ? "Yes" : "No";
+		String hasFinishedRumourText = plugin.getHunterRumourState() ? "Yes" : "No";
 
 		this.setTooltip(
 			"Rumour: " + rumour.getFullName() +
@@ -47,7 +46,7 @@ public class RumourInfoBox extends InfoBox
 	@Override
 	public Color getTextColor()
 	{
-		if (plugin.hasFinishedCurrentRumour())
+		if (plugin.getHunterRumourState())
 		{
 			return Color.GREEN;
 		}

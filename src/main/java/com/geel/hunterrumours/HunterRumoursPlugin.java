@@ -1,7 +1,6 @@
 package com.geel.hunterrumours;
 
 import com.google.inject.Provides;
-import java.awt.image.BufferedImage;
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.*;
 import net.runelite.api.coords.WorldPoint;
@@ -19,7 +18,6 @@ import net.runelite.client.ui.overlay.OverlayManager;
 import net.runelite.client.ui.overlay.infobox.InfoBoxManager;
 import net.runelite.client.ui.overlay.worldmap.WorldMapPointManager;
 import net.runelite.client.util.ColorUtil;
-import net.runelite.client.util.ImageUtil;
 
 import javax.inject.Inject;
 import java.awt.*;
@@ -46,6 +44,8 @@ public class HunterRumoursPlugin extends Plugin
 
 	public Hunter currentHunter = Hunter.NONE;
 	public Rumour currentDetachedRumour = Rumour.NONE;
+	private boolean currentRumourFinished = false;
+	private final Set<HunterRumourWorldMapPoint> currentMapPoints = new HashSet<>();
 
 	@Inject
 	private HunterRumoursConfig config;
@@ -79,10 +79,6 @@ public class HunterRumoursPlugin extends Plugin
 
 	@Inject
 	private WorldMapPointManager worldMapPointManager;
-
-	private BufferedImage mapArrow;
-	private final Set<HunterRumourWorldMapPoint> currentMapPoints = new HashSet<>();
-	private boolean hasFinishedCurrentRumour = false;
 
 	@Provides
 	HunterRumoursConfig provideConfig(ConfigManager configManager)
@@ -135,67 +131,201 @@ public class HunterRumoursPlugin extends Plugin
 		handleRumourFinishedChatMessage(event);
 	}
 
-	private void handleRumourFinishedChatMessage(ChatMessage event)
+	/**
+	 * Sets whether the user has completed their current rumour
+	 */
+	public void setHunterRumourState(boolean hasFinishedCurrentRumour)
 	{
-		String message = event.getMessage();
+		configManager.setRSProfileConfiguration(HunterRumoursConfig.GROUP, "current.rumour.finished", hasFinishedCurrentRumour);
+		this.currentRumourFinished = hasFinishedCurrentRumour;
+	}
 
-		if (event.getType() != ChatMessageType.GAMEMESSAGE)
-		{
-			return;
-		}
+	/**
+	 * Gets whether the user has completed their current rumour
+	 */
+	public boolean getHunterRumourState()
+	{
+		return this.currentRumourFinished;
+	}
 
-		if (Text.standardize(message).equalsIgnoreCase("You find a rare piece of the creature! You should take it back to the Hunter Guild."))
+	/**
+	 * Sets the Hunter whose Rumour the user is currently assigned
+	 */
+	public void setCurrentHunter(Hunter hunter)
+	{
+		configManager.setRSProfileConfiguration(HunterRumoursConfig.GROUP, "current.hunter", hunter);
+		currentHunter = hunter;
+	}
+
+	/**
+	 * Sets the current Rumour for the given Hunter, even if they're not the user's current Hunter
+	 */
+	public void setHunterRumour(Hunter hunter, Rumour rumour)
+	{
+		hunterRumours.put(hunter, rumour);
+		configManager.setRSProfileConfiguration(HunterRumoursConfig.GROUP, "hunter." + hunter.getNpcId(), rumour);
+	}
+
+	/**
+	 * Sets the user's current "detached rumour".
+	 *
+	 * A detached rumour is one that we know of from the Quetzal Whistle's "Rumour" functionality,
+	 * but we do not know which Hunter assigned it, since the game message does not include this information.
+	 */
+	public void setDetachedRumour(Rumour rumour)
+	{
+		currentDetachedRumour = rumour;
+		configManager.setRSProfileConfiguration(HunterRumoursConfig.GROUP, "current.detached.rumour", rumour);
+	}
+
+	/**
+	 * @return An array of the hunters that the user has enabled via plugin config.
+	 */
+	public Hunter[] getEnabledHunters()
+	{
+		return Arrays.stream(Hunter.allValues()).filter(this::isHunterEnabled).toArray(Hunter[]::new);
+	}
+
+	/**
+	 * @return True if the user has enabled the given hunter's Tier to be tracked/displayed via plugin config.
+	 */
+	public boolean isHunterEnabled(Hunter hunter)
+	{
+		switch (hunter.getTier())
 		{
-			setHunterRumourState(true);
-			handleInfoBox();
+			case MASTER:
+				return config.includeMasterHunters();
+			case EXPERT:
+				return config.includeExpertHunters();
+			case ADEPT:
+				return config.includeAdeptHunters();
+			case NOVICE:
+				return config.includeNoviceHunters();
+			case NONE:
+			default:
+				return false;
 		}
 	}
 
-	private void handleQuetzalWhistleChatMessage(ChatMessage event)
+	/**
+	 * @return The Rumour that (we think) the player is currently assigned.
+	 */
+	public Rumour getCurrentRumour()
+	{
+		// If there's no current Hunter, defer to the detached Rumour (if present).
+		if (currentHunter == Hunter.NONE)
+		{
+			return currentDetachedRumour == null ? Rumour.NONE : currentDetachedRumour;
+		}
+
+		// Otherwise, if we know the current Hunter, always use it.
+		return hunterRumours.get(currentHunter);
+	}
+
+	/**
+	 * @return True if the player is currently located within the Hunter Burrows
+	 */
+	public boolean isInBurrows()
+	{
+		Player local = client.getLocalPlayer();
+		if (local == null)
+		{
+			return false;
+		}
+
+		WorldPoint location = local.getWorldLocation();
+		if (location.getPlane() != 0)
+		{
+			return false;
+		}
+
+		int x = location.getX();
+		int y = location.getY();
+
+		return x >= 1549 && x <= 1565 && y >= 9449 && y <= 9464;
+	}
+
+	/**
+	 * Handles a chat message indicating that the current Rumour has been completed.
+	 *
+	 * Ignores any chat messages that are not relevant.
+	 */
+	private void handleRumourFinishedChatMessage(ChatMessage event)
 	{
 		String message = event.getMessage();
-
 		if (event.getType() != ChatMessageType.GAMEMESSAGE)
 		{
 			return;
 		}
 
+		// Ensure that this is the right chat message
+		if (!Text.standardize(message).equalsIgnoreCase("You find a rare piece of the creature! You should take it back to the Hunter Guild.")) {
+			return;
+		}
+
+		setHunterRumourState(true);
+		handleInfoBox();
+	}
+
+	/**
+	 * Handles the chat message that occurs when the player clicks "Rumour" on their Quetzal Whistle.
+	 *
+	 * Attempts to extract the current Rumour from the message.
+	 *
+	 * Ignores any chat messages that are not relevant.
+	 */
+	private void handleQuetzalWhistleChatMessage(ChatMessage event)
+	{
+		String message = event.getMessage();
+		if (event.getType() != ChatMessageType.GAMEMESSAGE)
+		{
+			return;
+		}
+
+		// Ensure that this is the right chat message
 		if (!message.contains("Your current rumour target is"))
 		{
 			return;
 		}
 
+		// Determine which Rumour the message is referencing -- if none, bail out.
 		Rumour referencedRumour = chatParser.getReferencedRumour(message);
 		if (referencedRumour == Rumour.NONE)
 		{
 			return;
 		}
 
-		if (referencedRumour != getCurrentRumour())
-		{
-			setDetachedRumour(referencedRumour);
-		}
-
-		// If we have a current hunter, and the current rumour disagrees with that hunter's rumour,
-		// then we know that something is wrong -- reset the current hunter, and reset the rumour of the "current hunter"
-		if (currentHunter == Hunter.NONE)
+		// If the referenced Rumour is what we already thought the Rumour was, then return early.
+		if (referencedRumour == getCurrentRumour())
 		{
 			return;
 		}
 
-		Rumour currentRumour = hunterRumours.get(currentHunter);
-		if (currentRumour == referencedRumour)
+		// The referenced rumour is not what we thought the current Rumour was. This means that we have a state
+		// mismatch. We know the current Rumour now, but not the right Hunter. Therefore, we need to
+		// save the current Rumour as "detached", and clear some state relating to the current Hunter.
+		setDetachedRumour(referencedRumour);
+
+		// If we have a notion of a current Hunter, clean that up, because we were probably wrong.
+		if (currentHunter != Hunter.NONE)
 		{
-			// Current rumour matches the whistle rumour -- everything's fine
-			return;
+			setHunterRumour(currentHunter, Rumour.NONE);
+			setCurrentHunter(Hunter.NONE);
+			setHunterRumourState(false);
 		}
 
-		// Current rumour DOES NOT match the whistle rumour -- reset things
-		hunterRumours.put(currentHunter, Rumour.NONE);
-		currentHunter = Hunter.NONE;
-		setHunterRumourState(false);
+		npcOverlayService.rebuild();
+		handleInfoBox();
+		handleWorldMap();
 	}
 
+	/**
+	 * Handles a chat message from a Hunter relating to Rumours.
+	 *
+	 * Attempts to figure out the state of things (which Hunter we're assigned to; which Rumour they've assigned).
+	 *
+	 * Ignores any chat messages that are not relevant.
+	 */
 	private void handleBurrowsHunterDialog(ChatMessage event)
 	{
 		String dialogMessage = event.getMessage();
@@ -219,6 +349,7 @@ public class HunterRumoursPlugin extends Plugin
 			return;
 		}
 
+		// The chat message comes in prefixed with the NPC name and "|" -- strip that out
 		String npcNamePrefix = client.getNpcDefinition(hunter.getNpcId()).getName() + "|";
 		String actualMessage = dialogMessage.replace(npcNamePrefix, "").toLowerCase(Locale.ROOT);
 
@@ -262,59 +393,11 @@ public class HunterRumoursPlugin extends Plugin
 		handleWorldMap();
 	}
 
-	public Hunter[] getEnabledHunters()
-	{
-		return Arrays.stream(Hunter.allValues()).filter(this::isHunterEnabled).toArray(Hunter[]::new);
-	}
-
-	private void setHunterRumourState(boolean hasFinishedCurrentRumour)
-	{
-		configManager.setRSProfileConfiguration(HunterRumoursConfig.GROUP, "current.rumour.finished", hasFinishedCurrentRumour);
-		this.hasFinishedCurrentRumour = hasFinishedCurrentRumour;
-	}
-
-	public void setCurrentHunter(Hunter hunter)
-	{
-		configManager.setRSProfileConfiguration(HunterRumoursConfig.GROUP, "current.hunter", hunter);
-		currentHunter = hunter;
-	}
-
-	public void setHunterRumour(Hunter hunter, Rumour rumour)
-	{
-		hunterRumours.put(hunter, rumour);
-		configManager.setRSProfileConfiguration(HunterRumoursConfig.GROUP, "hunter." + hunter.getNpcId(), rumour);
-	}
-
-	public void setDetachedRumour(Rumour rumour)
-	{
-		currentDetachedRumour = rumour;
-		configManager.setRSProfileConfiguration(HunterRumoursConfig.GROUP, "current.detached.rumour", rumour);
-	}
-
-	public boolean isHunterEnabled(Hunter hunter)
-	{
-		switch (hunter.getTier())
-		{
-			case MASTER:
-				return config.includeMasterHunters();
-			case EXPERT:
-				return config.includeExpertHunters();
-			case ADEPT:
-				return config.includeAdeptHunters();
-			case NOVICE:
-				return config.includeNoviceHunters();
-			case NONE:
-			default:
-				return false;
-		}
-	}
-
-	public boolean hasFinishedCurrentRumour()
-	{
-		return this.hasFinishedCurrentRumour;
-	}
-
 	private RumourInfoBox infoBox = null;
+
+	/**
+	 * Manages the InfoBox for the current Rumour -- adds/removes as necessary
+	 */
 	private void handleInfoBox()
 	{
 		if (infoBox != null)
@@ -338,6 +421,9 @@ public class HunterRumoursPlugin extends Plugin
 		infoBoxManager.addInfoBox(infoBox);
 	}
 
+	/**
+	 * Manages the World Map Locations -- adds/removes world map points as necessary
+	 */
 	private void handleWorldMap()
 	{
 		for (HunterRumourWorldMapPoint location : currentMapPoints)
@@ -367,10 +453,16 @@ public class HunterRumoursPlugin extends Plugin
 		}
 	}
 
+	/**
+	 * Callback registered with npcOverlayService -- determines if an NPC should be highlighted, and if so, how.
+	 *
+	 * Used to highlight Hunters and the current Hunter Target.
+	 */
 	private HighlightedNpc highlighterFn(NPC npc)
 	{
 		Hunter hunter = Hunter.fromNpcId(npc.getId());
 
+		// Highlight the current Hunter if relevant
 		if (hunter != Hunter.NONE && isHunterEnabled(hunter))
 		{
 			Rumour hunterRumour = hunterRumours.get(hunter);
@@ -405,10 +497,11 @@ public class HunterRumoursPlugin extends Plugin
 				.build();
 		}
 
+		// Highlight Rumour Target (hunter creature) if relevant
 		if (config.highlightHunterNPCs())
 		{
 			Rumour currentRumour = getCurrentRumour();
-			if (npc.getId() != currentRumour.getNpcId() || hasFinishedCurrentRumour)
+			if (npc.getId() != currentRumour.getNpcId() || currentRumourFinished)
 			{
 				return null;
 			}
@@ -424,6 +517,9 @@ public class HunterRumoursPlugin extends Plugin
 		return null;
 	}
 
+	/**
+	 * Loads all state (current hunter, rumours, etc.) from config
+	 */
 	private void loadFromConfig()
 	{
 		// Load current hunter
@@ -458,7 +554,7 @@ public class HunterRumoursPlugin extends Plugin
 		// Load has finished current rumour
 		try
 		{
-			hasFinishedCurrentRumour = configManager.getRSProfileConfiguration(HunterRumoursConfig.GROUP, "current.rumour.finished", boolean.class);
+			currentRumourFinished = configManager.getRSProfileConfiguration(HunterRumoursConfig.GROUP, "current.rumour.finished", boolean.class);
 		}
 		catch (NullPointerException ex)
 		{
@@ -472,36 +568,9 @@ public class HunterRumoursPlugin extends Plugin
 		handleWorldMap();
 	}
 
-	public boolean isInBurrows()
-	{
-		Player local = client.getLocalPlayer();
-		if (local == null)
-		{
-			return false;
-		}
-
-		WorldPoint location = local.getWorldLocation();
-		if (location.getPlane() != 0)
-		{
-			return false;
-		}
-
-		int x = location.getX();
-		int y = location.getY();
-
-		return x >= 1549 && x <= 1565 && y >= 9449 && y <= 9464;
-	}
-
-	public Rumour getCurrentRumour()
-	{
-		if (currentHunter == Hunter.NONE)
-		{
-			return currentDetachedRumour == null ? Rumour.NONE : currentDetachedRumour;
-		}
-
-		return hunterRumours.get(currentHunter);
-	}
-
+	/**
+	 * Resets internal game state. Doesn't touch persistent config.
+	 */
 	private void resetParams()
 	{
 		for (var hunter : hunterRumours.keySet())
