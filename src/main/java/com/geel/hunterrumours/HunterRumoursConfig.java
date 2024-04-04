@@ -122,8 +122,18 @@ public interface HunterRumoursConfig extends Config {
         return true;
     }
 
+	@ConfigItem(
+		position = 6,
+		keyName = "showWorldMapLocations",
+		name = "Show World Map Locations",
+		description = "Whether the locations of your current rumour should show up on your world map"
+	)
+	default boolean showWorldMapLocations() {
+		return true;
+	}
+
     @ConfigItem(
-            position = 6,
+            position = 7,
             keyName = "hunterNPCHighlightColor",
             name = "Hunter NPC Highlight Color",
             description = "Highlight color for Hunter targets"
@@ -133,7 +143,7 @@ public interface HunterRumoursConfig extends Config {
     }
 
     @ConfigItem(
-            position = 7,
+            position = 8,
             keyName = "currentHunterHighlightColor",
             name = "Current hunter highlight color",
             description = "Highlight color for hunter who assigned your current rumour"
@@ -143,7 +153,7 @@ public interface HunterRumoursConfig extends Config {
     }
 
     @ConfigItem(
-            position = 8,
+            position = 9,
             keyName = "knownHunterHighlightColor",
             name = "Known hunter highlight color",
             description = "Highlight color for hunters whose rumours are known"
@@ -153,7 +163,7 @@ public interface HunterRumoursConfig extends Config {
     }
 
     @ConfigItem(
-            position = 9,
+            position = 10,
             keyName = "unknownHunterHighlightColor",
             name = "Unknown hunter highlight color",
             description = "Highlight color for hunters whose rumours are not known"
