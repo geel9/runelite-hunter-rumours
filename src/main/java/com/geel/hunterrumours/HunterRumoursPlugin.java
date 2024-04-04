@@ -75,6 +75,9 @@ public class HunterRumoursPlugin extends Plugin
 	private ClientThread clientThread;
 
 	@Inject
+	private ChatParser chatParser;
+
+	@Inject
 	private WorldMapPointManager worldMapPointManager;
 
 	private BufferedImage mapArrow;
@@ -162,7 +165,7 @@ public class HunterRumoursPlugin extends Plugin
 			return;
 		}
 
-		Rumour referencedRumour = getReferencedRumour(message);
+		Rumour referencedRumour = chatParser.getReferencedRumour(message);
 		if (referencedRumour == Rumour.NONE)
 		{
 			return;
@@ -210,7 +213,7 @@ public class HunterRumoursPlugin extends Plugin
 		}
 
 		// Figure out which Hunter we're speaking to -- assuming we are
-		Hunter hunter = getSpeakingHunter(dialogMessage);
+		Hunter hunter = chatParser.getSpeakingHunter(dialogMessage);
 		if (hunter == Hunter.NONE)
 		{
 			return;
@@ -220,8 +223,8 @@ public class HunterRumoursPlugin extends Plugin
 		String actualMessage = dialogMessage.replace(npcNamePrefix, "").toLowerCase(Locale.ROOT);
 
 		// Determine what hunter and rumour are being talked about in this message
-		Hunter dialogHunter = getReferencedHunter(actualMessage);
-		Rumour dialogRumour = getReferencedRumour(actualMessage);
+		Hunter dialogHunter = chatParser.getReferencedHunter(actualMessage);
+		Rumour dialogRumour = chatParser.getReferencedRumour(actualMessage);
 
 		boolean hasHunter = dialogHunter != Hunter.NONE;
 		boolean hasRumour = dialogRumour != Rumour.NONE;
@@ -497,50 +500,6 @@ public class HunterRumoursPlugin extends Plugin
 		}
 
 		return hunterRumours.get(currentHunter);
-	}
-
-	private Hunter getSpeakingHunter(String message)
-	{
-		for (Hunter hunter : Hunter.allValues())
-		{
-			NPCComposition npc = client.getNpcDefinition(hunter.getNpcId());
-			if (message.startsWith(npc.getName() + "|"))
-			{
-				return hunter;
-			}
-		}
-
-		return Hunter.NONE;
-	}
-
-	private Hunter getReferencedHunter(String message)
-	{
-		for (var hunterName : Hunter.allCommonNames())
-		{
-			if (!message.contains(hunterName.toLowerCase()))
-			{
-				continue;
-			}
-
-			return Hunter.fromCommonName(hunterName);
-		}
-
-		return Hunter.NONE;
-	}
-
-	private Rumour getReferencedRumour(String message)
-	{
-		for (var rumour : Rumour.allValues())
-		{
-			if (!message.contains(rumour.getName().toLowerCase()))
-			{
-				continue;
-			}
-
-			return rumour;
-		}
-
-		return Rumour.NONE;
 	}
 
 	private void resetParams()
