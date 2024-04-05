@@ -40,7 +40,14 @@ public class RumourInfoBox extends InfoBox
 	@Override
 	public String getText()
 	{
-		return "Rumour";
+		if(plugin.getHunterRumourState())
+		{
+			return "Done";
+		}
+		else
+		{
+			return "Rumour";
+		}
 	}
 
 	@Override
