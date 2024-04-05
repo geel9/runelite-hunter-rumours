@@ -155,7 +155,7 @@ public class RumourItemHandler
 				&& currentRumour.getItemId() == groundItem.getItemId()
 				&& config.lootbeams())
 			{
-				addLootbeam(worldPoint, Color.GREEN);
+				addLootbeam(worldPoint, config.lootbeamColor());
 				return;
 			}
 		}

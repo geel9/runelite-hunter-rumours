@@ -203,10 +203,11 @@ public interface HunterRumoursConfig extends Config
 	}
 
 	@ConfigItem(
-		position = 7,
+		position = 8,
 		keyName = "inventoryTag",
 		name = "Rumour Item Inventory Tag",
-		description = "Highlights the rumour items in your inventory"
+		description = "Highlights the rumour items in your inventory",
+		section = highlightSection
 	)
 	default boolean inventoryTags()
 	{
@@ -214,13 +215,38 @@ public interface HunterRumoursConfig extends Config
 	}
 
 	@ConfigItem(
-		position = 8,
+		position = 9,
+		keyName = "inventoryTagColor",
+		name = "Inventory Tag Color",
+		description = "Highlight color for Rumour items in your inventory",
+		section = highlightSection
+	)
+	default Color inventoryTagColor()
+	{
+		return Color.GREEN;
+	}
+
+	@ConfigItem(
+		position = 10,
 		keyName = "lootbeams",
 		name = "Rumour Item Lootbeams",
-		description = "Shows a lootbeam whenever your current rumour item is dropped on the ground"
+		description = "Shows a lootbeam whenever your current rumour item is dropped on the ground",
+		section = highlightSection
 	)
 	default boolean lootbeams()
 	{
 		return true;
+	}
+
+	@ConfigItem(
+		position = 11,
+		keyName = "lootbeamColor",
+		name = "Lootbeam Color",
+		description = "Lootbeam color for Rumour items",
+		section = highlightSection
+	)
+	default Color lootbeamColor()
+	{
+		return Color.GREEN;
 	}
 }

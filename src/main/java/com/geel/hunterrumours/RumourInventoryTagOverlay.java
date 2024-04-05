@@ -35,7 +35,7 @@ public class RumourInventoryTagOverlay extends WidgetItemOverlay
 		Rectangle bounds = widgetItem.getCanvasBounds();
 		if (config.inventoryTags() && itemId == currentRumour.getItemId())
 		{
-			final BufferedImage outline = itemManager.getItemOutline(itemId, widgetItem.getQuantity(), Color.green);
+			final BufferedImage outline = itemManager.getItemOutline(itemId, widgetItem.getQuantity(), config.inventoryTagColor());
 			graphics.drawImage(outline, (int) bounds.getX(), (int) bounds.getY(), null);
 		}
 	}
