@@ -54,6 +54,16 @@ public interface HunterRumoursConfig extends Config {
         return true;
     }
 
+	@ConfigItem(
+		position = 3,
+		keyName = "compactWorldMap",
+		name = "Compact World Map Locations",
+		description = "Only show 1 icon per location on the World Map"
+	)
+	default boolean compactWorldMap() {
+		return false;
+	}
+
     @ConfigItem(
             position = 0,
             keyName = "includeMasterHunters",

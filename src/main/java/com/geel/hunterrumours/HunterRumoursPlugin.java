@@ -1,6 +1,7 @@
 package com.geel.hunterrumours;
 
 import com.google.inject.Provides;
+import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.*;
 import net.runelite.api.coords.WorldPoint;
@@ -168,7 +169,7 @@ public class HunterRumoursPlugin extends Plugin
 
 	/**
 	 * Sets the user's current "detached rumour".
-	 *
+	 * <p>
 	 * A detached rumour is one that we know of from the Quetzal Whistle's "Rumour" functionality,
 	 * but we do not know which Hunter assigned it, since the game message does not include this information.
 	 */
@@ -247,7 +248,7 @@ public class HunterRumoursPlugin extends Plugin
 
 	/**
 	 * Handles a chat message indicating that the current Rumour has been completed.
-	 *
+	 * <p>
 	 * Ignores any chat messages that are not relevant.
 	 */
 	private void handleRumourFinishedChatMessage(ChatMessage event)
@@ -259,7 +260,8 @@ public class HunterRumoursPlugin extends Plugin
 		}
 
 		// Ensure that this is the right chat message
-		if (!Text.standardize(message).equalsIgnoreCase("You find a rare piece of the creature! You should take it back to the Hunter Guild.")) {
+		if (!Text.standardize(message).equalsIgnoreCase("You find a rare piece of the creature! You should take it back to the Hunter Guild."))
+		{
 			return;
 		}
 
@@ -269,9 +271,9 @@ public class HunterRumoursPlugin extends Plugin
 
 	/**
 	 * Handles the chat message that occurs when the player clicks "Rumour" on their Quetzal Whistle.
-	 *
+	 * <p>
 	 * Attempts to extract the current Rumour from the message.
-	 *
+	 * <p>
 	 * Ignores any chat messages that are not relevant.
 	 */
 	private void handleQuetzalWhistleChatMessage(ChatMessage event)
@@ -321,9 +323,9 @@ public class HunterRumoursPlugin extends Plugin
 
 	/**
 	 * Handles a chat message from a Hunter relating to Rumours.
-	 *
+	 * <p>
 	 * Attempts to figure out the state of things (which Hunter we're assigned to; which Rumour they've assigned).
-	 *
+	 * <p>
 	 * Ignores any chat messages that are not relevant.
 	 */
 	private void handleBurrowsHunterDialog(ChatMessage event)
@@ -443,19 +445,33 @@ public class HunterRumoursPlugin extends Plugin
 			return;
 		}
 
-		Set<RumourLocation> locations = RumourLocation.getLocationsForRumour(rumour);
-		for (RumourLocation location :
-			locations)
+		if (config.compactWorldMap())
 		{
-			HunterRumourWorldMapPoint worldMapPoint = new HunterRumourWorldMapPoint(location.getWorldPoint(), itemManager, location);
-			currentMapPoints.add(worldMapPoint);
-			worldMapPointManager.add(worldMapPoint);
+			Map<String, List<RumourLocation>> locations = RumourLocation.getGroupedLocationsForRumour(rumour);
+			locations.keySet().forEach(locationKey ->
+			{
+				RumourLocation location = locations.get(locationKey).get(0);
+				HunterRumourWorldMapPoint worldMapPoint = new HunterRumourWorldMapPoint(location.getWorldPoint(), itemManager, location);
+				currentMapPoints.add(worldMapPoint);
+				worldMapPointManager.add(worldMapPoint);
+			});
+		}
+		else
+		{
+			Set<RumourLocation> locations = RumourLocation.getLocationsForRumour(rumour);
+			for (RumourLocation location :
+				locations)
+			{
+				HunterRumourWorldMapPoint worldMapPoint = new HunterRumourWorldMapPoint(location.getWorldPoint(), itemManager, location);
+				currentMapPoints.add(worldMapPoint);
+				worldMapPointManager.add(worldMapPoint);
+			}
 		}
 	}
 
 	/**
 	 * Callback registered with npcOverlayService -- determines if an NPC should be highlighted, and if so, how.
-	 *
+	 * <p>
 	 * Used to highlight Hunters and the current Hunter Target.
 	 */
 	private HighlightedNpc highlighterFn(NPC npc)
