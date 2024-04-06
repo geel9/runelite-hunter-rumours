@@ -33,7 +33,14 @@ class HunterRumourWorldMapPoint extends WorldMapPoint
 
 		this.setSnapToEdge(true);
 		this.setJumpOnClick(true);
-		this.setName(location.getRumour().getName() + " (" + location.getLocationName() + ")");
+		if (location.getFairyRingCode().equals(""))
+		{
+			this.setName(location.getRumour().getName() + " (" + location.getLocationName() + ")");
+		}
+		else
+		{
+			this.setName(location.getRumour().getName() + " (" + location.getLocationName() + ", " + location.getFairyRingCode() + ")");
+		}
 		this.setImage(hunterRumourWorldImage);
 		this.setImagePoint(hunterRumourWorldImagePoint);
 	}
@@ -52,8 +59,10 @@ class HunterRumourWorldMapPoint extends WorldMapPoint
 		this.setImagePoint(hunterRumourWorldImagePoint);
 	}
 
-	private static BufferedImage getMapArrow() {
-		if(mapArrow == null) {
+	private static BufferedImage getMapArrow()
+	{
+		if (mapArrow == null)
+		{
 			mapArrow = ImageUtil.loadImageResource(HunterRumoursPlugin.class, "/util/hunter_rumour_arrow.png");
 		}
 

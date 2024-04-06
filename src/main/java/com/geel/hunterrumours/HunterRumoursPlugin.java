@@ -1,6 +1,7 @@
 package com.geel.hunterrumours;
 
 import com.google.inject.Provides;
+import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.*;
 import net.runelite.api.coords.WorldPoint;
@@ -473,14 +474,17 @@ public class HunterRumoursPlugin extends Plugin
 			return;
 		}
 
-		Set<RumourLocation> locations = RumourLocation.getLocationsForRumour(rumour);
-		for (RumourLocation location :
-			locations)
-		{
-			HunterRumourWorldMapPoint worldMapPoint = new HunterRumourWorldMapPoint(location.getWorldPoint(), itemManager, location);
-			currentMapPoints.add(worldMapPoint);
-			worldMapPointManager.add(worldMapPoint);
-		}
+        Set<RumourLocation> locations = config.compactWorldMap()
+                ? RumourLocation.getCollapsedLocationsForRumour(rumour)
+                :  RumourLocation.getLocationsForRumour(rumour);
+
+        for (RumourLocation location :
+            locations)
+        {
+            HunterRumourWorldMapPoint worldMapPoint = new HunterRumourWorldMapPoint(location.getWorldPoint(), itemManager, location);
+            currentMapPoints.add(worldMapPoint);
+            worldMapPointManager.add(worldMapPoint);
+        }
 	}
 
 	/**

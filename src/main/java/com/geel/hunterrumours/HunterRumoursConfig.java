@@ -12,18 +12,18 @@ public interface HunterRumoursConfig extends Config
 {
 	String GROUP = "hunterrumours";
 
-	@ConfigSection(
-		name = "Hunter Tiers",
-		description = "The tiers of hunters that are enabled",
-		position = 3
-	)
-	String tiersSection = "tiersSection";
-	@ConfigSection(
-		name = "Highlights",
-		description = "Highlights for Hunters and Hunter Targets",
-		position = 4
-	)
-	String highlightSection = "highlightSection";
+    @ConfigSection(
+            name = "Hunter Tiers",
+            description = "The tiers of hunters that are enabled",
+            position = 4
+    )
+    String tiersSection = "tiersSection";
+    @ConfigSection(
+            name = "Highlights",
+            description = "Highlights for Hunters and Hunter Targets",
+            position = 5
+    )
+    String highlightSection = "highlightSection";
 
 	@ConfigItem(
 		position = 0,
@@ -59,16 +59,25 @@ public interface HunterRumoursConfig extends Config
 	}
 
 	@ConfigItem(
-		position = 0,
-		keyName = "includeMasterHunters",
-		name = "Include Master Hunters",
-		description = "Include master hunters in highlighting and info reports",
-		section = tiersSection
+		position = 3,
+		keyName = "compactWorldMap",
+		name = "Compact World Map Locations",
+		description = "Only show 1 icon per location on the World Map"
 	)
-	default boolean includeMasterHunters()
-	{
-		return true;
+	default boolean compactWorldMap() {
+		return false;
 	}
+
+    @ConfigItem(
+            position = 0,
+            keyName = "includeMasterHunters",
+            name = "Include Master Hunters",
+            description = "Include master hunters in highlighting and info reports",
+            section = tiersSection
+    )
+    default boolean includeMasterHunters() {
+        return true;
+    }
 
 	@ConfigItem(
 		position = 1,
