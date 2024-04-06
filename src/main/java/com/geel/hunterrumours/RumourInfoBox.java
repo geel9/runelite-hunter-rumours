@@ -23,7 +23,15 @@ public class RumourInfoBox extends InfoBox
 		StringBuilder sb = new StringBuilder();
 
 		locations.keySet().forEach(location -> {
-			sb.append("</br>" + location + " (" + locations.get(location).size() + " spawns)");
+			RumourLocation rumourLocation = locations.get(location).get(0);
+			if (rumourLocation.getFairyRingCode().equals(""))
+			{
+				sb.append("</br>" + location + " (" + locations.get(location).size() + " spawns)");
+			}
+			else
+			{
+				sb.append("</br>" + location + " (" + rumourLocation.getFairyRingCode() + ", " + locations.get(location).size() + " spawnsw)");
+			}
 		});
 
 		String hasFinishedRumourText = plugin.getHunterRumourState() ? "Yes" : "No";
@@ -55,5 +63,4 @@ public class RumourInfoBox extends InfoBox
 			return Color.WHITE;
 		}
 	}
-
 }
