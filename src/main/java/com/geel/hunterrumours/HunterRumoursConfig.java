@@ -14,13 +14,13 @@ public interface HunterRumoursConfig extends Config {
     @ConfigSection(
             name = "Hunter Tiers",
             description = "The tiers of hunters that are enabled",
-            position = 3
+            position = 4
     )
     String tiersSection = "tiersSection";
     @ConfigSection(
             name = "Highlights",
             description = "Highlights for Hunters and Hunter Targets",
-            position = 4
+            position = 5
     )
     String highlightSection = "highlightSection";
 
@@ -53,6 +53,16 @@ public interface HunterRumoursConfig extends Config {
     default boolean showWorldMapLocations() {
         return true;
     }
+
+	@ConfigItem(
+		position = 3,
+		keyName = "compactWorldMap",
+		name = "Compact World Map Locations",
+		description = "Only show 1 icon per location on the World Map"
+	)
+	default boolean compactWorldMap() {
+		return false;
+	}
 
     @ConfigItem(
             position = 0,
