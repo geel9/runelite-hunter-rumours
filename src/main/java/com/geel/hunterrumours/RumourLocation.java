@@ -386,11 +386,28 @@ public enum RumourLocation
 	@Getter
 	private final WorldPoint WorldPoint;
 
+	/**
+	 * Gets all RumourLocations linked to the given Rumour
+	 */
 	public static Set<RumourLocation> getLocationsForRumour(Rumour rumour)
 	{
 		return getLocationsStreamForRumour(rumour).collect(Collectors.toSet());
 	}
 
+	/**
+	 * Gets a Set of RumourLocations linked to the given Rumour -- grouped by LocationName, then collapsed to a single
+	 * entry per unique LocationName.
+	 * @param rumour
+	 * @return
+	 */
+	public static Set<RumourLocation> getCollapsedLocationsForRumour(Rumour rumour) {
+		var groupedLocations = getGroupedLocationsForRumour(rumour);
+		return groupedLocations.keySet().stream().map(l -> groupedLocations.get(l).get(0)).collect(Collectors.toSet());
+	}
+
+	/**
+	 * Gets all RumourLocations linked to the given Rumour, grouped by LocationName
+	 */
 	public static Map<String, List<RumourLocation>> getGroupedLocationsForRumour(Rumour rumour)
 	{
 		return getLocationsStreamForRumour(rumour).collect(Collectors.groupingBy(RumourLocation::getLocationName));

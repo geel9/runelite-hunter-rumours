@@ -271,7 +271,7 @@ public class HunterRumoursPlugin extends Plugin
 
 	/**
 	 * Handles the chat message that occurs when the player clicks "Rumour" on their Quetzal Whistle.
-	 * 
+	 *
 	 * Attempts to extract the current Rumour from the message.
 	 *
 	 * Ignores any chat messages that are not relevant.
@@ -445,28 +445,17 @@ public class HunterRumoursPlugin extends Plugin
 			return;
 		}
 
-		if (config.compactWorldMap())
-		{
-			Map<String, List<RumourLocation>> locations = RumourLocation.getGroupedLocationsForRumour(rumour);
-			locations.keySet().forEach(locationKey ->
-			{
-				RumourLocation location = locations.get(locationKey).get(0);
-				HunterRumourWorldMapPoint worldMapPoint = new HunterRumourWorldMapPoint(location.getWorldPoint(), itemManager, location);
-				currentMapPoints.add(worldMapPoint);
-				worldMapPointManager.add(worldMapPoint);
-			});
-		}
-		else
-		{
-			Set<RumourLocation> locations = RumourLocation.getLocationsForRumour(rumour);
-			for (RumourLocation location :
-				locations)
-			{
-				HunterRumourWorldMapPoint worldMapPoint = new HunterRumourWorldMapPoint(location.getWorldPoint(), itemManager, location);
-				currentMapPoints.add(worldMapPoint);
-				worldMapPointManager.add(worldMapPoint);
-			}
-		}
+        Set<RumourLocation> locations = config.compactWorldMap()
+                ? RumourLocation.getCollapsedLocationsForRumour(rumour)
+                :  RumourLocation.getLocationsForRumour(rumour);
+
+        for (RumourLocation location :
+            locations)
+        {
+            HunterRumourWorldMapPoint worldMapPoint = new HunterRumourWorldMapPoint(location.getWorldPoint(), itemManager, location);
+            currentMapPoints.add(worldMapPoint);
+            worldMapPointManager.add(worldMapPoint);
+        }
 	}
 
 	/**
