@@ -22,16 +22,16 @@ public class RumourInfoBox extends InfoBox
 
 		StringBuilder sb = new StringBuilder();
 
-		locations.keySet().forEach(location -> {
-			RumourLocation rumourLocation = locations.get(location).get(0);
-			if (rumourLocation.getFairyRingCode().equals(""))
+		locations.keySet().forEach(locationName -> {
+			var keyedLocations = locations.get(locationName);
+			RumourLocation rumourLocation = keyedLocations.get(0);
+
+			sb.append("</br>").append(locationName).append(" (");
+			if (!rumourLocation.getFairyRingCode().equals(""))
 			{
-				sb.append("</br>" + location + " (" + locations.get(location).size() + " spawns)");
+				sb.append(rumourLocation.getFairyRingCode()).append(", ");
 			}
-			else
-			{
-				sb.append("</br>" + location + " (" + rumourLocation.getFairyRingCode() + ", " + locations.get(location).size() + " spawnsw)");
-			}
+			sb.append(keyedLocations.size()).append(" spawns)");
 		});
 
 		String hasFinishedRumourText = plugin.getHunterRumourState() ? "Yes" : "No";
