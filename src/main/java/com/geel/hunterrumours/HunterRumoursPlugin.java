@@ -99,6 +99,10 @@ public class HunterRumoursPlugin extends Plugin
 	protected void shutDown() throws Exception
 	{
 		overlayManager.remove(overlay);
+		if (infoBox != null)
+		{
+			infoBoxManager.removeInfoBox(infoBox);
+		}
 		npcOverlayService.unregisterHighlighter(this::highlighterFn);
 		clientThread.invoke(this::resetParams);
 	}
