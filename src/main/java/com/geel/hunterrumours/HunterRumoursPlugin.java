@@ -510,7 +510,7 @@ public class HunterRumoursPlugin extends Plugin
 		if (config.highlightHunterNPCs())
 		{
 			Rumour currentRumour = getCurrentRumour();
-			if (npc.getId() != currentRumour.getNpcId() || currentRumourFinished)
+			if (currentRumour == Rumour.NONE || currentRumourFinished || npc.getId() != currentRumour.getNpcId())
 			{
 				return null;
 			}
