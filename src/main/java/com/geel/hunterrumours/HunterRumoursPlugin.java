@@ -108,6 +108,7 @@ public class HunterRumoursPlugin extends Plugin
 	{
 		overlayManager.remove(overlay);
 		overlayManager.remove(inventoryTagOverlay);
+		infoBoxManager.removeInfoBox(infoBox);
 		npcOverlayService.unregisterHighlighter(this::highlighterFn);
 		clientThread.invoke(this::resetParams);
 		rumourItemHandler.shutDown();
@@ -535,7 +536,7 @@ public class HunterRumoursPlugin extends Plugin
 		if (config.highlightHunterNPCs())
 		{
 			Rumour currentRumour = getCurrentRumour();
-			if (npc.getId() != currentRumour.getNpcId() || currentRumourFinished)
+			if (currentRumour == Rumour.NONE || currentRumourFinished || npc.getId() != currentRumour.getNpcId())
 			{
 				return null;
 			}
