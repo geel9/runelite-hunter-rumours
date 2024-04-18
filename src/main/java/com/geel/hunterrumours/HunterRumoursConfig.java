@@ -84,6 +84,17 @@ public interface HunterRumoursConfig extends Config {
     }
 
     @ConfigItem(
+            position = 1,
+            keyName = "backToBackMessage",
+            name = "Back-To-Back Message",
+            description = "Place a message in chat whenever the current back-to-back status changes",
+            section = messagesSection
+    )
+    default boolean backToBackMessage() {
+        return true;
+    }
+
+    @ConfigItem(
             position = 0,
             keyName = "includeMasterHunters",
             name = "Include Master Hunters",

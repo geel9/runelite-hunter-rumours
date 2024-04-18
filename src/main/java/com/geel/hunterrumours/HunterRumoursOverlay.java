@@ -46,6 +46,11 @@ class HunterRumoursOverlay extends OverlayPanel {
                         .left("Current Rumour")
                         .right(plugin.getCurrentRumour().getFullName())
                         .build(),
+                LineComponent.builder()
+                        .left("Back-To-Back")
+                        .right(plugin.getBackToBackState().getNiceName())
+                        .rightColor(BackToBackColor(plugin.getBackToBackState()))
+                        .build(),
                 LineComponent.builder().build()
                 )
         );
@@ -64,20 +69,17 @@ class HunterRumoursOverlay extends OverlayPanel {
         return super.render(graphics);
     }
 
-    private void highlightObject(Graphics2D graphics, TileObject object, Color color) {
-        /*Point mousePosition = client.getMouseCanvasPosition();
-
-        Shape objectClickbox = object.getClickbox();
-        if (objectClickbox != null) {
-            if (objectClickbox.contains(mousePosition.getX(), mousePosition.getY())) {
-                graphics.setColor(color.darker());
-            } else {
-                graphics.setColor(color);
-            }
-
-            graphics.draw(objectClickbox);
-            graphics.setColor(new Color(color.getRed(), color.getGreen(), color.getBlue(), 50));
-            graphics.fill(objectClickbox);
-        }*/
+    private Color BackToBackColor(BackToBackState state) {
+        switch (state) {
+            case UNKNOWN:
+                return Color.YELLOW;
+            case ENABLED:
+                return Color.GREEN;
+            case DISABLED:
+                return Color.RED;
+            default:
+                return Color.PINK;
+        }
     }
+
 }
