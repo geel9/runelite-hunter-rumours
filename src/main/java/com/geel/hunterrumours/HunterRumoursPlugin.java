@@ -1,11 +1,12 @@
 package com.geel.hunterrumours;
 
 import com.google.inject.Provides;
-import java.util.List;
+import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.*;
 import net.runelite.api.coords.WorldPoint;
 import net.runelite.api.events.*;
+import net.runelite.api.kit.KitType;
 import net.runelite.client.callback.ClientThread;
 import net.runelite.client.config.ConfigManager;
 import net.runelite.client.eventbus.Subscribe;
@@ -47,6 +48,9 @@ public class HunterRumoursPlugin extends Plugin
 	public Rumour currentDetachedRumour = Rumour.NONE;
 	private boolean currentRumourFinished = false;
 	private final Set<HunterRumourWorldMapPoint> currentMapPoints = new HashSet<>();
+
+    @Getter
+    boolean hasFullHunterKit = false;
 
 	@Inject
 	private HunterRumoursConfig config;
@@ -129,11 +133,40 @@ public class HunterRumoursPlugin extends Plugin
 	}
 
 	@Subscribe
-	public void onChatMessage(ChatMessage event)
-	{
+    public void onPlayerChanged(PlayerChanged event) {
+        // We only care about ourselves
+        if(event.getPlayer().getId() != client.getLocalPlayer().getId()) {
+            return;
+        }
+
+        // Parse out hunter equipment
+        var player = event.getPlayer();
+        var comp = player.getPlayerComposition();
+        var head = comp.getEquipmentId(KitType.HEAD);
+        var top = comp.getEquipmentId(KitType.TORSO);
+        var legs = comp.getEquipmentId(KitType.LEGS);
+        var boots = comp.getEquipmentId(KitType.BOOTS);
+
+        var isHead = head == ItemID.GUILD_HUNTER_HEADWEAR;
+        var isTop = top == ItemID.GUILD_HUNTER_TOP;
+        var isLegs = legs == ItemID.GUILD_HUNTER_LEGS;
+        var isBoots = boots == ItemID.GUILD_HUNTER_BOOTS;
+
+        boolean hasFullKit = isHead && isTop && isLegs && isBoots;
+        if(hasFullKit != hasFullHunterKit) {
+            hasFullHunterKit = hasFullKit;
+            refreshAllDisplays();
+        }
+    }
+
+    @Subscribe
+    public void onChatMessage(ChatMessage event) {
 		handleBurrowsHunterDialog(event);
 		handleQuetzalWhistleChatMessage(event);
 		handleRumourFinishedChatMessage(event);
+        handleBackToBackChatMessage(event);
+    }
+
 	}
 
 	/**

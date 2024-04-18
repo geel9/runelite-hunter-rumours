@@ -34,12 +34,15 @@ public class RumourInfoBox extends InfoBox
 			sb.append(keyedLocations.size()).append(" spawns)");
 		});
 
+		Trap trap = rumour.getTrap();
+		int pityThreshold = plugin.hasFullHunterKit ? trap.getFullOutfitRate() : trap.getPityThreshold();
 		String hasFinishedRumourText = plugin.getHunterRumourState() ? "Yes" : "No";
 
 		this.setTooltip(
 			"Rumour: " + rumour.getFullName() +
 				"</br>Finished: " + hasFinishedRumourText +
 				"</br>Item: " + itemManager.getItemComposition(rumour.getItemId()).getName() +
+				"</br>Pity Threshold: " + pityThreshold +
 				"</br>Locations:" + sb
 
 		);
