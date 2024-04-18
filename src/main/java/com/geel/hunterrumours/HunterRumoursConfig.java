@@ -12,15 +12,23 @@ public interface HunterRumoursConfig extends Config {
     String GROUP = "hunterrumours";
 
     @ConfigSection(
-            name = "Hunter Tiers",
-            description = "The tiers of hunters that are enabled",
+            name = "Chat Messages",
+            description = "Configure various chat messages that the plugin creates",
             position = 4
     )
+    String messagesSection = "messagesSection";
+
+    @ConfigSection(
+            name = "Hunter Tiers",
+            description = "The tiers of hunters that are enabled",
+            position = 5
+    )
     String tiersSection = "tiersSection";
+
     @ConfigSection(
             name = "Highlights",
             description = "Highlights for Hunters and Hunter Targets",
-            position = 5
+            position = 6
     )
     String highlightSection = "highlightSection";
 
@@ -63,6 +71,17 @@ public interface HunterRumoursConfig extends Config {
 	default boolean compactWorldMap() {
 		return false;
 	}
+
+	@ConfigItem(
+	        position = 0,
+            keyName = "currentRumourMessage",
+            name = "Current Rumour Message",
+            description = "Place a message in chat whenever the current Rumour changes",
+            section = messagesSection
+    )
+	default boolean currentRumourMessage() {
+        return true;
+    }
 
     @ConfigItem(
             position = 0,

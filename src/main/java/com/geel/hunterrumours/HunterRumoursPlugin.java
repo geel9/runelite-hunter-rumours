@@ -426,7 +426,9 @@ public class HunterRumoursPlugin extends Plugin
 			setDetachedRumour(Rumour.NONE);
 		}
 
+        if (config.currentRumourMessage()) {
 		client.addChatMessage(ChatMessageType.GAMEMESSAGE, "", "Current rumour: " + ColorUtil.wrapWithColorTag(dialogRumour.getFullName(), Color.RED) + " | Current hunter: " + ColorUtil.wrapWithColorTag(currentHunter.getCommonName(), Color.RED), "");
+        }
 		npcOverlayService.rebuild();
 		handleInfoBox();
 		handleWorldMap();
