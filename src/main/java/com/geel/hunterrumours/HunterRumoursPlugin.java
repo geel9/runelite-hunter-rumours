@@ -138,7 +138,7 @@ public class HunterRumoursPlugin extends Plugin {
     @Subscribe
     public void onPlayerChanged(PlayerChanged event) {
         // We only care about ourselves
-        if(event.getPlayer().getId() != client.getLocalPlayer().getId()) {
+        if (event.getPlayer().getId() != client.getLocalPlayer().getId()) {
             return;
         }
 
@@ -156,7 +156,7 @@ public class HunterRumoursPlugin extends Plugin {
         var isBoots = boots == ItemID.GUILD_HUNTER_BOOTS;
 
         boolean hasFullKit = isHead && isTop && isLegs && isBoots;
-        if(hasFullKit != hasFullHunterKit) {
+        if (hasFullKit != hasFullHunterKit) {
             hasFullHunterKit = hasFullKit;
             refreshAllDisplays();
         }
@@ -484,7 +484,7 @@ public class HunterRumoursPlugin extends Plugin {
         String actualMessage = dialogMessage.replace(npcNamePrefix, "").toLowerCase(Locale.ROOT);
 
         // Determine if it's a "rumour complete" message
-        if(actualMessage.contains("would you like another rumour?")) {
+        if (actualMessage.contains("would you like another rumour?")) {
             setHunterRumourState(false);
             setHunterRumour(currentHunter, Rumour.NONE);
             refreshAllDisplays();
@@ -627,7 +627,11 @@ public class HunterRumoursPlugin extends Plugin {
         // Highlight Rumour Target (hunter creature) if relevant
         if (config.highlightHunterNPCs()) {
             Rumour currentRumour = getCurrentRumour();
-            if (currentRumour == Rumour.NONE || currentRumourFinished || npc.getId() != currentRumour.getNpcId()) {
+            if (currentRumour == Rumour.NONE
+                    || currentRumour.getNpcId() == 0
+                    || currentRumourFinished
+                    || npc.getId() != currentRumour.getNpcId()
+            ) {
                 return null;
             }
 
