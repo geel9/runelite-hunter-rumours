@@ -52,10 +52,8 @@ public class RumourInfoBox extends InfoBox
 		{
 			return "Done";
 		}
-		else
-		{
-			return "Rumour";
-		}
+
+		return "";
 	}
 
 	@Override

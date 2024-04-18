@@ -22,38 +22,38 @@ import static com.geel.hunterrumours.Trap.NOOSE;
 enum Rumour {
     NONE(0, "Unknown", ItemID.COINS_995, BOX_TRAP, 0, false, false, false, false),
 
-    TROPICAL_WAGTAIL(NpcID.TROPICAL_WAGTAIL, "Tropical Wagtail", ItemID.TAILFEATHERS, SNARE, 19, true, false, false, false),
-    WILD_KEBBIT(NpcID.WILD_KEBBIT, "Wild Kebbit", ItemID.KEBBITY_TUFT, DEADFALL, 23, true, false, false, false),
-    SAPPHIRE_GLACIALIS(NpcID.SAPPHIRE_GLACIALIS, "Sapphire Glacialis", ItemID.BLUE_BUTTERFLY_WING, BUTTERFLY, 25, true, false, false, false),
+    TROPICAL_WAGTAIL(NpcID.TROPICAL_WAGTAIL, "Tropical Wagtail", ItemID.TROPICAL_WAGTAIL, SNARE, 19, true, false, false, false),
+    WILD_KEBBIT(NpcID.WILD_KEBBIT, "Wild Kebbit", ItemID.KEBBIT_9962, DEADFALL, 23, true, false, false, false),
+    SAPPHIRE_GLACIALIS(NpcID.SAPPHIRE_GLACIALIS, "Sapphire Glacialis", ItemID.BUTTERFLY_9971, BUTTERFLY, 25, true, false, false, false),
 
-    SWAMP_LIZARD(NpcID.SWAMP_LIZARD, "Swamp Lizard", ItemID.SWAMP_LIZARD_CLAW, NET_TRAP, 29, true, true, false, false),
-    SPINED_LARUPIA(NpcID.SPINED_LARUPIA, "Spined Larupia", ItemID.LARUPIA_EAR, PIT, 31, true, true, false, false),
-    BARB_TAILED_KEBBIT(NpcID.BARBTAILED_KEBBIT, "Barb-tailed Kebbit", ItemID.KEBBITY_TUFT, DEADFALL, 33, true, true, false, false),
-    SNOWY_KNIGHT(NpcID.SNOWY_KNIGHT, "Snowy Knight", ItemID.WHITE_BUTTERFLY_WING, BUTTERFLY, 35, true, true, false, false),
-    PRICKLY_KEBBIT(NpcID.PRICKLY_KEBBIT, "Prickly Kebbit", ItemID.KEBBITY_TUFT, DEADFALL, 37, true, true, false, false),
+    SWAMP_LIZARD(NpcID.SWAMP_LIZARD, "Swamp Lizard", ItemID.SWAMP_LIZARD, NET_TRAP, 29, true, true, false, false),
+    SPINED_LARUPIA(NpcID.SPINED_LARUPIA, "Spined Larupia", ItemID.LARUPIA_HAT, PIT, 31, true, true, false, false),
+    BARB_TAILED_KEBBIT(NpcID.BARBTAILED_KEBBIT, "Barb-tailed Kebbit", ItemID.KEBBIT_9958, DEADFALL, 33, true, true, false, false),
+    SNOWY_KNIGHT(NpcID.SNOWY_KNIGHT, "Snowy Knight", ItemID.BUTTERFLY_9972, BUTTERFLY, 35, true, true, false, false),
+    PRICKLY_KEBBIT(NpcID.PRICKLY_KEBBIT, "Prickly Kebbit", ItemID.KEBBIT_9957, DEADFALL, 37, true, true, false, false),
     // TODO: Verify jerboa
-    EMBERTAILED_JERBOA(NpcID.EMBERTAILED_JERBOA, "Embertailed Jerboa", ItemID.LARGE_JERBOA_TAIL, BOX_TRAP, 39, true, true, false, false),
-    HORNED_GRAAHK(NpcID.HORNED_GRAAHK, "Horned Graahk", ItemID.GRAAHK_HORN_SPUR, PIT, 41, true, true, false, false),
-    SPOTTED_KEBBIT(NpcID.SPOTTED_KEBBIT, "Spotted Kebbit", ItemID.KEBBITY_TUFT, FALCONRY, 43, true, true, false, false),
-    BLACK_WARLOCK(NpcID.BLACK_WARLOCK, "Black Warlock", ItemID.BLACK_BUTTERFLY_WING, BUTTERFLY, 45, true, true, false, false),
+    EMBERTAILED_JERBOA(NpcID.EMBERTAILED_JERBOA, "Embertailed Jerboa", ItemID.EMBERTAILED_JERBOA, BOX_TRAP, 39, true, true, false, false),
+    HORNED_GRAAHK(NpcID.HORNED_GRAAHK, "Horned Graahk", ItemID.GRAAHK_HEADDRESS, PIT, 41, true, true, false, false),
+    SPOTTED_KEBBIT(NpcID.SPOTTED_KEBBIT, "Spotted Kebbit", ItemID.KEBBIT_9960, FALCONRY, 43, true, true, false, false),
+    BLACK_WARLOCK(NpcID.BLACK_WARLOCK, "Black Warlock", ItemID.BUTTERFLY_9973, BUTTERFLY, 45, true, true, false, false),
 
-    ORANGE_SALAMANDER(NpcID.ORANGE_SALAMANDER, "Orange Salamander", ItemID.ORANGE_SALAMANDER_CLAW, NET_TRAP, 47, true, true, true, false),
-    RAZOR_BACKED_KEBBIT(0, "Razor-backed Kebbit", ItemID.KEBBITY_TUFT, NOOSE,49, true, true, true, false), //TODO
-    SABRE_TOOTHED_KEBBIT(NpcID.SABRETOOTHED_KEBBIT, "Sabre-toothed Kebbit", ItemID.KEBBITY_TUFT, DEADFALL, 51, true, true, true, false),
-    GREY_CHINCHOMPA(NpcID.CHINCHOMPA, "Grey Chinchompa", ItemID.CHINCHOMPA_TUFT, BOX_TRAP, 53, true, true, true, false),
-    SABRE_TOOTHED_KYATT(NpcID.SABRETOOTHED_KYATT, "Sabre-toothed Kyatt", ItemID.KYATT_TOOTH_CHIP, PIT, 53, true, true, true, false),
-    DARK_KEBBIT(NpcID.DARK_KEBBIT, "Dark Kebbit", ItemID.KEBBITY_TUFT, FALCONRY, 57, true, true, true, false),
-    PYRE_FOX(NpcID.PYRE_FOX, "Pyre Fox", ItemID.FOX_FLUFF, DEADFALL, 57, true, true, true, true),
-    RED_SALAMANDER(NpcID.RED_SALAMANDER, "Red Salamander", ItemID.RED_SALAMANDER_CLAW, NET_TRAP, 59, true, false, true, true),
-    RED_CHINCHOMPA(NpcID.CARNIVOROUS_CHINCHOMPA, "Carnivorous Chinchompa", ItemID.RED_CHINCHOMPA_TUFT, BOX_TRAP, 63, true, false, true, true),
-    RED_CHINCHOMPA_2(NpcID.CARNIVOROUS_CHINCHOMPA, "Red Chinchompa", ItemID.RED_CHINCHOMPA_TUFT, BOX_TRAP, 63, true, false, true, true),
-    SUNLIGHT_MOTH(NpcID.SUNLIGHT_MOTH, "Sunlight Moth", ItemID.SUNLIGHT_MOTH_WING, BUTTERFLY, 65, true, false, false, true),
-    DASHING_KEBBIT(NpcID.DASHING_KEBBIT, "Dashing Kebbit", ItemID.KEBBITY_TUFT, FALCONRY, 69, true, false, true, true),
-    SUNLIGHT_ANTELOPE(NpcID.SUNLIGHT_ANTELOPE, "Sunlight Antelope", ItemID.ANTELOPE_HOOF_SHARD, PIT, 72, true, false, true, true),
-    MOONLIGHT_MOTH(NpcID.MOONLIGHT_MOTH, "Moonlight Moth", ItemID.MOONLIGHT_MOTH_WING, BUTTERFLY, 75, true, false, false, true),
-    TECU_SALAMANDER(NpcID.TECU_SALAMANDER, "Tecu Salamander", ItemID.SALAMANDER_CLAW, NET_TRAP, 79, true, false, false, true),
-    HERBIBOAR(NpcID.HERBIBOAR, "Herbiboar", ItemID.HERBY_TUFT, NOOSE, 80, true, false, false, true),
-    MOONLIGHT_ANTELOPE(NpcID.MOONLIGHT_ANTELOPE, "Moonlight Antelope", ItemID.ANTELOPE_HOOF_SHARD, PIT, 91, true, false, false, true);
+    ORANGE_SALAMANDER(NpcID.ORANGE_SALAMANDER, "Orange Salamander", ItemID.ORANGE_SALAMANDER, NET_TRAP, 47, true, true, true, false),
+    RAZOR_BACKED_KEBBIT(0, "Razor-backed Kebbit", ItemID.KEBBIT_9961, NOOSE,49, true, true, true, false), //TODO
+    SABRE_TOOTHED_KEBBIT(NpcID.SABRETOOTHED_KEBBIT, "Sabre-toothed Kebbit", ItemID.KEBBIT_9959, DEADFALL, 51, true, true, true, false),
+    GREY_CHINCHOMPA(NpcID.CHINCHOMPA, "Grey Chinchompa", ItemID.CHINCHOMPA, BOX_TRAP, 53, true, true, true, false),
+    SABRE_TOOTHED_KYATT(NpcID.SABRETOOTHED_KYATT, "Sabre-toothed Kyatt", ItemID.KYATT_HAT, PIT, 53, true, true, true, false),
+    DARK_KEBBIT(NpcID.DARK_KEBBIT, "Dark Kebbit", ItemID.KEBBIT_9963, FALCONRY, 57, true, true, true, false),
+    PYRE_FOX(NpcID.PYRE_FOX, "Pyre Fox", ItemID.PYRE_FOX, DEADFALL, 57, true, true, true, true),
+    RED_SALAMANDER(NpcID.RED_SALAMANDER, "Red Salamander", ItemID.RED_SALAMANDER, NET_TRAP, 59, true, false, true, true),
+    RED_CHINCHOMPA(NpcID.CARNIVOROUS_CHINCHOMPA, "Carnivorous Chinchompa", ItemID.RED_CHINCHOMPA, BOX_TRAP, 63, true, false, true, true),
+    RED_CHINCHOMPA_2(NpcID.CARNIVOROUS_CHINCHOMPA, "Red Chinchompa", ItemID.RED_CHINCHOMPA, BOX_TRAP, 63, true, false, true, true),
+    SUNLIGHT_MOTH(NpcID.SUNLIGHT_MOTH, "Sunlight Moth", ItemID.SUNLIGHT_MOTH, BUTTERFLY, 65, true, false, false, true),
+    DASHING_KEBBIT(NpcID.DASHING_KEBBIT, "Dashing Kebbit", ItemID.KEBBIT_9964, FALCONRY, 69, true, false, true, true),
+    SUNLIGHT_ANTELOPE(NpcID.SUNLIGHT_ANTELOPE, "Sunlight Antelope", ItemID.SUNLIGHT_ANTELOPE, PIT, 72, true, false, true, true),
+    MOONLIGHT_MOTH(NpcID.MOONLIGHT_MOTH, "Moonlight Moth", ItemID.MOONLIGHT_MOTH, BUTTERFLY, 75, true, false, false, true),
+    TECU_SALAMANDER(NpcID.TECU_SALAMANDER, "Tecu Salamander", ItemID.TECU_SALAMANDER, NET_TRAP, 79, true, false, false, true),
+    HERBIBOAR(NpcID.HERBIBOAR, "Herbiboar", ItemID.HERBIBOAR, NOOSE, 80, true, false, false, true),
+    MOONLIGHT_ANTELOPE(NpcID.MOONLIGHT_ANTELOPE, "Moonlight Antelope", ItemID.MOONLIGHT_ANTELOPE, PIT, 91, true, false, false, true);
 
     @Getter
     private final int NpcId;
