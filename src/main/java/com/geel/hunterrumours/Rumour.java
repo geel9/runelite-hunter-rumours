@@ -87,6 +87,11 @@ enum Rumour {
     }
 
     public String getFullName() {
+        // Don't show the trap if it's NONE
+        if(this == NONE) {
+            return this.getName();
+        }
+
         return this.getName() + " (" + this.getTrap().getName() + ")";
     }
 }
