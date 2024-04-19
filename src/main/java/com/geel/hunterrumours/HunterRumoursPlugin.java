@@ -23,12 +23,11 @@ import net.runelite.client.ui.overlay.OverlayManager;
 import net.runelite.client.ui.overlay.infobox.InfoBoxManager;
 import net.runelite.client.ui.overlay.worldmap.WorldMapPointManager;
 import net.runelite.client.util.ColorUtil;
+import net.runelite.client.util.Text;
 
 import javax.inject.Inject;
 import java.awt.*;
 import java.util.*;
-
-import net.runelite.client.util.Text;
 
 @PluginDescriptor(
         name = "Hunter Rumours",
@@ -51,6 +50,7 @@ public class HunterRumoursPlugin extends Plugin {
     private BackToBackState backToBackState = BackToBackState.UNKNOWN;
     private final Set<HunterRumourWorldMapPoint> currentMapPoints = new HashSet<>();
     boolean backToBackDialogOpened = false; // Tracking variable to hook into back-to-back dialog opening
+    private int previousExp = -1;
 
     @Getter
     boolean hasFullHunterKit = false;
@@ -237,6 +237,22 @@ public class HunterRumoursPlugin extends Plugin {
         handleBackToBackChatMessage(event);
     }
 
+    @Subscribe
+    protected void onStatChanged(StatChanged event) {
+        if (event.getSkill() != Skill.HUNTER) {
+            return;
+        }
+        final int currentXp = event.getXp();
+        final int xpDiff = currentXp - previousExp;
+        if (xpDiff > 0) {
+            if (Arrays.stream(getCurrentRumour().getPossibleXpDrops()).anyMatch(possibleXpDrop -> possibleXpDrop == xpDiff)) {
+                incrementCaughtCreatures();
+                refreshAllDisplays();
+            }
+            previousExp = currentXp;
+        }
+    }
+
     /**
      * Sets the back-to-back state in memory and in config.
      * <p>
@@ -300,6 +316,35 @@ public class HunterRumoursPlugin extends Plugin {
      */
     public Hunter[] getEnabledHunters() {
         return Arrays.stream(Hunter.allValues()).filter(this::isHunterEnabled).toArray(Hunter[]::new);
+    }
+
+    /**
+     * Increments the currently caught creatures by one and sets the value.
+     */
+    public void incrementCaughtCreatures() {
+        final int currentlyCaughtCreatures = getCaughtRumourCreatures();
+        setCaughtCreatures(currentlyCaughtCreatures + 1);
+    }
+
+    /**
+     * Sets the currently caught creatures.
+     *
+     * @param caughtCreatures the amount of creatures currently caught
+     */
+    private void setCaughtCreatures(int caughtCreatures) {
+        configManager.setRSProfileConfiguration(HunterRumoursConfig.GROUP, "caught.rumour.creatures", caughtCreatures);
+    }
+
+    /**
+     * @return The current amount of hunter creatures you've caught.
+     */
+    public int getCaughtRumourCreatures() {
+        try {
+            final int caughtCreatures = configManager.getRSProfileConfiguration(HunterRumoursConfig.GROUP, "caught.rumour.creatures", int.class);
+            return caughtCreatures;
+        } catch (NullPointerException ex) {
+            return 0;
+        }
     }
 
     /**
@@ -379,6 +424,21 @@ public class HunterRumoursPlugin extends Plugin {
         }
 
         setHunterRumourState(true);
+
+        if (config.luckMessage()) {
+            final int caughtCreatures = getCaughtRumourCreatures();
+
+            final float pityThreshold = (float) (hasFullHunterKit ? getCurrentRumour().getTrap().getFullOutfitRate() : getCurrentRumour().getTrap().getPityThreshold());
+            final float percentage = (float) caughtCreatures / pityThreshold * 100f;
+            if (percentage >= 75) {
+                client.addChatMessage(ChatMessageType.GAMEMESSAGE, "Hunter Rumours", "Hunter Rumours: You were quite  " + ColorUtil.wrapWithColorTag("unlucky", Color.RED) + " on this one!", "");
+            } else if (percentage >= 50) {
+                client.addChatMessage(ChatMessageType.GAMEMESSAGE, "Hunter Rumours", "Hunter Rumours: That wasn't " + ColorUtil.wrapWithColorTag("too bad", Color.ORANGE) + " was it?", "");
+            } else {
+                client.addChatMessage(ChatMessageType.GAMEMESSAGE, "Hunter Rumours", "Hunter Rumours: It's too easy for you, " + ColorUtil.wrapWithColorTag("so lucky", Color.GREEN) + "!", "");
+            }
+        }
+
         refreshAllDisplays();
     }
 
@@ -421,6 +481,7 @@ public class HunterRumoursPlugin extends Plugin {
             setHunterRumour(currentHunter, Rumour.NONE);
             setCurrentHunter(Hunter.NONE);
             setHunterRumourState(false);
+            setCaughtCreatures(0);
         }
 
         refreshAllDisplays();
@@ -446,8 +507,9 @@ public class HunterRumoursPlugin extends Plugin {
         }
 
         // Filter for the specific message we're looking for
-        if (!event.getMessage().startsWith("Guild Scribe Verity|Would you like me to filter the rumour information a"))
+        if (!event.getMessage().startsWith("Guild Scribe Verity|Would you like me to filter the rumour information a")) {
             return;
+        }
 
         // Update our back-to-back internal state with what we can glean from the message
         setBackToBackState(event.getMessage().contains("little less") ? BackToBackState.DISABLED : BackToBackState.ENABLED, false);
@@ -485,8 +547,9 @@ public class HunterRumoursPlugin extends Plugin {
 
         // Determine if it's a "rumour complete" message
         if (actualMessage.contains("would you like another rumour?")) {
-            setHunterRumourState(false);
             setHunterRumour(currentHunter, Rumour.NONE);
+            setHunterRumourState(false);
+            setCaughtCreatures(0);
             refreshAllDisplays();
             return;
         }
@@ -701,6 +764,7 @@ public class HunterRumoursPlugin extends Plugin {
         configManager.unsetRSProfileConfiguration(HunterRumoursConfig.GROUP, "current.detached.rumour");
         configManager.unsetRSProfileConfiguration(HunterRumoursConfig.GROUP, "current.rumour.finished");
         configManager.unsetRSProfileConfiguration(HunterRumoursConfig.GROUP, "backtoback");
+        configManager.unsetRSProfileConfiguration(HunterRumoursConfig.GROUP, "caught.rumour.creatures");
 
         for (var hunter : Hunter.allValues()) {
             configManager.unsetRSProfileConfiguration("hunterrumours", "hunter." + hunter.getNpcId());
