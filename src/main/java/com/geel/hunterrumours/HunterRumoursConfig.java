@@ -59,15 +59,15 @@ public interface HunterRumoursConfig extends Config {
         return true;
     }
 
-	@ConfigItem(
+    @ConfigItem(
             position = 2,
-		keyName = "compactWorldMap",
-		name = "Compact World Map Locations",
-		description = "Only show 1 icon per location on the World Map"
-	)
-	default boolean compactWorldMap() {
-		return false;
-	}
+            keyName = "compactWorldMap",
+            name = "Compact World Map Locations",
+            description = "Only show 1 icon per location on the World Map"
+    )
+    default boolean compactWorldMap() {
+        return false;
+    }
 
     @ConfigItem(
             position = 0,
@@ -91,14 +91,14 @@ public interface HunterRumoursConfig extends Config {
         return true;
     }
 
-	@ConfigItem(
-	        position = 0,
+    @ConfigItem(
+            position = 0,
             keyName = "currentRumourMessage",
             name = "Current Rumour Message",
             description = "Place a message in chat whenever the current Rumour changes",
             section = messagesSection
     )
-	default boolean currentRumourMessage() {
+    default boolean currentRumourMessage() {
         return true;
     }
 
@@ -114,11 +114,11 @@ public interface HunterRumoursConfig extends Config {
     }
 
     @ConfigItem(
-        position = 2,
-        keyName = "endOfRumourMessage",
-        name = "End-of-Rumour Message",
-        description = "Place a message in chat whenever you complete a rumour, containing stats about the rumour.",
-        section = messagesSection
+            position = 2,
+            keyName = "endOfRumourMessage",
+            name = "End-of-Rumour Message",
+            description = "Place a message in chat whenever you complete a rumour, containing stats about the rumour.",
+            section = messagesSection
     )
     default boolean endOfRumourMessage() {
         return false;
