@@ -1,8 +1,10 @@
 package com.geel.hunterrumours;
 
 import lombok.extern.slf4j.Slf4j;
-import net.runelite.api.*;
-import net.runelite.client.ui.overlay.*;
+import net.runelite.api.Client;
+import net.runelite.client.ui.overlay.OverlayLayer;
+import net.runelite.client.ui.overlay.OverlayPanel;
+import net.runelite.client.ui.overlay.OverlayPosition;
 import net.runelite.client.ui.overlay.components.LineComponent;
 import net.runelite.client.ui.overlay.components.TitleComponent;
 

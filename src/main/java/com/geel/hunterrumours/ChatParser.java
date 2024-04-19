@@ -17,13 +17,10 @@ public class ChatParser {
         this.client = client;
     }
 
-    public Hunter getSpeakingHunter(String message)
-    {
-        for (Hunter hunter : Hunter.allValues())
-        {
+    public Hunter getSpeakingHunter(String message) {
+        for (Hunter hunter : Hunter.allValues()) {
             NPCComposition npc = client.getNpcDefinition(hunter.getNpcId());
-            if (message.startsWith(npc.getName() + "|"))
-            {
+            if (message.startsWith(npc.getName() + "|")) {
                 return hunter;
             }
         }
@@ -31,12 +28,9 @@ public class ChatParser {
         return Hunter.NONE;
     }
 
-    public Hunter getReferencedHunter(String message)
-    {
-        for (var hunterName : Hunter.allCommonNames())
-        {
-            if (!message.contains(hunterName.toLowerCase()))
-            {
+    public Hunter getReferencedHunter(String message) {
+        for (var hunterName : Hunter.allCommonNames()) {
+            if (!message.contains(hunterName.toLowerCase())) {
                 continue;
             }
 
@@ -46,12 +40,9 @@ public class ChatParser {
         return Hunter.NONE;
     }
 
-    public Rumour getReferencedRumour(String message)
-    {
-        for (var rumour : Rumour.allValues())
-        {
-            if (!message.contains(rumour.getName().toLowerCase()))
-            {
+    public Rumour getReferencedRumour(String message) {
+        for (var rumour : Rumour.allValues()) {
+            if (!message.contains(rumour.getName().toLowerCase())) {
                 continue;
             }
 
