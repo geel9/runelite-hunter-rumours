@@ -1,5 +1,8 @@
 package com.geel.hunterrumours;
 
+import com.geel.hunterrumours.enums.Rumour;
+import com.geel.hunterrumours.enums.RumourLocation;
+import com.geel.hunterrumours.enums.Trap;
 import net.runelite.client.game.ItemManager;
 import net.runelite.client.ui.overlay.infobox.InfoBox;
 import net.runelite.client.util.ColorUtil;

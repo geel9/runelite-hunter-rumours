@@ -1,6 +1,6 @@
-package com.geel.hunterrumours;
+package com.geel.hunterrumours.enums;
 
-import static com.geel.hunterrumours.Rumour.*;
+import static com.geel.hunterrumours.enums.Rumour.*;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;

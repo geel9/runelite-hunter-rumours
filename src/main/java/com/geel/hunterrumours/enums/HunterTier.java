@@ -1,4 +1,4 @@
-package com.geel.hunterrumours;
+package com.geel.hunterrumours.enums;
 
 public enum HunterTier {
     NOVICE,

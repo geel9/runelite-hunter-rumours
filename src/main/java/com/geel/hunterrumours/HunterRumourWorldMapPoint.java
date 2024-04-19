@@ -1,6 +1,7 @@
 package com.geel.hunterrumours;
 
 
+import com.geel.hunterrumours.enums.RumourLocation;
 import net.runelite.api.Point;
 import net.runelite.api.coords.WorldPoint;
 import net.runelite.client.game.ItemManager;

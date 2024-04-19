@@ -1,5 +1,6 @@
 package com.geel.hunterrumours;
 
+import com.geel.hunterrumours.enums.Rumour;
 import org.junit.Test;
 
 import static org.junit.Assert.fail;

@@ -1,5 +1,7 @@
 package com.geel.hunterrumours;
 
+import com.geel.hunterrumours.enums.Hunter;
+import com.geel.hunterrumours.enums.Rumour;
 import net.runelite.api.Client;
 import net.runelite.api.NPCComposition;
 

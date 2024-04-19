@@ -1,5 +1,6 @@
 package com.geel.hunterrumours;
 
+import com.geel.hunterrumours.enums.BackToBackState;
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.Client;
 import net.runelite.client.ui.overlay.OverlayLayer;

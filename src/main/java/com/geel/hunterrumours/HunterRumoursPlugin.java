@@ -1,5 +1,9 @@
 package com.geel.hunterrumours;
 
+import com.geel.hunterrumours.enums.BackToBackState;
+import com.geel.hunterrumours.enums.Hunter;
+import com.geel.hunterrumours.enums.Rumour;
+import com.geel.hunterrumours.enums.RumourLocation;
 import com.google.inject.Provides;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
