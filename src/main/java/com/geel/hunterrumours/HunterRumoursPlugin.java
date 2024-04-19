@@ -23,12 +23,11 @@ import net.runelite.client.ui.overlay.OverlayManager;
 import net.runelite.client.ui.overlay.infobox.InfoBoxManager;
 import net.runelite.client.ui.overlay.worldmap.WorldMapPointManager;
 import net.runelite.client.util.ColorUtil;
+import net.runelite.client.util.Text;
 
 import javax.inject.Inject;
 import java.awt.*;
 import java.util.*;
-
-import net.runelite.client.util.Text;
 
 @PluginDescriptor(
         name = "Hunter Rumours",
