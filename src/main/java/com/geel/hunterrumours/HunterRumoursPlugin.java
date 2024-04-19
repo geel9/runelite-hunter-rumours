@@ -56,6 +56,7 @@ public class HunterRumoursPlugin extends Plugin {
     boolean hasFullHunterKit = false;
 
     @Inject
+    @Getter
     private HunterRumoursConfig config;
 
     @Inject

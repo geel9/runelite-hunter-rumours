@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Map;
 import net.runelite.client.game.ItemManager;
 import net.runelite.client.ui.overlay.infobox.InfoBox;
+import net.runelite.client.util.ColorUtil;
 
 import javax.annotation.Nonnull;
 import java.awt.*;
@@ -54,8 +55,7 @@ public class RumourInfoBox extends InfoBox
 		}
 
 		final Rumour currentRumour = plugin.getCurrentRumour();
-
-		if (currentRumour != Rumour.NONE)
+		if (currentRumour != Rumour.NONE && showNumUntilPity())
 		{
 			return String.valueOf(currentRumour.getTrap().getPityThreshold() - plugin.getCaughtRumourCreatures());
 		}
@@ -70,8 +70,9 @@ public class RumourInfoBox extends InfoBox
 		{
 			return Color.GREEN;
 		}
-		else
-		{
+		else if(!showNumUntilPity()) {
+		    return Color.WHITE;
+        } else {
 			final Rumour currentRumour = plugin.getCurrentRumour();
 			if (currentRumour == Rumour.NONE)
 			{
@@ -94,4 +95,12 @@ public class RumourInfoBox extends InfoBox
 			}
 		}
 	}
+
+	private boolean showNumUntilPity() {
+	    if(this.plugin == null || this.plugin.getConfig() == null) {
+	        return false;
+        }
+
+	    return this.plugin.getConfig().showCatchesRemainingUntilPity();
+    }
 }
