@@ -53,7 +53,10 @@ public class HunterRumoursPlugin extends Plugin {
     boolean backToBackDialogOpened = false; // Tracking variable to hook into back-to-back dialog opening
 
     @Getter
-    boolean hasFullHunterKit = false;
+    private int numRumoursCompleted = 0; // Number of rumours completed
+
+    @Getter
+    boolean hasFullHunterKit = false; // Whether the user is currently wearing the full hunter guild kit
 
     @Inject
     private HunterRumoursConfig config;
@@ -235,6 +238,7 @@ public class HunterRumoursPlugin extends Plugin {
         handleQuetzalWhistleChatMessage(event);
         handleRumourFinishedChatMessage(event);
         handleBackToBackChatMessage(event);
+        handleNumRumoursCompletedChatMessage(event);
     }
 
     /**
@@ -266,6 +270,14 @@ public class HunterRumoursPlugin extends Plugin {
      */
     public boolean getHunterRumourState() {
         return this.currentRumourFinished;
+    }
+
+    /**
+     * Sets the number of rumours completed by the player
+     */
+    public void setNumRumoursCompleted(int numRumoursCompleted) {
+        configManager.setRSProfileConfiguration(HunterRumoursConfig.GROUP, "rumours.completed", numRumoursCompleted);
+        this.numRumoursCompleted = numRumoursCompleted;
     }
 
     /**
@@ -451,6 +463,39 @@ public class HunterRumoursPlugin extends Plugin {
 
         // Update our back-to-back internal state with what we can glean from the message
         setBackToBackState(event.getMessage().contains("little less") ? BackToBackState.DISABLED : BackToBackState.ENABLED, false);
+    }
+
+    /**
+     * Handles the chat message indicating how many Hunter Rumours you have completed
+     */
+    private void handleNumRumoursCompletedChatMessage(ChatMessage event) {
+
+        // If not NPC dialog, can't be for rumours
+        if (event.getType() != ChatMessageType.GAMEMESSAGE) {
+            return;
+        }
+
+        // If not in Burrows, can't be a rumour-complete message
+        if (!isInBurrows()) {
+            return;
+        }
+
+        //  You have completed <col=ff3045>62</col> rumours for the Hunter Guild.
+        String prefix = "You have completed <col=ff3045>";
+        String suffix = "</col> rumours for the Hunter Guild.";
+        String message = event.getMessage();
+
+        // Filter for the specific message we're looking for
+        if (!message.startsWith(prefix) || !message.endsWith(suffix)) {
+            return;
+        }
+
+        // I do so much to avoid regex
+        int numDigits = message.length() - (prefix.length() + suffix.length());
+        String justTheDigits = message.substring(prefix.length(), prefix.length() + numDigits);
+        int numRumours = Integer.parseInt(justTheDigits);
+
+        setNumRumoursCompleted(numRumours);
     }
 
     /**
@@ -650,6 +695,13 @@ public class HunterRumoursPlugin extends Plugin {
      * Loads all state (current hunter, rumours, etc.) from config
      */
     private void loadFromConfig() {
+        // Load number of Rumours completed
+        Integer loadedNumRumours = configManager.getRSProfileConfiguration(HunterRumoursConfig.GROUP, "rumours.completed", Integer.class);
+        if (loadedNumRumours == null) {
+            loadedNumRumours = 0;
+        }
+        this.numRumoursCompleted = loadedNumRumours;
+
         // Load current hunter
         Hunter loadedCurrentHunter = configManager.getRSProfileConfiguration("hunterrumours", "current.hunter", Hunter.class);
         if (loadedCurrentHunter == null) {
