@@ -11,7 +11,7 @@ import java.util.Locale;
 import java.util.Map;
 
 @AllArgsConstructor
-enum Hunter {
+public enum Hunter {
     NONE(0, "Unknown", HunterTier.NONE),
 
     MASTER_WOLF(13126, "Wolf", HunterTier.MASTER),

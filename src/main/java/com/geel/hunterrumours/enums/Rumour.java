@@ -17,7 +17,7 @@ import static com.geel.hunterrumours.Trap.BUTTERFLY;
 import static com.geel.hunterrumours.Trap.NOOSE;
 
 @AllArgsConstructor
-enum Rumour
+public enum Rumour
 {
 	NONE(0, "Unknown", ItemID.COINS_995, BOX_TRAP, 0, new int[]{}, false, false, false, false),
 
