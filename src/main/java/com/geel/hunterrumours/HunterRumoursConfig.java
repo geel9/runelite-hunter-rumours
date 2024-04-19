@@ -12,6 +12,13 @@ public interface HunterRumoursConfig extends Config {
     String GROUP = "hunterrumours";
 
     @ConfigSection(
+            name = "Current Rumour Infobox",
+            description = "Configure the infobox that shows your current Rumour",
+            position = 3
+    )
+    String infoBoxSection = "infoBoxSection";
+
+    @ConfigSection(
             name = "Chat Messages",
             description = "Configure various chat messages that the plugin creates",
             position = 4
@@ -44,16 +51,6 @@ public interface HunterRumoursConfig extends Config {
 
     @ConfigItem(
             position = 1,
-            keyName = "showRumourInfoBox",
-            name = "Show Rumour Infobox",
-            description = "Whether an infobox containing your current rumour target should be displayed"
-    )
-    default boolean showInfoBox() {
-        return true;
-    }
-
-    @ConfigItem(
-            position = 2,
             keyName = "showWorldMapLocations",
             name = "Show World Map Locations",
             description = "Whether the locations of your current rumour should show up on your world map"
@@ -62,24 +59,46 @@ public interface HunterRumoursConfig extends Config {
         return true;
     }
 
-	@ConfigItem(
-		position = 3,
-		keyName = "compactWorldMap",
-		name = "Compact World Map Locations",
-		description = "Only show 1 icon per location on the World Map"
-	)
-	default boolean compactWorldMap() {
-		return false;
-	}
+    @ConfigItem(
+            position = 2,
+            keyName = "compactWorldMap",
+            name = "Compact World Map Locations",
+            description = "Only show 1 icon per location on the World Map"
+    )
+    default boolean compactWorldMap() {
+        return false;
+    }
 
-	@ConfigItem(
-	        position = 0,
+    @ConfigItem(
+            position = 0,
+            keyName = "showRumourInfoBox",
+            name = "Show Rumour Infobox",
+            description = "Whether an infobox containing your current rumour target should be displayed",
+            section = infoBoxSection
+    )
+    default boolean showInfoBox() {
+        return true;
+    }
+
+    @ConfigItem(
+            position = 1,
+            keyName = "showCatchesRemainingUntilPity",
+            name = "Show Catches Remaining",
+            description = "Show the catches remaining until the pity threshold is reached",
+            section = infoBoxSection
+    )
+    default boolean showCatchesRemainingUntilPity() {
+        return true;
+    }
+
+    @ConfigItem(
+            position = 0,
             keyName = "currentRumourMessage",
             name = "Current Rumour Message",
             description = "Place a message in chat whenever the current Rumour changes",
             section = messagesSection
     )
-	default boolean currentRumourMessage() {
+    default boolean currentRumourMessage() {
         return true;
     }
 
@@ -95,14 +114,14 @@ public interface HunterRumoursConfig extends Config {
     }
 
     @ConfigItem(
-        position = 2,
-        keyName = "luckMessage",
-        name = "Luck Message",
-        description = "Place a message in chat whenever you complete a rumour.",
-        section = messagesSection
+            position = 2,
+            keyName = "endOfRumourMessage",
+            name = "End-of-Rumour Message",
+            description = "Place a message in chat whenever you complete a rumour, containing stats about the rumour.",
+            section = messagesSection
     )
-    default boolean luckMessage() {
-        return true;
+    default boolean endOfRumourMessage() {
+        return false;
     }
 
     @ConfigItem(

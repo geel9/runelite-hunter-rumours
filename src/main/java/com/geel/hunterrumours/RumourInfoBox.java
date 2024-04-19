@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Map;
 import net.runelite.client.game.ItemManager;
 import net.runelite.client.ui.overlay.infobox.InfoBox;
+import net.runelite.client.util.ColorUtil;
 
 import javax.annotation.Nonnull;
 import java.awt.*;
@@ -15,18 +16,16 @@ public class RumourInfoBox extends InfoBox
 	public RumourInfoBox(Rumour rumour, @Nonnull HunterRumoursPlugin plugin, @Nonnull ItemManager itemManager)
 	{
 		super(itemManager.getImage(rumour.getItemId()), plugin);
-
 		this.plugin = plugin;
 
 		final Map<String, List<RumourLocation>> locations = RumourLocation.getGroupedLocationsForRumour(rumour);
-
 		final StringBuilder sb = new StringBuilder();
 
 		locations.keySet().forEach(locationName -> {
 			var keyedLocations = locations.get(locationName);
 			RumourLocation rumourLocation = keyedLocations.get(0);
 
-			sb.append("</br>").append(locationName).append(" (");
+			sb.append("</br>  • ").append(locationName).append(" (");
 			if (!rumourLocation.getFairyRingCode().equals(""))
 			{
 				sb.append(rumourLocation.getFairyRingCode()).append(", ");
@@ -39,13 +38,11 @@ public class RumourInfoBox extends InfoBox
 		String hasFinishedRumourText = plugin.getHunterRumourState() ? "Yes" : "No";
 
 		this.setTooltip(
-			"Rumour: " + rumour.getFullName() +
-				"</br>Finished: " + hasFinishedRumourText +
-				"</br>Item: " + itemManager.getItemComposition(rumour.getItemId()).getName() +
-				"</br>Currently Caught: " + plugin.getCaughtRumourCreatures() +
-				"</br>Pity Threshold: " + pityThreshold +
-				"</br>Locations:" + sb
-
+                ColorUtil.wrapWithColorTag("Rumour: ", Color.YELLOW) + rumour.getFullName() + "</br>" +
+            ColorUtil.wrapWithColorTag("Finished: ", Color.YELLOW) + hasFinishedRumourText + "</br>" +
+            ColorUtil.wrapWithColorTag("Item: ", Color.YELLOW) + itemManager.getItemComposition(rumour.getItemId()).getName() + "</br>" +
+            ColorUtil.wrapWithColorTag("Caught: ", Color.YELLOW) + plugin.getCaughtRumourCreatures() + " / " + pityThreshold + "</br>" +
+            ColorUtil.wrapWithColorTag("Locations:", Color.YELLOW) + sb
 		);
 	}
 
@@ -58,8 +55,7 @@ public class RumourInfoBox extends InfoBox
 		}
 
 		final Rumour currentRumour = plugin.getCurrentRumour();
-
-		if (currentRumour != Rumour.NONE)
+		if (currentRumour != Rumour.NONE && showNumUntilPity())
 		{
 			return String.valueOf(currentRumour.getTrap().getPityThreshold() - plugin.getCaughtRumourCreatures());
 		}
@@ -74,8 +70,9 @@ public class RumourInfoBox extends InfoBox
 		{
 			return Color.GREEN;
 		}
-		else
-		{
+		else if(!showNumUntilPity()) {
+		    return Color.WHITE;
+        } else {
 			final Rumour currentRumour = plugin.getCurrentRumour();
 			if (currentRumour == Rumour.NONE)
 			{
@@ -98,4 +95,12 @@ public class RumourInfoBox extends InfoBox
 			}
 		}
 	}
+
+	private boolean showNumUntilPity() {
+	    if(this.plugin == null || this.plugin.getConfig() == null) {
+	        return false;
+        }
+
+	    return this.plugin.getConfig().showCatchesRemainingUntilPity();
+    }
 }
