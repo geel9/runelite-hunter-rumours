@@ -220,7 +220,8 @@ public interface HunterRumoursConfig extends Config {
             section = highlightSection
     )
     default Color currentHunterHighlightColor() {
-        return Color.GREEN;
+
+        return new Color(0, 0x96, 0);
     }
 
     @ConfigItem(
@@ -231,7 +232,7 @@ public interface HunterRumoursConfig extends Config {
             section = highlightSection
     )
     default Color knownHunterHighlightColor() {
-        return Color.YELLOW;
+        return new Color(0xC8, 0xC8, 00);
     }
 
     @ConfigItem(
@@ -242,7 +243,8 @@ public interface HunterRumoursConfig extends Config {
             section = highlightSection
     )
     default Color unknownHunterHighlightColor() {
-        return Color.RED;
+
+        return new Color(0x96, 0, 0);
     }
 
     @ConfigItem(
@@ -253,6 +255,7 @@ public interface HunterRumoursConfig extends Config {
             section = highlightSection
     )
     default Color hunterNPCHighlightColor() {
-        return Color.GREEN;
+
+        return new Color(0x2A, 0xBE, 0x2A);
     }
 }
