@@ -95,6 +95,17 @@ public interface HunterRumoursConfig extends Config {
     }
 
     @ConfigItem(
+        position = 2,
+        keyName = "luckMessage",
+        name = "Luck Message",
+        description = "Place a message in chat whenever you complete a rumour.",
+        section = messagesSection
+    )
+    default boolean luckMessage() {
+        return true;
+    }
+
+    @ConfigItem(
             position = 0,
             keyName = "includeMasterHunters",
             name = "Include Master Hunters",

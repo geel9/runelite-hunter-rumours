@@ -18,9 +18,9 @@ public class RumourInfoBox extends InfoBox
 
 		this.plugin = plugin;
 
-		Map<String, List<RumourLocation>> locations = RumourLocation.getGroupedLocationsForRumour(rumour);
+		final Map<String, List<RumourLocation>> locations = RumourLocation.getGroupedLocationsForRumour(rumour);
 
-		StringBuilder sb = new StringBuilder();
+		final StringBuilder sb = new StringBuilder();
 
 		locations.keySet().forEach(locationName -> {
 			var keyedLocations = locations.get(locationName);
@@ -34,14 +34,15 @@ public class RumourInfoBox extends InfoBox
 			sb.append(keyedLocations.size()).append(" spawns)");
 		});
 
-		Trap trap = rumour.getTrap();
-		int pityThreshold = plugin.hasFullHunterKit ? trap.getFullOutfitRate() : trap.getPityThreshold();
+		final Trap trap = rumour.getTrap();
+		final int pityThreshold = plugin.hasFullHunterKit ? trap.getFullOutfitRate() : trap.getPityThreshold();
 		String hasFinishedRumourText = plugin.getHunterRumourState() ? "Yes" : "No";
 
 		this.setTooltip(
 			"Rumour: " + rumour.getFullName() +
 				"</br>Finished: " + hasFinishedRumourText +
 				"</br>Item: " + itemManager.getItemComposition(rumour.getItemId()).getName() +
+				"</br>Currently Caught: " + plugin.getCaughtRumourCreatures() +
 				"</br>Pity Threshold: " + pityThreshold +
 				"</br>Locations:" + sb
 
@@ -51,9 +52,16 @@ public class RumourInfoBox extends InfoBox
 	@Override
 	public String getText()
 	{
-		if(plugin.getHunterRumourState())
+		if (plugin.getHunterRumourState())
 		{
 			return "Done";
+		}
+
+		final Rumour currentRumour = plugin.getCurrentRumour();
+
+		if (currentRumour != Rumour.NONE)
+		{
+			return String.valueOf(currentRumour.getTrap().getPityThreshold() - plugin.getCaughtRumourCreatures());
 		}
 
 		return "";
@@ -68,7 +76,25 @@ public class RumourInfoBox extends InfoBox
 		}
 		else
 		{
-			return Color.WHITE;
+			final Rumour currentRumour = plugin.getCurrentRumour();
+			if (currentRumour == Rumour.NONE)
+			{
+				return Color.WHITE;
+			}
+			final int caughtCreatures = plugin.getCaughtRumourCreatures();
+			final float percentage = (float)caughtCreatures / (float) currentRumour.getTrap().getPityThreshold() * 100f;
+			if (percentage >= 75)
+			{
+				return Color.ORANGE.brighter();
+			}
+			else if (percentage >= 50)
+			{
+				return Color.ORANGE.darker();
+			}
+			else
+			{
+				return Color.RED;
+			}
 		}
 	}
 }
