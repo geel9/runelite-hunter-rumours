@@ -48,25 +48,42 @@ class HunterRumoursOverlay extends OverlayPanel {
                 LineComponent.builder()
                         .left("Current Rumour")
                         .right(plugin.getCurrentRumour().getFullName())
-                        .build(),
-                LineComponent.builder()
-                        .left("Back-To-Back")
-                        .right(plugin.getBackToBackState().getNiceName())
-                        .rightColor(BackToBackColor(plugin.getBackToBackState()))
-                        .build(),
-                LineComponent.builder().build()
+                        .build()
                 )
         );
 
-        for (var hunter : plugin.getEnabledHunters()) {
-            children.add(
-                    LineComponent.builder()
-                            .left(hunter.getCommonName())
-                            .right(HunterRumoursPlugin.hunterRumours.get(hunter).getFullName())
-                            .build()
+        // Add back-to-back state if enabled
+        if (plugin.getConfig().guildOverlayShowBackToBackState()) {
+            children.add(LineComponent.builder()
+                    .left("Back-To-Back")
+                    .right(plugin.getBackToBackState().getNiceName())
+                    .rightColor(BackToBackColor(plugin.getBackToBackState()))
+                    .build()
             );
         }
 
+        // Add list of hunters if enabled
+        if (plugin.getConfig().guildOverlayListHunters()) {
+            var enabledHunters = plugin.getEnabledHunters();
+
+            // If any hunters to add, add a spacing line before listing them
+            if (enabledHunters.length > 0) {
+                children.add(LineComponent.builder().build());
+            }
+
+            // List all hunters
+            for (var hunter : enabledHunters) {
+                children.add(
+                        LineComponent.builder()
+                                .left(hunter.getCommonName())
+                                .right(HunterRumoursPlugin.hunterRumours.get(hunter).getFullName())
+                                .build()
+                );
+            }
+
+        }
+
+        // Hack to figure out ~~~roughly~~~ how big the panel should be
         panelComponent.setPreferredSize(new Dimension(graphics.getFontMetrics().stringWidth("Current Rumour      Razor-backed Kebbit (Deadfall)"), 0));
 
         return super.render(graphics);

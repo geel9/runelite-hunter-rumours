@@ -12,38 +12,75 @@ public interface HunterRumoursConfig extends Config {
     String GROUP = "hunterrumours";
 
     @ConfigSection(
+            name = "Hunter Guild Display",
+            description = "Configure the panel that displays information while underground in the Hunter Guild",
+            position = 0
+    )
+    String hunterGuildDisplaySection = "hunterGuildDisplaySection";
+
+    @ConfigSection(
             name = "Current Rumour Infobox",
             description = "Configure the infobox that shows your current Rumour",
-            position = 3
+            position = 1
     )
     String infoBoxSection = "infoBoxSection";
 
     @ConfigSection(
+            name = "World Map",
+            description = "Configure the hunter creature locations the plugin adds to the world map",
+            position = 2
+    )
+    String worldMapSection = "worldMapSection";
+
+    @ConfigSection(
             name = "Chat Messages",
             description = "Configure various chat messages that the plugin creates",
-            position = 4
+            position = 3
     )
     String messagesSection = "messagesSection";
 
     @ConfigSection(
             name = "Hunter Tiers",
             description = "The tiers of hunters that are enabled",
-            position = 5
+            position = 4
     )
     String tiersSection = "tiersSection";
 
     @ConfigSection(
             name = "Highlights",
             description = "Highlights for Hunters and Hunter Targets",
-            position = 6
+            position = 5
     )
     String highlightSection = "highlightSection";
 
     @ConfigItem(
             position = 0,
+            keyName = "showWorldMapLocations",
+            name = "Show World Map Locations",
+            description = "Whether the locations of your current rumour should show up on your world map",
+            section = worldMapSection
+    )
+    default boolean showWorldMapLocations() {
+        return true;
+    }
+
+    @ConfigItem(
+            position = 1,
+            keyName = "compactWorldMap",
+            name = "Compact World Map Locations",
+            description = "Only show 1 icon per location on the World Map",
+            section = worldMapSection
+    )
+    default boolean compactWorldMap() {
+        return false;
+    }
+
+    @ConfigItem(
+            position = 0,
             keyName = "showOverlay",
-            name = "Show Hunter Guild Overlay",
-            description = "Show an overlay that lists the current hunter guild rumours when in the burrows"
+            name = "Show Hunter Guild Info Panel",
+            description = "Show an overlay that lists the current hunter guild rumours when in the burrows",
+            section = hunterGuildDisplaySection
     )
     default boolean showOverlay() {
         return true;
@@ -51,22 +88,24 @@ public interface HunterRumoursConfig extends Config {
 
     @ConfigItem(
             position = 1,
-            keyName = "showWorldMapLocations",
-            name = "Show World Map Locations",
-            description = "Whether the locations of your current rumour should show up on your world map"
+            keyName = "showAllHunters",
+            name = "List All Hunter Rumours",
+            description = "List all tracked hunters and their current rumours in the guild overlay",
+            section = hunterGuildDisplaySection
     )
-    default boolean showWorldMapLocations() {
-        return true;
+    default boolean guildOverlayListHunters() {
+        return false;
     }
 
     @ConfigItem(
             position = 2,
-            keyName = "compactWorldMap",
-            name = "Compact World Map Locations",
-            description = "Only show 1 icon per location on the World Map"
+            keyName = "showBackToBackState",
+            name = "Show Back-to-Back State",
+            description = "Displays the back-to-back state (enabled/disabled) in the guild overlay",
+            section = hunterGuildDisplaySection
     )
-    default boolean compactWorldMap() {
-        return false;
+    default boolean guildOverlayShowBackToBackState() {
+        return true;
     }
 
     @ConfigItem(
@@ -232,7 +271,7 @@ public interface HunterRumoursConfig extends Config {
             section = highlightSection
     )
     default Color knownHunterHighlightColor() {
-        return new Color(0xC8, 0xC8, 00);
+        return new Color(0xC8, 0xC8, 0);
     }
 
     @ConfigItem(
