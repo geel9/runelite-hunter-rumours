@@ -187,7 +187,7 @@ public interface HunterRumoursConfig extends Config {
             section = highlightSection
     )
     default boolean highlightKnownHunters() {
-        return true;
+        return false;
     }
 
     @ConfigItem(
@@ -198,7 +198,7 @@ public interface HunterRumoursConfig extends Config {
             section = highlightSection
     )
     default boolean highlightUnknownHunters() {
-        return true;
+        return false;
     }
 
     @ConfigItem(
