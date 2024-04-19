@@ -82,7 +82,8 @@ public class RumourInfoBox extends InfoBox
 				return Color.WHITE;
 			}
 			final int caughtCreatures = plugin.getCaughtRumourCreatures();
-			final float percentage = (float)caughtCreatures / (float) currentRumour.getTrap().getPityThreshold() * 100f;
+			final float pityThreshold = (float)(plugin.isHasFullHunterKit() ? plugin.getCurrentRumour().getTrap().getFullOutfitRate() : plugin.getCurrentRumour().getTrap().getPityThreshold());
+			final float percentage = (float)caughtCreatures / pityThreshold * 100f;
 			if (percentage >= 75)
 			{
 				return Color.ORANGE.brighter();

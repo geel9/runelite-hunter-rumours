@@ -485,7 +485,9 @@ public class HunterRumoursPlugin extends Plugin
 		if (config.luckMessage())
 		{
 			final int caughtCreatures = getCaughtRumourCreatures();
-			final float percentage = (float)caughtCreatures / (float) getCurrentRumour().getTrap().getPityThreshold() * 100f;
+
+			final float pityThreshold = (float)(hasFullHunterKit ? getCurrentRumour().getTrap().getFullOutfitRate() : getCurrentRumour().getTrap().getPityThreshold());
+			final float percentage = (float)caughtCreatures / pityThreshold * 100f;
 			if (percentage >= 75)
 			{
 				client.addChatMessage(ChatMessageType.GAMEMESSAGE, "Hunter Rumours", "You were quite unlucky on this one!", "");
