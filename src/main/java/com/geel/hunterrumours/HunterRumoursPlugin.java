@@ -50,7 +50,7 @@ public class HunterRumoursPlugin extends Plugin {
     private BackToBackState backToBackState = BackToBackState.UNKNOWN;
     private final Set<HunterRumourWorldMapPoint> currentMapPoints = new HashSet<>();
     boolean backToBackDialogOpened = false; // Tracking variable to hook into back-to-back dialog opening
-    private int previousExp = -1;
+    private int previousExp = -1; // Tracks Hunter experience -- used to detect XP drops indicating a creature was caught
 
     @Getter
     boolean hasFullHunterKit = false;
@@ -423,22 +423,31 @@ public class HunterRumoursPlugin extends Plugin {
             return;
         }
 
-        setHunterRumourState(true);
 
-        if (config.luckMessage()) {
+        if (config.endOfRumourMessage()) {
             final int caughtCreatures = getCaughtRumourCreatures();
 
             final float pityThreshold = (float) (hasFullHunterKit ? getCurrentRumour().getTrap().getFullOutfitRate() : getCurrentRumour().getTrap().getPityThreshold());
-            final float percentage = (float) caughtCreatures / pityThreshold * 100f;
+            final int percentage = (int) ((100 * caughtCreatures) / pityThreshold);
+
+            Color color;
             if (percentage >= 75) {
-                client.addChatMessage(ChatMessageType.GAMEMESSAGE, "Hunter Rumours", "Hunter Rumours: You were quite  " + ColorUtil.wrapWithColorTag("unlucky", Color.RED) + " on this one!", "");
+                color = Color.RED;
             } else if (percentage >= 50) {
-                client.addChatMessage(ChatMessageType.GAMEMESSAGE, "Hunter Rumours", "Hunter Rumours: That wasn't " + ColorUtil.wrapWithColorTag("too bad", Color.ORANGE) + " was it?", "");
+                color = Color.ORANGE;
             } else {
-                client.addChatMessage(ChatMessageType.GAMEMESSAGE, "Hunter Rumours", "Hunter Rumours: It's too easy for you, " + ColorUtil.wrapWithColorTag("so lucky", Color.GREEN) + "!", "");
+                color = Color.GREEN;
             }
+
+            client.addChatMessage(ChatMessageType.GAMEMESSAGE,
+                    "Hunter Rumours",
+                    "Hunter Rumours: Rumour finished " +
+                            ColorUtil.wrapWithColorTag(String.valueOf(percentage), color) +
+                            "% of the way towards pity rate of " + pityThreshold,
+                    "");
         }
 
+        setHunterRumourState(true);
         refreshAllDisplays();
     }
 
