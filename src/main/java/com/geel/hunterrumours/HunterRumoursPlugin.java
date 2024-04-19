@@ -249,7 +249,7 @@ public class HunterRumoursPlugin extends Plugin {
         // If the user changed the current status, put a message in chat
         if (isFromUserChoice && config.backToBackMessage()) {
             Color color = backToBackState == BackToBackState.ENABLED ? Color.GREEN : Color.RED;
-            client.addChatMessage(ChatMessageType.GAMEMESSAGE, "", "Back-to-back: " + ColorUtil.wrapWithColorTag(backToBackState.getNiceName(), color), "");
+            client.addChatMessage(ChatMessageType.GAMEMESSAGE, "Hunter Rumours", "Back-to-back: " + ColorUtil.wrapWithColorTag(backToBackState.getNiceName(), color), "");
         }
     }
 
@@ -523,7 +523,7 @@ public class HunterRumoursPlugin extends Plugin {
         }
 
         if (config.currentRumourMessage()) {
-            client.addChatMessage(ChatMessageType.GAMEMESSAGE, "", "Current rumour: " + ColorUtil.wrapWithColorTag(dialogRumour.getFullName(), Color.RED) + " | Current hunter: " + ColorUtil.wrapWithColorTag(currentHunter.getCommonName(), Color.RED), "");
+            client.addChatMessage(ChatMessageType.GAMEMESSAGE, "Hunter Rumours", "Current rumour: " + ColorUtil.wrapWithColorTag(dialogRumour.getFullName(), Color.RED) + " | Current hunter: " + ColorUtil.wrapWithColorTag(currentHunter.getCommonName(), Color.RED), "");
         }
 
         refreshAllDisplays();
