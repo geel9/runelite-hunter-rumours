@@ -125,7 +125,7 @@ public class HunterRumoursPlugin extends Plugin {
         }
 
         clientThread.invoke(this::loadFromConfig);
-        clientThread.invoke(npcOverlayService::rebuild);
+        clientThread.invoke(this::refreshAllDisplays);
     }
 
     @Subscribe
