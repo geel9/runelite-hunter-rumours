@@ -258,7 +258,7 @@ public class HunterRumoursPlugin extends Plugin {
 
         final int xpDiff = currentXp - previousHunterExp;
         if (xpDiff > 0) {
-            if (Arrays.stream(getCurrentRumour().getPossibleXpDrops()).anyMatch(possibleXpDrop -> possibleXpDrop == xpDiff)) {
+            if (Arrays.stream(getCurrentRumour().getTargetCreature().getPossibleXpDrops()).anyMatch(possibleXpDrop -> possibleXpDrop == xpDiff)) {
                 incrementCaughtCreatures();
                 refreshAllDisplays();
             }
@@ -712,9 +712,9 @@ public class HunterRumoursPlugin extends Plugin {
         if (config.highlightHunterNPCs()) {
             Rumour currentRumour = getCurrentRumour();
             if (currentRumour == Rumour.NONE
-                    || currentRumour.getNpcId() == 0
+                    || currentRumour.getTargetCreature().getNpcId() == 0
                     || currentRumourFinished
-                    || npc.getId() != currentRumour.getNpcId()
+                    || npc.getId() != currentRumour.getTargetCreature().getNpcId()
             ) {
                 return null;
             }

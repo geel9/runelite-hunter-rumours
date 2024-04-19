@@ -2,12 +2,9 @@ package com.geel.hunterrumours.enums;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
-import net.runelite.api.ItemID;
-import net.runelite.api.ObjectID;
 
 import java.util.Arrays;
 import java.util.HashMap;
-import java.util.Locale;
 import java.util.Map;
 
 @AllArgsConstructor

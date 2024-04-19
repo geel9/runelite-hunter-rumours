@@ -24,7 +24,7 @@ class HunterRumourWorldMapPoint extends WorldMapPoint {
         hunterRumourWorldImage = new BufferedImage(getMapArrow().getWidth(), getMapArrow().getHeight(), BufferedImage.TYPE_INT_ARGB);
         Graphics graphics = hunterRumourWorldImage.getGraphics();
         graphics.drawImage(getMapArrow(), 0, 0, null);
-        graphics.drawImage(manager.getImage(location.getRumour().getItemId()), 0, 0, null);
+        graphics.drawImage(manager.getImage(location.getRumour().getTargetCreature().getItemId()), 0, 0, null);
 
         // Center image horizontally over world point
         hunterRumourWorldImagePoint = new Point(

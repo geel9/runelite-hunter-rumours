@@ -16,7 +16,7 @@ public class RumourInfoBox extends InfoBox {
     private final HunterRumoursPlugin plugin;
 
     public RumourInfoBox(Rumour rumour, @Nonnull HunterRumoursPlugin plugin, @Nonnull ItemManager itemManager) {
-        super(itemManager.getImage(rumour.getItemId()), plugin);
+        super(itemManager.getImage(rumour.getTargetCreature().getItemId()), plugin);
         this.plugin = plugin;
 
         final Map<String, List<RumourLocation>> locations = RumourLocation.getGroupedLocationsForRumour(rumour);
@@ -33,14 +33,14 @@ public class RumourInfoBox extends InfoBox {
             sb.append(keyedLocations.size()).append(" spawns)");
         });
 
-        final Trap trap = rumour.getTrap();
+        final Trap trap = rumour.getTargetCreature().getTrap();
         final int pityThreshold = plugin.hasFullHunterKit ? trap.getFullOutfitRate() : trap.getPityThreshold();
         String hasFinishedRumourText = plugin.getHunterRumourState() ? "Yes" : "No";
 
         this.setTooltip(
                 ColorUtil.wrapWithColorTag("Rumour: ", Color.YELLOW) + rumour.getFullName() + "</br>" +
                         ColorUtil.wrapWithColorTag("Finished: ", Color.YELLOW) + hasFinishedRumourText + "</br>" +
-                        ColorUtil.wrapWithColorTag("Item: ", Color.YELLOW) + itemManager.getItemComposition(rumour.getItemId()).getName() + "</br>" +
+                        ColorUtil.wrapWithColorTag("Item: ", Color.YELLOW) + itemManager.getItemComposition(rumour.getRumourItemID()).getName() + "</br>" +
                         ColorUtil.wrapWithColorTag("Caught: ", Color.YELLOW) + plugin.getCaughtRumourCreatures() + " / " + pityThreshold + "</br>" +
                         ColorUtil.wrapWithColorTag("Locations:", Color.YELLOW) + sb
         );
@@ -54,7 +54,7 @@ public class RumourInfoBox extends InfoBox {
 
         final Rumour currentRumour = plugin.getCurrentRumour();
         if (currentRumour != Rumour.NONE && showNumUntilPity()) {
-            return String.valueOf(currentRumour.getTrap().getPityThreshold() - plugin.getCaughtRumourCreatures());
+            return String.valueOf(currentRumour.getTargetCreature().getTrap().getPityThreshold() - plugin.getCaughtRumourCreatures());
         }
 
         return "";
@@ -72,7 +72,9 @@ public class RumourInfoBox extends InfoBox {
                 return Color.WHITE;
             }
             final int caughtCreatures = plugin.getCaughtRumourCreatures();
-            final float pityThreshold = (float) (plugin.isHasFullHunterKit() ? plugin.getCurrentRumour().getTrap().getFullOutfitRate() : plugin.getCurrentRumour().getTrap().getPityThreshold());
+            final float pityThreshold = (float) (plugin.isHasFullHunterKit()
+                    ? plugin.getCurrentRumour().getTargetCreature().getTrap().getFullOutfitRate()
+                    : plugin.getCurrentRumour().getTargetCreature().getTrap().getPityThreshold());
             final float percentage = (float) caughtCreatures / pityThreshold * 100f;
             if (percentage >= 75) {
                 return Color.ORANGE.brighter();

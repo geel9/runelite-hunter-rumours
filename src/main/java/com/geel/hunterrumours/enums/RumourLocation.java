@@ -375,7 +375,7 @@ public enum RumourLocation
 	SUNLIGHT_MOTH_AVIUM_NEYPOTZLI_4(SUNLIGHT_MOTH, "Neypotzli", "", new WorldPoint(1444, 9633, 0));
 
 	@Getter
-	private final Rumour Rumour;
+	private final com.geel.hunterrumours.enums.Rumour Rumour;
 
 	@Getter
 	private final String LocationName;

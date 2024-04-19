@@ -20,17 +20,18 @@ public class HunterRumoursTest {
             }
 
             // Should have an item id
-            if (rumour.getItemId() <= 0) {
-                fail("Rumour (" + rumour.getName() + ")" + " has invalid item id: " + rumour.getItemId());
+            // TODO: Refactor into `Creature`-specific tests
+            if (rumour.getTargetCreature().getItemId() <= 0) {
+                fail("Rumour (" + rumour.getName() + ")" + " has invalid item id: " + rumour.getTargetCreature().getItemId());
             }
 
             // Should have a hunter level of at least 1
-            if (rumour.getHunterLevel() <= 0) {
-                fail("Rumour (" + rumour.getName() + ")" + " has invalid hunter level: " + rumour.getHunterLevel());
+            if (rumour.getTargetCreature().getHunterLevel() <= 0) {
+                fail("Rumour (" + rumour.getName() + ")" + " has invalid hunter level: " + rumour.getTargetCreature().getHunterLevel());
             }
 
             // Should have at least one possible xp drop
-            if (rumour.getPossibleXpDrops().length == 0) {
+            if (rumour.getTargetCreature().getPossibleXpDrops().length == 0) {
                 fail("Rumour (" + rumour.getName() + ")" + " has no possible xp drops");
             }
 
