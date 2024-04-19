@@ -50,7 +50,7 @@ public class HunterRumoursPlugin extends Plugin {
     private BackToBackState backToBackState = BackToBackState.UNKNOWN;
     private final Set<HunterRumourWorldMapPoint> currentMapPoints = new HashSet<>();
     boolean backToBackDialogOpened = false; // Tracking variable to hook into back-to-back dialog opening
-    private int previousExp = -1; // Tracks Hunter experience -- used to detect XP drops indicating a creature was caught
+    private int previousHunterExp = -1; // Tracks Hunter experience -- used to detect XP drops indicating a creature was caught
 
     @Getter
     boolean hasFullHunterKit = false;
@@ -242,14 +242,22 @@ public class HunterRumoursPlugin extends Plugin {
         if (event.getSkill() != Skill.HUNTER) {
             return;
         }
+
         final int currentXp = event.getXp();
-        final int xpDiff = currentXp - previousExp;
+
+        // If previous XP is -1, just update to the current XP.
+        if (previousHunterExp == -1) {
+            previousHunterExp = currentXp;
+            return;
+        }
+
+        final int xpDiff = currentXp - previousHunterExp;
         if (xpDiff > 0) {
             if (Arrays.stream(getCurrentRumour().getPossibleXpDrops()).anyMatch(possibleXpDrop -> possibleXpDrop == xpDiff)) {
                 incrementCaughtCreatures();
                 refreshAllDisplays();
             }
-            previousExp = currentXp;
+            previousHunterExp = currentXp;
         }
     }
 
@@ -722,6 +730,12 @@ public class HunterRumoursPlugin extends Plugin {
      * Loads all state (current hunter, rumours, etc.) from config
      */
     private void loadFromConfig() {
+        // Fetch current hunter XP
+        int hunterExperience = client.getSkillExperience(Skill.HUNTER);
+        if (hunterExperience > 0) {
+            previousHunterExp = hunterExperience;
+        }
+
         // Load current hunter
         Hunter loadedCurrentHunter = configManager.getRSProfileConfiguration("hunterrumours", "current.hunter", Hunter.class);
         if (loadedCurrentHunter == null) {
