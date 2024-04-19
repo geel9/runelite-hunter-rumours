@@ -490,15 +490,15 @@ public class HunterRumoursPlugin extends Plugin
 			final float percentage = (float)caughtCreatures / pityThreshold * 100f;
 			if (percentage >= 75)
 			{
-				client.addChatMessage(ChatMessageType.GAMEMESSAGE, "Hunter Rumours", "You were quite unlucky on this one!", "");
+				client.addChatMessage(ChatMessageType.GAMEMESSAGE, "Hunter Rumours", "Hunter Rumours: You were quite  " + ColorUtil.wrapWithColorTag("unlucky", Color.RED) + " on this one!", "");
 			}
 			else if (percentage >= 50)
 			{
-				client.addChatMessage(ChatMessageType.GAMEMESSAGE, "Hunter Rumours", "That wasn't too bad was it?", "");
+				client.addChatMessage(ChatMessageType.GAMEMESSAGE, "Hunter Rumours", "Hunter Rumours: That wasn't " + ColorUtil.wrapWithColorTag("too bad", Color.ORANGE) + " was it?", "");
 			}
 			else
 			{
-				client.addChatMessage(ChatMessageType.GAMEMESSAGE, "Hunter Rumours", "It's too easy for you, so lucky!", "");
+				client.addChatMessage(ChatMessageType.GAMEMESSAGE, "Hunter Rumours", "Hunter Rumours: It's too easy for you, " + ColorUtil.wrapWithColorTag("so lucky", Color.GREEN) + "!", "");
 			}
 		}
 
