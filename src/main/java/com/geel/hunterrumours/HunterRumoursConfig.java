@@ -255,6 +255,4 @@ public interface HunterRumoursConfig extends Config {
     default Color hunterNPCHighlightColor() {
         return Color.GREEN;
     }
-
-
 }

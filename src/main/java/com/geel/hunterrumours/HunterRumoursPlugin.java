@@ -331,8 +331,7 @@ public class HunterRumoursPlugin extends Plugin {
      * Increments the currently caught creatures by one and sets the value.
      */
     public void incrementCaughtCreatures() {
-        final int currentlyCaughtCreatures = getCaughtRumourCreatures();
-        setCaughtCreatures(currentlyCaughtCreatures + 1);
+        setCaughtCreatures(getCaughtRumourCreatures() + 1);
     }
 
     /**
@@ -341,7 +340,7 @@ public class HunterRumoursPlugin extends Plugin {
      * @param caughtCreatures the amount of creatures currently caught
      */
     private void setCaughtCreatures(int caughtCreatures) {
-        configManager.setRSProfileConfiguration(HunterRumoursConfig.GROUP, "caught.rumour.creatures", caughtCreatures);
+        configManager.setRSProfileConfiguration(HunterRumoursConfig.GROUP, "current.rumour.caught", caughtCreatures);
     }
 
     /**
@@ -349,7 +348,7 @@ public class HunterRumoursPlugin extends Plugin {
      */
     public int getCaughtRumourCreatures() {
         try {
-            final int caughtCreatures = configManager.getRSProfileConfiguration(HunterRumoursConfig.GROUP, "caught.rumour.creatures", int.class);
+            final int caughtCreatures = configManager.getRSProfileConfiguration(HunterRumoursConfig.GROUP, "current.rumour.caught", int.class);
             return caughtCreatures;
         } catch (NullPointerException ex) {
             return 0;
@@ -788,7 +787,7 @@ public class HunterRumoursPlugin extends Plugin {
         configManager.unsetRSProfileConfiguration(HunterRumoursConfig.GROUP, "current.detached.rumour");
         configManager.unsetRSProfileConfiguration(HunterRumoursConfig.GROUP, "current.rumour.finished");
         configManager.unsetRSProfileConfiguration(HunterRumoursConfig.GROUP, "backtoback");
-        configManager.unsetRSProfileConfiguration(HunterRumoursConfig.GROUP, "caught.rumour.creatures");
+        configManager.unsetRSProfileConfiguration(HunterRumoursConfig.GROUP, "current.rumour.caught");
 
         for (var hunter : Hunter.allValues()) {
             configManager.unsetRSProfileConfiguration("hunterrumours", "hunter." + hunter.getNpcId());
