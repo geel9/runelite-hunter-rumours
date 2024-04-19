@@ -15,18 +15,16 @@ public class RumourInfoBox extends InfoBox
 	public RumourInfoBox(Rumour rumour, @Nonnull HunterRumoursPlugin plugin, @Nonnull ItemManager itemManager)
 	{
 		super(itemManager.getImage(rumour.getItemId()), plugin);
-
 		this.plugin = plugin;
 
 		final Map<String, List<RumourLocation>> locations = RumourLocation.getGroupedLocationsForRumour(rumour);
-
 		final StringBuilder sb = new StringBuilder();
 
 		locations.keySet().forEach(locationName -> {
 			var keyedLocations = locations.get(locationName);
 			RumourLocation rumourLocation = keyedLocations.get(0);
 
-			sb.append("</br>").append(locationName).append(" (");
+			sb.append("</br>  • ").append(locationName).append(" (");
 			if (!rumourLocation.getFairyRingCode().equals(""))
 			{
 				sb.append(rumourLocation.getFairyRingCode()).append(", ");
@@ -39,13 +37,11 @@ public class RumourInfoBox extends InfoBox
 		String hasFinishedRumourText = plugin.getHunterRumourState() ? "Yes" : "No";
 
 		this.setTooltip(
-			"Rumour: " + rumour.getFullName() +
-				"</br>Finished: " + hasFinishedRumourText +
-				"</br>Item: " + itemManager.getItemComposition(rumour.getItemId()).getName() +
-				"</br>Currently Caught: " + plugin.getCaughtRumourCreatures() +
-				"</br>Pity Threshold: " + pityThreshold +
-				"</br>Locations:" + sb
-
+                ColorUtil.wrapWithColorTag("Rumour: ", Color.YELLOW) + rumour.getFullName() + "</br>" +
+            ColorUtil.wrapWithColorTag("Finished: ", Color.YELLOW) + hasFinishedRumourText + "</br>" +
+            ColorUtil.wrapWithColorTag("Item: ", Color.YELLOW) + itemManager.getItemComposition(rumour.getItemId()).getName() + "</br>" +
+            ColorUtil.wrapWithColorTag("Caught: ", Color.YELLOW) + plugin.getCaughtRumourCreatures() + " / " + pityThreshold + "</br>" +
+            ColorUtil.wrapWithColorTag("Locations:", Color.YELLOW) + sb
 		);
 	}
 
