@@ -6,6 +6,7 @@ import net.runelite.api.Client;
 import net.runelite.api.NPCComposition;
 
 import javax.inject.Inject;
+import java.util.Locale;
 
 /**
  * Utility functions for parsing game/chat messages to extract rumour-related information,
@@ -31,6 +32,7 @@ public class ChatParser {
     }
 
     public Hunter getReferencedHunter(String message) {
+        message = message.toLowerCase();
         for (var hunterName : Hunter.allCommonNames()) {
             if (!message.contains(hunterName.toLowerCase())) {
                 continue;
