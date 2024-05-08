@@ -49,7 +49,6 @@ public class HunterRumoursPlugin extends Plugin {
     };
 
     public Hunter currentHunter = Hunter.NONE;
-    public Rumour currentDetachedRumour = Rumour.NONE;
     private boolean currentRumourFinished = false;
     private BackToBackState backToBackState = BackToBackState.UNKNOWN;
     private final Set<HunterRumourWorldMapPoint> currentMapPoints = new HashSet<>();
@@ -314,17 +313,6 @@ public class HunterRumoursPlugin extends Plugin {
     }
 
     /**
-     * Sets the user's current "detached rumour".
-     * <p>
-     * A detached rumour is one that we know of from the Quetzal Whistle's "Rumour" functionality,
-     * but we do not know which Hunter assigned it, since the game message does not include this information.
-     */
-    public void setDetachedRumour(Rumour rumour) {
-        currentDetachedRumour = rumour;
-        configManager.setRSProfileConfiguration(HunterRumoursConfig.GROUP, "current.detached.rumour", rumour);
-    }
-
-    /**
      * @return An array of the hunters that the user has enabled via plugin config.
      */
     public Hunter[] getEnabledHunters() {
@@ -385,14 +373,13 @@ public class HunterRumoursPlugin extends Plugin {
         return backToBackState;
     }
 
-
     /**
      * @return The Rumour that (we think) the player is currently assigned.
      */
     public Rumour getCurrentRumour() {
-        // If there's no current Hunter, defer to the detached Rumour (if present).
+        // If there's no current Hunter, we don't have a rumour??? obviously?????
         if (currentHunter == Hunter.NONE) {
-            return currentDetachedRumour == null ? Rumour.NONE : currentDetachedRumour;
+            return Rumour.NONE;
         }
 
         // Otherwise, if we know the current Hunter, always use it.
@@ -487,23 +474,23 @@ public class HunterRumoursPlugin extends Plugin {
             return;
         }
 
-        // If the referenced Rumour is what we already thought the Rumour was, then return early.
-        if (referencedRumour == getCurrentRumour()) {
+        // Determine which Hunter the message is referencing -- if none, bail out.
+        Hunter referencedHunter = chatParser.getReferencedHunter(message);
+        if(referencedHunter == Hunter.NONE) {
             return;
         }
 
-        // The referenced rumour is not what we thought the current Rumour was. This means that we have a state
-        // mismatch. We know the current Rumour now, but not the right Hunter. Therefore, we need to
-        // save the current Rumour as "detached", and clear some state relating to the current Hunter.
-        setDetachedRumour(referencedRumour);
-
-        // If we have a notion of a current Hunter, clean that up, because we were probably wrong.
-        if (currentHunter != Hunter.NONE) {
-            setHunterRumour(currentHunter, Rumour.NONE);
-            setCurrentHunter(Hunter.NONE);
-            setHunterRumourState(false);
-            setCaughtCreatures(0);
+        // If the referenced Rumour is what we already thought the Rumour was, then return early.
+        if (referencedRumour == getCurrentRumour() && referencedHunter == currentHunter) {
+            return;
         }
+
+        // Hunter or Rumour is different than what we thought it was. Update state.
+        // TODO: too much manual state shit, abstract this away
+        setHunterRumour(referencedHunter, referencedRumour);
+        setCurrentHunter(referencedHunter);
+        setHunterRumourState(false);
+        setCaughtCreatures(0);
 
         refreshAllDisplays();
     }
@@ -603,7 +590,6 @@ public class HunterRumoursPlugin extends Plugin {
         // also say a target but not another hunter (but that doesn't mean he's now the current hunter).
         if (!isNoviceReassignmentOffer) {
             setCurrentHunter(dialogHunter);
-            setDetachedRumour(Rumour.NONE);
         }
 
         if (config.currentRumourMessage()) {
@@ -758,13 +744,6 @@ public class HunterRumoursPlugin extends Plugin {
             hunterRumours.put(hunter, rumour);
         }
 
-        // Load detached rumour
-        Rumour loadedDetachedRumour = configManager.getRSProfileConfiguration(HunterRumoursConfig.GROUP, "current.detached.rumour", Rumour.class);
-        if (loadedDetachedRumour == null) {
-            loadedDetachedRumour = Rumour.NONE;
-        }
-        currentDetachedRumour = loadedDetachedRumour;
-
         // Load has finished current rumour
         try {
             currentRumourFinished = configManager.getRSProfileConfiguration(HunterRumoursConfig.GROUP, "current.rumour.finished", boolean.class);
@@ -788,7 +767,6 @@ public class HunterRumoursPlugin extends Plugin {
      */
     private void resetConfig() {
         configManager.unsetRSProfileConfiguration(HunterRumoursConfig.GROUP, "current.hunter");
-        configManager.unsetRSProfileConfiguration(HunterRumoursConfig.GROUP, "current.detached.rumour");
         configManager.unsetRSProfileConfiguration(HunterRumoursConfig.GROUP, "current.rumour.finished");
         configManager.unsetRSProfileConfiguration(HunterRumoursConfig.GROUP, "backtoback");
         configManager.unsetRSProfileConfiguration(HunterRumoursConfig.GROUP, "current.rumour.caught");
@@ -812,7 +790,6 @@ public class HunterRumoursPlugin extends Plugin {
         }
 
         currentHunter = Hunter.NONE;
-        currentDetachedRumour = Rumour.NONE;
         backToBackState = BackToBackState.UNKNOWN;
         hasFullHunterKit = false;
 
