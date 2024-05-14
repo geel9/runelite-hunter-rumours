@@ -56,7 +56,7 @@ public class HunterRumoursPlugin extends Plugin {
     private int previousHunterExp = -1; // Tracks Hunter experience -- used to detect XP drops indicating a creature was caught
 
     @Getter
-    private float hunterKitMultiplier = 1.0f;
+    private int hunterKitItems = 0;
 
     @Inject
     @Getter
@@ -159,26 +159,26 @@ public class HunterRumoursPlugin extends Plugin {
         var isLegs = legs == ItemID.GUILD_HUNTER_LEGS;
         var isBoots = boots == ItemID.GUILD_HUNTER_BOOTS;
 
-        var multiplier = 1.0f;
+        var items = 0;
 
         if (isHead) {
-            multiplier += 0.0125f;
+            items++;
         }
 
         if (isTop) {
-            multiplier += 0.0125f;
+            items++;
         }
 
         if (isLegs) {
-            multiplier += 0.0125f;
+            items++;
         }
 
         if (isBoots) {
-            multiplier += 0.0125f;
+            items++;
         }
 
-        if (multiplier != hunterKitMultiplier) {
-            hunterKitMultiplier = multiplier;
+        if (items != hunterKitItems) {
+            hunterKitItems = items;
             refreshAllDisplays();
         }
     }
@@ -441,8 +441,7 @@ public class HunterRumoursPlugin extends Plugin {
 
         if (config.endOfRumourMessage()) {
             final int caughtCreatures = getCaughtRumourCreatures();
-
-            final int pityThreshold = (int) Math.floor(getCurrentRumour().getTrap().getPityThreshold() * hunterKitMultiplier);
+            final int pityThreshold = getCurrentRumour().getTrap().getOutfitRate(hunterKitItems);
             final int percentage = 100 * caughtCreatures / pityThreshold;
 
             Color color;
@@ -807,7 +806,7 @@ public class HunterRumoursPlugin extends Plugin {
 
         currentHunter = Hunter.NONE;
         backToBackState = BackToBackState.UNKNOWN;
-        hunterKitMultiplier = 1.0f;
+        hunterKitItems = 1;
 
         refreshAllDisplays();
     }

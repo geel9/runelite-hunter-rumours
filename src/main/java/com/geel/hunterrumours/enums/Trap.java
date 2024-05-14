@@ -24,8 +24,7 @@ public enum Trap {
     @Getter
     private final int PityThreshold;
 
-    // TODO: Investigate if partial outfit provides any benefits.
-    public int getFullOutfitRate() {
-        return (int) Math.floor((double) this.getPityThreshold() * 0.95d);
+    public int getOutfitRate(final int items) {
+        return (int) Math.floor(this.getPityThreshold() * (1 + items * 0.0125f));
     }
 }
