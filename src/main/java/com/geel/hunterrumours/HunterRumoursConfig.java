@@ -1,9 +1,6 @@
 package com.geel.hunterrumours;
 
-import net.runelite.client.config.Config;
-import net.runelite.client.config.ConfigGroup;
-import net.runelite.client.config.ConfigItem;
-import net.runelite.client.config.ConfigSection;
+import net.runelite.client.config.*;
 
 import java.awt.*;
 
@@ -128,6 +125,29 @@ public interface HunterRumoursConfig extends Config {
     )
     default boolean showCatchesRemainingUntilPity() {
         return true;
+    }
+
+    @ConfigItem(
+            position = 2,
+            keyName = "infoBoxDisableTimer",
+            name = "Info Box Disable Timer (minutes)",
+            description = "Disables the info box after a certain amount of time (in minutes) of no hunter rumour related activity.",
+            section = infoBoxSection
+    )
+    @Range(min = 1)
+    default int infoBoxDisableTimer() {
+        return 5;
+    }
+
+    @ConfigItem(
+            position = 3,
+            keyName = "forceShowInfoBox",
+            name = "Force Show Info Box",
+            description = "Forces the infobox to be shown even after the time set above",
+            section = infoBoxSection
+    )
+    default boolean forceShowInfoBox() {
+        return false;
     }
 
     @ConfigItem(
