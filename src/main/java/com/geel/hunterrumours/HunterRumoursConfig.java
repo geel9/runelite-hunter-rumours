@@ -73,6 +73,29 @@ public interface HunterRumoursConfig extends Config {
     }
 
     @ConfigItem(
+            position = 2,
+            keyName = "worldMapLocationsDisableTimer",
+            name = "Locations Disable Timer (minutes)",
+            description = "Stops showing the locations on the World Map after a certain amount of time (in minutes) of no hunter rumour related activity.",
+            section = worldMapSection
+    )
+    @Range(min = 1)
+    default int worldMapLocationsDisableTimer() {
+        return 5;
+    }
+
+    @ConfigItem(
+            position = 3,
+            keyName = "forceShowWorldMapLocations",
+            name = "Force Show Locations",
+            description = "Forces the World Map Locations to be shown even after the time set above",
+            section = worldMapSection
+    )
+    default boolean forceShowWorldMapLocations() {
+        return false;
+    }
+
+    @ConfigItem(
             position = 0,
             keyName = "showOverlay",
             name = "Show Hunter Guild Info Panel",

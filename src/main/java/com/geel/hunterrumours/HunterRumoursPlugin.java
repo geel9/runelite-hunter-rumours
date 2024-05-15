@@ -304,6 +304,15 @@ public class HunterRumoursPlugin extends Plugin {
             }
         }
 
+        if (currentTick - latestInteractionTime > config.worldMapLocationsDisableTimer() * 100) {
+            if (!config.forceShowWorldMapLocations()) {
+                for (HunterRumourWorldMapPoint location : currentMapPoints) {
+                    worldMapPointManager.remove(location);
+                }
+                currentMapPoints.clear();
+            }
+        }
+
         if (!isShowingInfoBox) {
             infoBoxManager.addInfoBox(infoBox);
         }
