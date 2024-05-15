@@ -56,7 +56,7 @@ public class HunterRumoursPlugin extends Plugin {
     private int previousHunterExp = -1; // Tracks Hunter experience -- used to detect XP drops indicating a creature was caught
 
     @Getter
-    boolean hasFullHunterKit = false;
+    private int hunterKitItems = 0;
 
     @Inject
     @Getter
@@ -159,9 +159,26 @@ public class HunterRumoursPlugin extends Plugin {
         var isLegs = legs == ItemID.GUILD_HUNTER_LEGS;
         var isBoots = boots == ItemID.GUILD_HUNTER_BOOTS;
 
-        boolean hasFullKit = isHead && isTop && isLegs && isBoots;
-        if (hasFullKit != hasFullHunterKit) {
-            hasFullHunterKit = hasFullKit;
+        var items = 0;
+
+        if (isHead) {
+            items++;
+        }
+
+        if (isTop) {
+            items++;
+        }
+
+        if (isLegs) {
+            items++;
+        }
+
+        if (isBoots) {
+            items++;
+        }
+
+        if (items != hunterKitItems) {
+            hunterKitItems = items;
             refreshAllDisplays();
         }
     }
@@ -422,12 +439,10 @@ public class HunterRumoursPlugin extends Plugin {
             return;
         }
 
-
         if (config.endOfRumourMessage()) {
             final int caughtCreatures = getCaughtRumourCreatures();
-
-            final float pityThreshold = (float) (hasFullHunterKit ? getCurrentRumour().getTrap().getFullOutfitRate() : getCurrentRumour().getTrap().getPityThreshold());
-            final int percentage = (int) ((100 * caughtCreatures) / pityThreshold);
+            final int pityThreshold = getCurrentRumour().getTrap().getOutfitRate(hunterKitItems);
+            final int percentage = 100 * caughtCreatures / pityThreshold;
 
             Color color;
             if (percentage >= 75) {
@@ -476,7 +491,7 @@ public class HunterRumoursPlugin extends Plugin {
 
         // Determine which Hunter the message is referencing -- if none, bail out.
         Hunter referencedHunter = chatParser.getReferencedHunter(message);
-        if(referencedHunter == Hunter.NONE) {
+        if (referencedHunter == Hunter.NONE) {
             return;
         }
 
@@ -791,7 +806,7 @@ public class HunterRumoursPlugin extends Plugin {
 
         currentHunter = Hunter.NONE;
         backToBackState = BackToBackState.UNKNOWN;
-        hasFullHunterKit = false;
+        hunterKitItems = 1;
 
         refreshAllDisplays();
     }
