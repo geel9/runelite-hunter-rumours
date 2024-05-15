@@ -813,7 +813,7 @@ public class HunterRumoursPlugin extends Plugin {
     }
 
     /**
-     *
+     * Records the current tick as the "latest interaction time" -- used to track how long it's been since the player has engaged in Hunter Rumour-related behavior
      */
     private void updateLatestInteractionTime() {
         latestInteractionTime = client.getTickCount();
