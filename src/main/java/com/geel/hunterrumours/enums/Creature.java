@@ -1,5 +1,7 @@
 package com.geel.hunterrumours.enums;
 
+import java.util.stream.IntStream;
+
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import net.runelite.api.ItemID;
@@ -39,7 +41,7 @@ public enum Creature {
     SUNLIGHT_ANTELOPE(NpcID.SUNLIGHT_ANTELOPE, ItemID.SUNLIGHT_ANTELOPE, PIT, 72,  new int[]{380}),
     MOONLIGHT_MOTH(NpcID.MOONLIGHT_MOTH, ItemID.MOONLIGHT_MOTH, BUTTERFLY, 75,  new int[]{84}),
     TECU_SALAMANDER(NpcID.TECU_SALAMANDER, ItemID.TECU_SALAMANDER, NET_TRAP, 79, new int[]{344}),
-    HERBIBOAR(NpcID.HERBIBOAR, ItemID.HERBIBOAR, NOOSE, 80, new int[]{204}),
+    HERBIBOAR(NpcID.HERBIBOAR, ItemID.HERBIBOAR, NOOSE, 80, IntStream.rangeClosed(1950, 2461).toArray()),
     MOONLIGHT_ANTELOPE(NpcID.MOONLIGHT_ANTELOPE, ItemID.MOONLIGHT_ANTELOPE, PIT, 91, new int[]{450});
 
     @Getter
