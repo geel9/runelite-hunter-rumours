@@ -569,7 +569,8 @@ public class HunterRumoursPlugin extends Plugin {
         String actualMessage = dialogMessage.replace(npcNamePrefix, "").toLowerCase(Locale.ROOT);
 
         // Determine if it's a "rumour complete" message
-        if (actualMessage.contains("would you like another rumour?")) {
+        if (actualMessage.contains("would you like another rumour?") ||
+            actualMessage.contains("here's your reward.")) {
             setHunterRumour(currentHunter, Rumour.NONE);
             setHunterRumourState(false);
             setCaughtCreatures(0);
