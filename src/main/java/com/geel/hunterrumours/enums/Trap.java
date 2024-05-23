@@ -13,7 +13,8 @@ public enum Trap {
     BOX_TRAP("Box Trap", ItemID.BOX_TRAP, 100),
     FALCONRY("Falconry", ItemID.FALCONERS_GLOVE, 20),
     BUTTERFLY("Butterfly Net", ItemID.BUTTERFLY_NET, 150),
-    NOOSE("Tracking", ItemID.NOOSE_WAND, 30);
+    NOOSE("Tracking", ItemID.NOOSE_WAND, 30),
+    NOOSE_HERBIBOAR("Tracking", ItemID.NOOSE_WAND, 14);
 
     @Getter
     private final String Name;
