@@ -25,6 +25,6 @@ public enum Trap {
     private final int PityThreshold;
 
     public int getOutfitRate(final int items) {
-        return (int) Math.floor(this.getPityThreshold() * (1 + items * 0.0125f));
+        return (int) Math.floor(this.getPityThreshold() / (1 + items * 0.0125f));
     }
 }
