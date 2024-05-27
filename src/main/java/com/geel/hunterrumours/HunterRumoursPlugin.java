@@ -571,7 +571,7 @@ public class HunterRumoursPlugin extends Plugin {
         // Determine if it's a "rumour complete" message
         if (actualMessage.contains("would you like another rumour?") ||
             actualMessage.contains("here's your reward.") ||
-            actualMessage.contains("Another one done?") {
+            actualMessage.contains("another one done?")) {
             setHunterRumour(currentHunter, Rumour.NONE);
             setHunterRumourState(false);
             setCaughtCreatures(0);
