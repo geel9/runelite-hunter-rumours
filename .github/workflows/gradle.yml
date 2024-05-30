@@ -40,12 +40,10 @@ jobs:
 
       - name: Run tests and display failures
         run: |
-          ./gradlew test --no-daemon || echo "Tests failed"
-          if [[ -d build/test-results/test ]]; then
-            for file in $(find build/test-results/test -name "*.xml"); do
-              grep -oP '(?<=<failure message=")[^"]*' "$file" | while read -r line; do
-                echo -e "\e[31m$line\e[0m"
-              done
+          ./gradlew test --no-daemon || false
+          for file in $(find build/test-results/test -name "*.xml"); do
+            grep -oP '(?<=<failure message=")[^"]*' "$file" | while read -r line; do
+              echo -e "\e[31m$line\e[0m"
             done
-          fi
+          done
         continue-on-error: false
