@@ -23,6 +23,14 @@ public class TrapTest {
             if (trap.getPityThreshold() <= 0) {
                 fail("Trap (" + trap.getName() + ") should have a pity threshold > 0");
             }
+
+            if (trap.getPityThresholdWithOutfit() <= 0) {
+                fail("Trap (" + trap.getName() + ") should have a pity threshold (with outfit) > 0");
+            }
+
+            if (trap.getPityThresholdWithOutfit() >= trap.getPityThreshold()) {
+                fail("Trap (" + trap.getName() + ") should have a pity threshold (with outfit) < pity threshold (without outfit)");
+            }
         }
     }
 }
