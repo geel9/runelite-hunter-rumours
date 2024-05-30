@@ -483,7 +483,7 @@ public class HunterRumoursPlugin extends Plugin {
 
         if (config.endOfRumourMessage()) {
             final int caughtCreatures = getCaughtRumourCreatures();
-            final int pityThreshold = getCurrentRumour().getTrap().getOutfitRate(hunterKitItems);
+            final int pityThreshold = getCurrentRumour().getTrap().calculatePityRateForItems(hunterKitItems);
             final int percentage = 100 * caughtCreatures / pityThreshold;
 
             Color color;
@@ -611,7 +611,9 @@ public class HunterRumoursPlugin extends Plugin {
         String actualMessage = dialogMessage.replace(npcNamePrefix, "").toLowerCase(Locale.ROOT);
 
         // Determine if it's a "rumour complete" message
-        if (actualMessage.contains("would you like another rumour?")) {
+        if (actualMessage.contains("would you like another rumour?") ||
+            actualMessage.contains("here's your reward.") ||
+            actualMessage.contains("another one done?")) {
             setHunterRumour(currentHunter, Rumour.NONE);
             setHunterRumourState(false);
             setCaughtCreatures(0);

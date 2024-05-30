@@ -34,7 +34,7 @@ public class RumourInfoBox extends InfoBox {
         });
 
         final Trap trap = rumour.getTargetCreature().getTrap();
-        final int pityThreshold = trap.getOutfitRate(plugin.getHunterKitItems());
+        final int pityThreshold = trap.calculatePityRateForItems(plugin.getHunterKitItems());
         String hasFinishedRumourText = plugin.getHunterRumourState() ? "Yes" : "No";
 
         this.setTooltip(
@@ -54,7 +54,7 @@ public class RumourInfoBox extends InfoBox {
 
         final Rumour currentRumour = plugin.getCurrentRumour();
         if (currentRumour != Rumour.NONE && showNumUntilPity()) {
-            final int pityThreshold = currentRumour.getTrap().getOutfitRate(plugin.getHunterKitItems());
+            final int pityThreshold = currentRumour.getTrap().calculatePityRateForItems(plugin.getHunterKitItems());
             return String.valueOf(pityThreshold - plugin.getCaughtRumourCreatures());
         }
 
@@ -73,7 +73,7 @@ public class RumourInfoBox extends InfoBox {
                 return Color.WHITE;
             }
             final int caughtCreatures = plugin.getCaughtRumourCreatures();
-            final int pityThreshold = currentRumour.getTrap().getOutfitRate(plugin.getHunterKitItems());
+            final int pityThreshold = currentRumour.getTrap().calculatePityRateForItems(plugin.getHunterKitItems());
             final float percentage = (float) caughtCreatures / pityThreshold * 100f;
             if (percentage >= 75) {
                 return Color.ORANGE.brighter();
