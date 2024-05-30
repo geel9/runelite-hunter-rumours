@@ -48,7 +48,7 @@ public class ChatParserTest {
             fail("You messed up the getSpeakingHunter method of ChatParser");
         }
 
-        if (chatParser.getReferencedRumour("your next assignment is embertailed jerboa") != Rumour.EMBERTAILED_JERBOA) {
+        if (chatParser.getReferencedRumour("your next assignment is aaa jerboa") != Rumour.EMBERTAILED_JERBOA) {
             fail("You messed up the getReferencedRumour method of ChatParser");
         }
 
