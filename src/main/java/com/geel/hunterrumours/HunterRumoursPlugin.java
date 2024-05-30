@@ -183,7 +183,7 @@ public class HunterRumoursPlugin extends Plugin {
         if (items != hunterKitItems) {
             hunterKitItems = items;
             if (items > 0) {
-                updateLatestInteractionTime(); 
+                updateLatestInteractionTime();
             }
             refreshAllDisplays();
         }
@@ -296,27 +296,16 @@ public class HunterRumoursPlugin extends Plugin {
             return;
         }
 
-        if (currentTick - latestInteractionTime > config.infoBoxDisableTimer() * 100) {
-            if (!config.forceShowInfoBox()) {
-                infoBoxManager.removeInfoBox(infoBox);
-                isShowingInfoBox = false;
-                return;
+        if (shouldInfoBoxBeDisabled()) {
+            infoBoxManager.removeInfoBox(infoBox);
+            isShowingInfoBox = false;
+        }
+        if (shouldWorldMapLocationsBeDisabled()) {
+            for (HunterRumourWorldMapPoint location : currentMapPoints) {
+                worldMapPointManager.remove(location);
             }
+            currentMapPoints.clear();
         }
-
-        if (currentTick - latestInteractionTime > config.worldMapLocationsDisableTimer() * 100) {
-            if (!config.forceShowWorldMapLocations()) {
-                for (HunterRumourWorldMapPoint location : currentMapPoints) {
-                    worldMapPointManager.remove(location);
-                }
-                currentMapPoints.clear();
-            }
-        }
-
-        if (!isShowingInfoBox) {
-            infoBoxManager.addInfoBox(infoBox);
-        }
-        isShowingInfoBox = true;
     }
 
     /**
@@ -612,8 +601,8 @@ public class HunterRumoursPlugin extends Plugin {
 
         // Determine if it's a "rumour complete" message
         if (actualMessage.contains("would you like another rumour?") ||
-            actualMessage.contains("here's your reward.") ||
-            actualMessage.contains("another one done?")) {
+                actualMessage.contains("here's your reward.") ||
+                actualMessage.contains("another one done?")) {
             setHunterRumour(currentHunter, Rumour.NONE);
             setHunterRumourState(false);
             setCaughtCreatures(0);
@@ -676,7 +665,7 @@ public class HunterRumoursPlugin extends Plugin {
             isShowingInfoBox = false;
         }
 
-        if (!config.showInfoBox()) {
+        if (shouldInfoBoxBeDisabled()) {
             return;
         }
 
@@ -699,7 +688,7 @@ public class HunterRumoursPlugin extends Plugin {
         }
         currentMapPoints.clear();
 
-        if (!config.showWorldMapLocations()) {
+        if (shouldWorldMapLocationsBeDisabled()) {
             return;
         }
 
@@ -828,6 +817,38 @@ public class HunterRumoursPlugin extends Plugin {
      */
     private void updateLatestInteractionTime() {
         latestInteractionTime = client.getTickCount();
+    }
+
+    /**
+     * Checks the configurations of the info box, returns true if the info box should be disabled.
+     */
+    private boolean shouldInfoBoxBeDisabled() {
+        if (!config.showInfoBox()) {
+            return true;
+        }
+
+        if (client.getTickCount() - latestInteractionTime > config.infoBoxDisableTimer() * 100) {
+            if (!config.forceShowInfoBox()) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * Checks the configurations of the world map locations, returns true if the world map locations should be disabled.
+     */
+    private boolean shouldWorldMapLocationsBeDisabled() {
+        if (!config.showWorldMapLocations()) {
+            return true;
+        }
+
+        if (client.getTickCount() - latestInteractionTime > config.worldMapLocationsDisableTimer() * 100) {
+            if (!config.forceShowWorldMapLocations()) {
+                return true;
+            }
+        }
+        return false;
     }
 
     /**
