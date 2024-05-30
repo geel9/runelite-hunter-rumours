@@ -42,6 +42,11 @@ jobs:
         run: ./gradlew test --no-daemon
         continue-on-error: true
 
-      - name: Display test results if tests fail
+      - name: Display test failure messages
         if: failure()
-        run: cat $(find build/test-results/test -name "*.xml" | grep ".xml$") | grep -E "testsuite|testcase|failure"
+        run: |
+          for file in $(find build/test-results/test -name "*.xml"); do
+            grep -oP '(?<=<failure message=")[^"]*' "$file" | while read -r line; do
+              echo -e "\e[31m$line\e[0m"
+            done
+          done
