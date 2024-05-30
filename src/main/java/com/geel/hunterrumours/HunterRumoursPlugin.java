@@ -91,6 +91,8 @@ public class HunterRumoursPlugin extends Plugin {
 
     @Inject
     private WorldMapPointManager worldMapPointManager;
+    private int latestInteractionTime = -1;
+    private boolean isShowingInfoBox = false;
 
     @Provides
     HunterRumoursConfig provideConfig(ConfigManager configManager) {
@@ -119,6 +121,7 @@ public class HunterRumoursPlugin extends Plugin {
     public void onGameStateChanged(GameStateChanged gameStateChanged) {
         if (gameStateChanged.getGameState() == GameState.LOGGED_IN) {
             clientThread.invoke(this::loadFromConfig);
+            clientThread.invoke(this::updateLatestInteractionTime);
         }
     }
 
@@ -179,6 +182,9 @@ public class HunterRumoursPlugin extends Plugin {
 
         if (items != hunterKitItems) {
             hunterKitItems = items;
+            if (items > 0) {
+                updateLatestInteractionTime(); 
+            }
             refreshAllDisplays();
         }
     }
@@ -282,12 +288,35 @@ public class HunterRumoursPlugin extends Plugin {
         }
     }
 
+    @Subscribe
+    public void onGameTick(GameTick event) {
+        final int currentTick = client.getTickCount();
+
+        if (!config.showInfoBox()) {
+            return;
+        }
+
+        if (currentTick - latestInteractionTime > config.infoBoxDisableTimer() * 100) {
+            if (!config.forceShowInfoBox()) {
+                infoBoxManager.removeInfoBox(infoBox);
+                isShowingInfoBox = false;
+                return;
+            }
+        }
+
+        if (!isShowingInfoBox) {
+            infoBoxManager.addInfoBox(infoBox);
+        }
+        isShowingInfoBox = true;
+    }
+
     /**
      * Sets the back-to-back state in memory and in config.
      * <p>
      * If this is due to a user's choice (eg they changed it), puts a message in chat indicating their current back-to-back status
      */
     public void setBackToBackState(BackToBackState backToBackState, boolean isFromUserChoice) {
+        updateLatestInteractionTime();
         configManager.setRSProfileConfiguration(HunterRumoursConfig.GROUP, "backtoback", backToBackState);
         this.backToBackState = backToBackState;
 
@@ -302,6 +331,7 @@ public class HunterRumoursPlugin extends Plugin {
      * Sets whether the user has completed their current rumour
      */
     public void setHunterRumourState(boolean hasFinishedCurrentRumour) {
+        updateLatestInteractionTime();
         configManager.setRSProfileConfiguration(HunterRumoursConfig.GROUP, "current.rumour.finished", hasFinishedCurrentRumour);
         this.currentRumourFinished = hasFinishedCurrentRumour;
     }
@@ -317,6 +347,7 @@ public class HunterRumoursPlugin extends Plugin {
      * Sets the Hunter whose Rumour the user is currently assigned
      */
     public void setCurrentHunter(Hunter hunter) {
+        updateLatestInteractionTime();
         configManager.setRSProfileConfiguration(HunterRumoursConfig.GROUP, "current.hunter", hunter);
         currentHunter = hunter;
     }
@@ -325,6 +356,7 @@ public class HunterRumoursPlugin extends Plugin {
      * Sets the current Rumour for the given Hunter, even if they're not the user's current Hunter
      */
     public void setHunterRumour(Hunter hunter, Rumour rumour) {
+        updateLatestInteractionTime();
         hunterRumours.put(hunter, rumour);
         configManager.setRSProfileConfiguration(HunterRumoursConfig.GROUP, "hunter." + hunter.getNpcId(), rumour);
     }
@@ -340,6 +372,7 @@ public class HunterRumoursPlugin extends Plugin {
      * Increments the currently caught creatures by one and sets the value.
      */
     public void incrementCaughtCreatures() {
+        updateLatestInteractionTime();
         setCaughtCreatures(getCaughtRumourCreatures() + 1);
     }
 
@@ -631,6 +664,7 @@ public class HunterRumoursPlugin extends Plugin {
         if (infoBox != null) {
             infoBoxManager.removeInfoBox(infoBox);
             infoBox = null;
+            isShowingInfoBox = false;
         }
 
         if (!config.showInfoBox()) {
@@ -644,6 +678,7 @@ public class HunterRumoursPlugin extends Plugin {
 
         infoBox = new RumourInfoBox(rumour, this, itemManager);
         infoBoxManager.addInfoBox(infoBox);
+        isShowingInfoBox = true;
     }
 
     /**
@@ -777,6 +812,13 @@ public class HunterRumoursPlugin extends Plugin {
         this.backToBackState = loadedState;
 
         refreshAllDisplays();
+    }
+
+    /**
+     * Records the current tick as the "latest interaction time" -- used to track how long it's been since the player has engaged in Hunter Rumour-related behavior
+     */
+    private void updateLatestInteractionTime() {
+        latestInteractionTime = client.getTickCount();
     }
 
     /**
