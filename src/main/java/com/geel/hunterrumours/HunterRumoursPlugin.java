@@ -441,7 +441,7 @@ public class HunterRumoursPlugin extends Plugin {
 
         if (config.endOfRumourMessage()) {
             final int caughtCreatures = getCaughtRumourCreatures();
-            final int pityThreshold = getCurrentRumour().getTrap().getOutfitRate(hunterKitItems);
+            final int pityThreshold = getCurrentRumour().getTrap().calculatePityRateForItems(hunterKitItems);
             final int percentage = 100 * caughtCreatures / pityThreshold;
 
             Color color;
