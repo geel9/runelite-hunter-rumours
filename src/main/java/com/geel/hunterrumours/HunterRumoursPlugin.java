@@ -292,10 +292,6 @@ public class HunterRumoursPlugin extends Plugin {
     public void onGameTick(GameTick event) {
         final int currentTick = client.getTickCount();
 
-        if (!config.showInfoBox()) {
-            return;
-        }
-
         if (shouldInfoBoxBeDisabled()) {
             infoBoxManager.removeInfoBox(infoBox);
             isShowingInfoBox = false;
