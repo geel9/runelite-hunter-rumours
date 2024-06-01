@@ -18,7 +18,10 @@ public class RumourInfoBox extends InfoBox {
     public RumourInfoBox(Rumour rumour, @Nonnull HunterRumoursPlugin plugin, @Nonnull ItemManager itemManager) {
         super(itemManager.getImage(rumour.getTargetCreature().getItemId()), plugin);
         this.plugin = plugin;
+        this.setTooltip(getTooltipText(rumour, itemManager));
+    }
 
+    public String getTooltipText(Rumour rumour, ItemManager itemManager) {
         final Map<String, List<RumourLocation>> locations = RumourLocation.getGroupedLocationsForRumour(rumour);
         final StringBuilder sb = new StringBuilder();
 
@@ -36,14 +39,12 @@ public class RumourInfoBox extends InfoBox {
         final Trap trap = rumour.getTargetCreature().getTrap();
         final int pityThreshold = trap.calculatePityRateForItems(plugin.getHunterKitItems());
         String hasFinishedRumourText = plugin.getHunterRumourState() ? "Yes" : "No";
-
-        this.setTooltip(
-                ColorUtil.wrapWithColorTag("Rumour: ", Color.YELLOW) + rumour.getFullName() + "</br>" +
-                        ColorUtil.wrapWithColorTag("Finished: ", Color.YELLOW) + hasFinishedRumourText + "</br>" +
-                        ColorUtil.wrapWithColorTag("Item: ", Color.YELLOW) + itemManager.getItemComposition(rumour.getRumourItemID()).getName() + "</br>" +
-                        ColorUtil.wrapWithColorTag("Caught: ", Color.YELLOW) + plugin.getCaughtRumourCreatures() + " / " + pityThreshold + "</br>" +
-                        ColorUtil.wrapWithColorTag("Locations:", Color.YELLOW) + sb
-        );
+        String tooltipText = ColorUtil.wrapWithColorTag("Rumour: ", Color.YELLOW) + rumour.getFullName() + "</br>" +
+                ColorUtil.wrapWithColorTag("Finished: ", Color.YELLOW) + hasFinishedRumourText + "</br>" +
+                ColorUtil.wrapWithColorTag("Item: ", Color.YELLOW) + itemManager.getItemComposition(rumour.getRumourItemID()).getName() + "</br>" +
+                ColorUtil.wrapWithColorTag("Caught: ", Color.YELLOW) + plugin.getCaughtRumourCreatures() + " / " + pityThreshold + "</br>" +
+                ColorUtil.wrapWithColorTag("Locations:", Color.YELLOW) + sb;
+        return tooltipText;
     }
 
     @Override
