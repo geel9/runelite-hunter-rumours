@@ -151,6 +151,65 @@ public interface HunterRumoursConfig extends Config {
     }
 
     @ConfigItem(
+            position = 4,
+            keyName = "infoBoxCompletedRumourColor",
+            name = "Infobox Completed Rumour Color",
+            description = "Text color of the infobox when you completed a rumour.",
+            section = infoBoxSection
+    )
+    default Color completedRumourInfoBoxTextColor() {
+
+        return Color.GREEN;
+    }
+
+    @ConfigItem(
+            position = 5,
+            keyName = "infoBoxLuckyRateColor",
+            name = "Infobox Lucky Rate Color",
+            description = "Text color of the infobox when you're still in the lucky bracket (<50%) for catching creatures based on pity rates.",
+            section = infoBoxSection
+    )
+    default Color luckyRateInfoBoxTextColor() {
+
+        return Color.RED;
+    }
+
+    @ConfigItem(
+            position = 6,
+            keyName = "infoBoxDefaultColor",
+            name = "Infobox Default Color",
+            description = "The default text color of the infobox.",
+            section = infoBoxSection
+    )
+    default Color defaultInfoBoxTextColor() {
+
+        return Color.WHITE;
+    }
+
+    @ConfigItem(
+            position = 7,
+            keyName = "infoBoxNormalRateColor",
+            name = "Infobox Normal Rate Color",
+            description = "Text color of the infobox when you're in the normal bracket (between 50% and 75%) for catching creatures based on pity rates.",
+            section = infoBoxSection
+    )
+    default Color normalRateInfoBoxTextColor() {
+
+        return Color.ORANGE.darker();
+    }
+
+    @ConfigItem(
+            position = 8,
+            keyName = "infoBoxUnluckyColor",
+            name = "Infobox Unlucky Rate Color",
+            description = "Text color of the infobox when you're in the unlucky bracket (75% or more) for catching creatures based on pity rates.",
+            section = infoBoxSection
+    )
+    default Color unluckyRateInfoBoxTextColor() {
+        return Color.ORANGE.brighter();
+    }
+
+    @ConfigItem(
             position = 0,
             keyName = "currentRumourMessage",
             name = "Current Rumour Message",
@@ -181,6 +240,42 @@ public interface HunterRumoursConfig extends Config {
     )
     default boolean endOfRumourMessage() {
         return false;
+    }
+
+    @ConfigItem(
+            position = 3,
+            keyName = "endOfRumourMessageUnluckyColor",
+            name = "End-of-Rumour Unlucky Color",
+            description = "Message color if you've caught >= 75% of the pity rate threshold.",
+            section = messagesSection
+    )
+    default Color endOfRumourMessageUnluckyColor() {
+
+        return Color.RED;
+    }
+
+    @ConfigItem(
+            position = 4,
+            keyName = "endOfRumourMessageNormalColor",
+            name = "End-of-Rumour Normal Color",
+            description = "Message color if you've caught between and including 50 and 74 percent of the pity rate threshold.",
+            section = messagesSection
+    )
+    default Color endOfRumourMessageNormalColor() {
+
+        return Color.ORANGE;
+    }
+
+    @ConfigItem(
+            position = 5,
+            keyName = "endOfRumourMessageLuckyColor",
+            name = "End-of-Rumour Lucky Color",
+            description = "Message color if you've caught less than 50% of the pity rate threshold.",
+            section = messagesSection
+    )
+    default Color endOfRumourMessageLuckyColor() {
+
+        return Color.GREEN;
     }
 
     @ConfigItem(

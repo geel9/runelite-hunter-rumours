@@ -63,24 +63,25 @@ public class RumourInfoBox extends InfoBox {
 
     @Override
     public Color getTextColor() {
+        HunterRumoursConfig config = plugin.getConfig();
         if (plugin.getHunterRumourState()) {
-            return Color.GREEN;
+            return config.completedRumourInfoBoxTextColor();
         } else if (!showNumUntilPity()) {
-            return Color.WHITE;
+            return config.defaultInfoBoxTextColor();
         } else {
             final Rumour currentRumour = plugin.getCurrentRumour();
             if (currentRumour == Rumour.NONE) {
-                return Color.WHITE;
+                return config.defaultInfoBoxTextColor();
             }
             final int caughtCreatures = plugin.getCaughtRumourCreatures();
             final int pityThreshold = currentRumour.getTrap().calculatePityRateForItems(plugin.getHunterKitItems());
             final float percentage = (float) caughtCreatures / pityThreshold * 100f;
             if (percentage >= 75) {
-                return Color.ORANGE.brighter();
+                return config.unluckyRateInfoBoxTextColor();
             } else if (percentage >= 50) {
-                return Color.ORANGE.darker();
+                return config.normalRateInfoBoxTextColor();
             } else {
-                return Color.RED;
+                return config.luckyRateInfoBoxTextColor();
             }
         }
     }
