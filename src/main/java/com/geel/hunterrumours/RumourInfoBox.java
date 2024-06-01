@@ -21,7 +21,7 @@ public class RumourInfoBox extends InfoBox {
         this.setTooltip(getTooltipText(rumour, itemManager));
     }
 
-    public String getTooltipText(Rumour rumour, ItemManager itemManager) {
+    String getTooltipText(Rumour rumour, ItemManager itemManager) {
         final Map<String, List<RumourLocation>> locations = RumourLocation.getGroupedLocationsForRumour(rumour);
         final StringBuilder sb = new StringBuilder();
 

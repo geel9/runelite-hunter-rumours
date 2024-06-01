@@ -1,15 +1,21 @@
 package com.geel.hunterrumours;
 
 import com.geel.hunterrumours.enums.Rumour;
+import com.geel.hunterrumours.enums.RumourLocation;
 import com.google.inject.Guice;
 
 import com.google.inject.testing.fieldbinder.BoundFieldModule;
 
-import java.awt.*;
+import java.awt.Color;
+
+import java.util.List;
+
+import java.util.Map;
 
 import net.runelite.api.ItemComposition;
 import net.runelite.client.game.ItemManager;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 
 import org.junit.Before;
@@ -141,5 +147,53 @@ public class RumourInfoBoxTest {
 
     private boolean colorsArentEqual(Color color1, Color color2) {
         return color1.getRed() != color2.getRed() || color1.getGreen() != color2.getGreen() || color1.getBlue() != color2.getBlue();
+    }
+
+    @Test
+    public void testGetTooltipText_multipleLocations() {
+        Rumour rumour = Rumour.TROPICAL_WAGTAIL;
+
+        // Mock the plugin methods
+        when(plugin.getHunterKitItems()).thenReturn(0);
+        when(plugin.getHunterRumourState()).thenReturn(true);
+        when(plugin.getCaughtRumourCreatures()).thenReturn(1);
+
+        // Mock itemManager method
+        ItemComposition mockItemComposition = mock(ItemComposition.class);
+        when(mockItemComposition.getName()).thenReturn("Tail Feathers");
+        when(itemManager.getItemComposition(rumour.getRumourItemID())).thenReturn(mockItemComposition);
+
+        // Expected tooltip text
+        String expected = "<col=ffff00>Rumour: </col>Tropical Wagtail (Bird snare)</br><col=ffff00>Finished: </col>Yes</br><col=ffff00>Item: </col>Tail Feathers</br><col=ffff00>Caught: </col>1 / 40</br><col=ffff00>Locations:</col></br>  • Feldip Hunter area (AKS, 4 spawns)";
+
+        // Run the test
+        String actual = rumourInfoBox.getTooltipText(rumour, itemManager);
+
+        // Assert
+        assertEquals(expected, actual);
+    }
+
+    @Test
+    public void testGetTooltipText_noFairyRingCode() {
+        Rumour rumour = Rumour.RED_SALAMANDER;
+
+        // Mock the plugin methods
+        when(plugin.getHunterKitItems()).thenReturn(2);
+        when(plugin.getHunterRumourState()).thenReturn(false);
+        when(plugin.getCaughtRumourCreatures()).thenReturn(3);
+
+        // Mock itemManager method
+        ItemComposition mockItemComposition = mock(ItemComposition.class);
+        when(mockItemComposition.getName()).thenReturn("Red Salamander Claw");
+        when(itemManager.getItemComposition(rumour.getRumourItemID())).thenReturn(mockItemComposition);
+
+        // Expected tooltip text
+        String expected = "<col=ffff00>Rumour: </col>Red Salamander (Net trap)</br><col=ffff00>Finished: </col>No</br><col=ffff00>Item: </col>Red Salamander Claw</br><col=ffff00>Caught: </col>3 / 48</br><col=ffff00>Locations:</col></br>  • Ourania Hunter area (9 spawns)";
+
+        // Run the test
+        String actual = rumourInfoBox.getTooltipText(rumour, itemManager);
+
+        // Assert
+        assertEquals(expected, actual);
     }
 }
