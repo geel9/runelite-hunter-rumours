@@ -473,11 +473,11 @@ public class HunterRumoursPlugin extends Plugin {
 
             Color color;
             if (percentage >= 75) {
-                color = Color.RED;
+                color = config.endOfRumourMessageUnluckyColor();
             } else if (percentage >= 50) {
-                color = Color.ORANGE;
+                color = config.endOfRumourMessageNormalColor();
             } else {
-                color = Color.GREEN;
+                color = config.endOfRumourMessageLuckyColor();
             }
 
             client.addChatMessage(ChatMessageType.GAMEMESSAGE,
