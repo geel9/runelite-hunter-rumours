@@ -371,7 +371,7 @@ public interface HunterRumoursConfig extends Config {
             position = 2,
             keyName = "highlightUnknownHunters",
             name = "Highlight unknown hunters",
-            description = "Whether hunters whose rumour is known should be highlighted.",
+            description = "Whether hunters whose rumour is unknown should be highlighted.",
             section = highlightSection
     )
     default boolean highlightUnknownHunters() {
