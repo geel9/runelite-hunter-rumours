@@ -260,8 +260,16 @@ public class HunterRumoursPlugin extends Plugin {
     public void onChatMessage(ChatMessage event) {
         handleBurrowsHunterDialog(event);
         handleQuetzalWhistleChatMessage(event);
-        handleRumourFinishedChatMessage(event);
         handleBackToBackChatMessage(event);
+
+        // Handle the "rumour finished" chat message at the END of the current tick.
+        // This is to ensure that we process the caught creature XP drop and increment the caught count
+        // before we display stats about the rumour on completion.
+        // Without this, we (sometimes?) handle the rumour finished before we handle the creature being caught,
+        // causing us to show incorrect statistics.
+        clientThread.invokeAtTickEnd(() -> {
+            handleRumourFinishedChatMessage(event);
+        });
     }
 
     @Subscribe
