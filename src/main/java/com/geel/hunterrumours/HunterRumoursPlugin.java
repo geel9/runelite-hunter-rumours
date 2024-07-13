@@ -849,7 +849,7 @@ public class HunterRumoursPlugin extends Plugin {
         }
 
         // Infobox should be disabled if it's been long enough since the last interaction time
-        return client.getTickCount() - latestInteractionTime <= config.infoBoxDisableTimer();
+        return client.getTickCount() - latestInteractionTime <= config.infoBoxDisableTimer() * 100;
     }
 
     /**
