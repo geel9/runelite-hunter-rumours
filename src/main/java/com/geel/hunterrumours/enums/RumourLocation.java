@@ -148,10 +148,13 @@ public enum RumourLocation
 	BLACK_WARLOCK_IN_AND_AROUND_THE_FARMING_GUILD_4(BLACK_WARLOCK, "In and around the Farming Guild", "CIR", new WorldPoint(1220, 3747, 0)),
 	BLACK_WARLOCK_IN_AND_AROUND_THE_FARMING_GUILD_5(BLACK_WARLOCK, "In and around the Farming Guild", "CIR", new WorldPoint(1233, 3745, 0)),
 
+	ORANGE_SALAMANDER_NECROPOLIS_HUNTER_1(ORANGE_SALAMANDER, "Necropolis (w/ Beneath Cursed Sands)", "AKP", new WorldPoint(3285, 2741, 0)),
+	ORANGE_SALAMANDER_NECROPOLIS_HUNTER_2(ORANGE_SALAMANDER, "Necropolis (w/ Beneath Cursed Sands)", "AKP", new WorldPoint(3285, 2739, 0)),
+	ORANGE_SALAMANDER_NECROPOLIS_HUNTER_3(ORANGE_SALAMANDER, "Necropolis (w/ Beneath Cursed Sands)", "AKP", new WorldPoint(3287, 2739, 0)),
+	ORANGE_SALAMANDER_NECROPOLIS_HUNTER_4(ORANGE_SALAMANDER, "Necropolis (w/ Beneath Cursed Sands)", "AKP", new WorldPoint(3288, 2738, 0)),
 	ORANGE_SALAMANDER_UZER_HUNTER_AREA_1(ORANGE_SALAMANDER, "Uzer Hunter area", "DLQ", new WorldPoint(3405, 3133, 0)),
 	ORANGE_SALAMANDER_UZER_HUNTER_AREA_2(ORANGE_SALAMANDER, "Uzer Hunter area", "DLQ", new WorldPoint(3403, 3090, 0)),
 	ORANGE_SALAMANDER_UZER_HUNTER_AREA_3(ORANGE_SALAMANDER, "Uzer Hunter area", "DLQ", new WorldPoint(3417, 3073, 0)),
-	ORANGE_SALAMANDER_NECROPOLIS_HUNTER_4(ORANGE_SALAMANDER, "Necropolis Hunter area", "AKP", new WorldPoint(3285, 2741, 0)),
 
 	RAZOR_BACKED_KEBBIT_PISCATORIS_HUNTER_AREA_1(RAZOR_BACKED_KEBBIT, "Piscatoris Hunter area", "AKQ", new WorldPoint(2353, 3595, 0)),
 	RAZOR_BACKED_KEBBIT_PISCATORIS_HUNTER_AREA_2(RAZOR_BACKED_KEBBIT, "Piscatoris Hunter area", "AKQ", new WorldPoint(2360, 3611, 0)),
