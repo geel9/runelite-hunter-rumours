@@ -9,6 +9,7 @@ import net.runelite.client.util.ColorUtil;
 
 import javax.annotation.Nonnull;
 import java.awt.*;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
@@ -19,18 +20,17 @@ public class RumourInfoBox extends InfoBox {
         super(itemManager.getImage(rumour.getTargetCreature().getItemId()), plugin);
         this.plugin = plugin;
 
-        final Map<String, List<RumourLocation>> locations = RumourLocation.getGroupedLocationsForRumour(rumour);
+        final var locations = RumourLocation.getGroupedLocationsForRumour(rumour);
         final StringBuilder sb = new StringBuilder();
 
-        locations.keySet().forEach(locationName -> {
-            var keyedLocations = locations.get(locationName);
-            RumourLocation rumourLocation = keyedLocations.get(0);
+        locations.forEach(entry -> {
+            RumourLocation rumourLocation = entry.getValue().get(0);
 
-            sb.append("</br>  • ").append(locationName).append(" (");
+            sb.append("</br>  • ").append(entry.getKey()).append(" (");
             if (!rumourLocation.getFairyRingCode().equals("")) {
                 sb.append(rumourLocation.getFairyRingCode()).append(", ");
             }
-            sb.append(keyedLocations.size()).append(" spawns)");
+            sb.append(entry.getValue().size()).append(" spawns)");
         });
 
         final Trap trap = rumour.getTargetCreature().getTrap();

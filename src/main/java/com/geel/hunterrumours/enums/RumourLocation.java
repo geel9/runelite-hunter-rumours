@@ -1,10 +1,8 @@
 package com.geel.hunterrumours.enums;
 
 import static com.geel.hunterrumours.enums.Rumour.*;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+
+import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -148,10 +146,14 @@ public enum RumourLocation
 	BLACK_WARLOCK_IN_AND_AROUND_THE_FARMING_GUILD_4(BLACK_WARLOCK, "In and around the Farming Guild", "CIR", new WorldPoint(1220, 3747, 0)),
 	BLACK_WARLOCK_IN_AND_AROUND_THE_FARMING_GUILD_5(BLACK_WARLOCK, "In and around the Farming Guild", "CIR", new WorldPoint(1233, 3745, 0)),
 
+	ORANGE_SALAMANDER_NECROPOLIS_HUNTER_1(ORANGE_SALAMANDER, "Necropolis (w/ Beneath Cursed Sands)", "AKP", new WorldPoint(3285, 2741, 0)),
+	ORANGE_SALAMANDER_NECROPOLIS_HUNTER_2(ORANGE_SALAMANDER, "Necropolis (w/ Beneath Cursed Sands)", "AKP", new WorldPoint(3285, 2739, 0)),
+	ORANGE_SALAMANDER_NECROPOLIS_HUNTER_3(ORANGE_SALAMANDER, "Necropolis (w/ Beneath Cursed Sands)", "AKP", new WorldPoint(3287, 2739, 0)),
+	ORANGE_SALAMANDER_NECROPOLIS_HUNTER_4(ORANGE_SALAMANDER, "Necropolis (w/ Beneath Cursed Sands)", "AKP", new WorldPoint(3288, 2738, 0)),
+	ORANGE_SALAMANDER_NECROPOLIS_HUNTER_5(ORANGE_SALAMANDER, "Necropolis (w/ Beneath Cursed Sands)", "AKP", new WorldPoint(3286, 2738, 0)),
 	ORANGE_SALAMANDER_UZER_HUNTER_AREA_1(ORANGE_SALAMANDER, "Uzer Hunter area", "DLQ", new WorldPoint(3405, 3133, 0)),
 	ORANGE_SALAMANDER_UZER_HUNTER_AREA_2(ORANGE_SALAMANDER, "Uzer Hunter area", "DLQ", new WorldPoint(3403, 3090, 0)),
 	ORANGE_SALAMANDER_UZER_HUNTER_AREA_3(ORANGE_SALAMANDER, "Uzer Hunter area", "DLQ", new WorldPoint(3417, 3073, 0)),
-	ORANGE_SALAMANDER_NECROPOLIS_HUNTER_4(ORANGE_SALAMANDER, "Necropolis Hunter area", "AKP", new WorldPoint(3285, 2741, 0)),
 
 	RAZOR_BACKED_KEBBIT_PISCATORIS_HUNTER_AREA_1(RAZOR_BACKED_KEBBIT, "Piscatoris Hunter area", "AKQ", new WorldPoint(2353, 3595, 0)),
 	RAZOR_BACKED_KEBBIT_PISCATORIS_HUNTER_AREA_2(RAZOR_BACKED_KEBBIT, "Piscatoris Hunter area", "AKQ", new WorldPoint(2360, 3611, 0)),
@@ -402,15 +404,34 @@ public enum RumourLocation
 	 */
 	public static Set<RumourLocation> getCollapsedLocationsForRumour(Rumour rumour) {
 		var groupedLocations = getGroupedLocationsForRumour(rumour);
-		return groupedLocations.keySet().stream().map(l -> groupedLocations.get(l).get(0)).collect(Collectors.toSet());
+		return groupedLocations.map(l -> l.getValue().get(0)).collect(Collectors.toSet());
 	}
 
 	/**
 	 * Gets all RumourLocations linked to the given Rumour, grouped by LocationName
 	 */
-	public static Map<String, List<RumourLocation>> getGroupedLocationsForRumour(Rumour rumour)
+	public static Stream<Map.Entry<String, List<RumourLocation>>> getGroupedLocationsForRumour(Rumour rumour)
 	{
-		return getLocationsStreamForRumour(rumour).collect(Collectors.groupingBy(RumourLocation::getLocationName));
+		var locations = getLocationsStreamForRumour(rumour).toArray(RumourLocation[]::new);
+
+		// Create a map to remember the ordering of declaration of the locations (by the first instance of
+		// each location name). This is so we can group by name (which loses this ordering) and then sort the groups
+		// by the original declaration order.
+		Map<String, Integer> locationDeclarationOrder = new HashMap<>();
+		int i = 0;
+		for(RumourLocation location : locations) {
+			if(!locationDeclarationOrder.containsKey(location.getLocationName())) {
+				locationDeclarationOrder.put(location.getLocationName(), i++);
+			}
+		}
+
+		// I do not know Java very well and there is surely a better way to do this, but... I think it works, so, oh well.
+		// Group the locations by their name, then return those groups sorted by declaration order of their first location.
+		 return Arrays.stream(locations)
+				 .collect(Collectors.groupingBy(RumourLocation::getLocationName))
+				 .entrySet()
+				 .stream()
+				 .sorted(Comparator.comparingInt(a -> locationDeclarationOrder.get(a.getKey())));
 	}
 
 	private static Stream<RumourLocation> getLocationsStreamForRumour(Rumour rumour)
