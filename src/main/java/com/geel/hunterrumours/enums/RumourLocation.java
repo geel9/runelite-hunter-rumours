@@ -152,6 +152,7 @@ public enum RumourLocation
 	ORANGE_SALAMANDER_NECROPOLIS_HUNTER_2(ORANGE_SALAMANDER, "Necropolis (w/ Beneath Cursed Sands)", "AKP", new WorldPoint(3285, 2739, 0)),
 	ORANGE_SALAMANDER_NECROPOLIS_HUNTER_3(ORANGE_SALAMANDER, "Necropolis (w/ Beneath Cursed Sands)", "AKP", new WorldPoint(3287, 2739, 0)),
 	ORANGE_SALAMANDER_NECROPOLIS_HUNTER_4(ORANGE_SALAMANDER, "Necropolis (w/ Beneath Cursed Sands)", "AKP", new WorldPoint(3288, 2738, 0)),
+	ORANGE_SALAMANDER_NECROPOLIS_HUNTER_5(ORANGE_SALAMANDER, "Necropolis (w/ Beneath Cursed Sands)", "AKP", new WorldPoint(3286, 2738, 0)),
 	ORANGE_SALAMANDER_UZER_HUNTER_AREA_1(ORANGE_SALAMANDER, "Uzer Hunter area", "DLQ", new WorldPoint(3405, 3133, 0)),
 	ORANGE_SALAMANDER_UZER_HUNTER_AREA_2(ORANGE_SALAMANDER, "Uzer Hunter area", "DLQ", new WorldPoint(3403, 3090, 0)),
 	ORANGE_SALAMANDER_UZER_HUNTER_AREA_3(ORANGE_SALAMANDER, "Uzer Hunter area", "DLQ", new WorldPoint(3417, 3073, 0)),
