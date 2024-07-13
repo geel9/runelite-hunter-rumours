@@ -92,7 +92,6 @@ public class HunterRumoursPlugin extends Plugin {
     @Inject
     private WorldMapPointManager worldMapPointManager;
     private int latestInteractionTime = -1;
-    private boolean isShowingInfoBox = false;
 
     @Provides
     HunterRumoursConfig provideConfig(ConfigManager configManager) {
@@ -109,9 +108,8 @@ public class HunterRumoursPlugin extends Plugin {
     @Override
     protected void shutDown() throws Exception {
         overlayManager.remove(overlay);
-        if (infoBox != null) {
-            infoBoxManager.removeInfoBox(infoBox);
-        }
+
+        removeInfoBox();
         npcOverlayService.unregisterHighlighter(this::highlighterFn);
         npcOverlayService.rebuild();
         clientThread.invoke(this::resetParams);
@@ -121,7 +119,6 @@ public class HunterRumoursPlugin extends Plugin {
     public void onGameStateChanged(GameStateChanged gameStateChanged) {
         if (gameStateChanged.getGameState() == GameState.LOGGED_IN) {
             clientThread.invoke(this::loadFromConfig);
-            clientThread.invoke(this::updateLatestInteractionTime);
         }
     }
 
@@ -298,14 +295,13 @@ public class HunterRumoursPlugin extends Plugin {
 
     @Subscribe
     public void onGameTick(GameTick event) {
-        if (shouldInfoBoxBeDisabled()) {
-            infoBoxManager.removeInfoBox(infoBox);
-            isShowingInfoBox = false;
-        }
-        if (shouldWorldMapLocationsBeDisabled()) {
+        handleInfoBox();
+
+        if (!shouldWorldMapLocationsBeShown()) {
             for (HunterRumourWorldMapPoint location : currentMapPoints) {
                 worldMapPointManager.remove(location);
             }
+
             currentMapPoints.clear();
         }
     }
@@ -657,32 +653,33 @@ public class HunterRumoursPlugin extends Plugin {
 
     private void refreshAllDisplays() {
         npcOverlayService.rebuild();
-        handleInfoBox();
         handleWorldMap();
+
+        // Remove the infobox -- then re-enable it if necessary.
+        removeInfoBox();
+        handleInfoBox();
     }
 
     /**
      * Manages the InfoBox for the current Rumour -- adds/removes as necessary
      */
     private void handleInfoBox() {
-        if (infoBox != null) {
+        var isShowing = infoBox != null;
+        var shouldShow = shouldInfoBoxBeShown();
+
+        if(isShowing && !shouldShow) {
+            removeInfoBox();
+        } else if(shouldShow && !isShowing) {
+            infoBox = new RumourInfoBox(getCurrentRumour(), this, itemManager);
+            infoBoxManager.addInfoBox(infoBox);
+        }
+    }
+
+    private void removeInfoBox() {
+        if(infoBox != null) {
             infoBoxManager.removeInfoBox(infoBox);
             infoBox = null;
-            isShowingInfoBox = false;
         }
-
-        if (shouldInfoBoxBeDisabled()) {
-            return;
-        }
-
-        var rumour = getCurrentRumour();
-        if (rumour == Rumour.NONE) {
-            return;
-        }
-
-        infoBox = new RumourInfoBox(rumour, this, itemManager);
-        infoBoxManager.addInfoBox(infoBox);
-        isShowingInfoBox = true;
     }
 
     /**
@@ -692,9 +689,10 @@ public class HunterRumoursPlugin extends Plugin {
         for (HunterRumourWorldMapPoint location : currentMapPoints) {
             worldMapPointManager.remove(location);
         }
+
         currentMapPoints.clear();
 
-        if (shouldWorldMapLocationsBeDisabled()) {
+        if (!shouldWorldMapLocationsBeShown()) {
             return;
         }
 
@@ -828,33 +826,53 @@ public class HunterRumoursPlugin extends Plugin {
     /**
      * Checks the configurations of the info box, returns true if the info box should be disabled.
      */
-    private boolean shouldInfoBoxBeDisabled() {
+    private boolean shouldInfoBoxBeShown() {
+        // If infobox isn't enabled, it obviously should not be shown
         if (!config.showInfoBox()) {
+            return false;
+        }
+
+        // If "force info box" is enabled, then the infobox should always be shown (if infobox itself is enabled)
+        if(config.forceShowInfoBox()) {
             return true;
         }
 
-        if (client.getTickCount() - latestInteractionTime > config.infoBoxDisableTimer() * 100) {
-            if (!config.forceShowInfoBox()) {
-                return true;
-            }
+        // If we don't have an interaction recorded, then we shouldn't show the infobox.
+        if(latestInteractionTime == -1) {
+            return false;
         }
-        return false;
+
+        // If we have no active rumour, don't show the info box.
+        var rumour = getCurrentRumour();
+        if (rumour == Rumour.NONE) {
+            return false;
+        }
+
+        // Infobox should be disabled if it's been long enough since the last interaction time
+        return client.getTickCount() - latestInteractionTime <= config.infoBoxDisableTimer();
     }
 
     /**
      * Checks the configurations of the world map locations, returns true if the world map locations should be disabled.
      */
-    private boolean shouldWorldMapLocationsBeDisabled() {
+    private boolean shouldWorldMapLocationsBeShown() {
+        // If world map locations aren't enabled, obviously they should not be enabled!
         if (!config.showWorldMapLocations()) {
+            return false;
+        }
+
+        // If "force show world map locations" is enabled, then we should never disable world map locations.
+        if(config.forceShowWorldMapLocations()) {
             return true;
         }
 
-        if (client.getTickCount() - latestInteractionTime > config.worldMapLocationsDisableTimer() * 100) {
-            if (!config.forceShowWorldMapLocations()) {
-                return true;
-            }
+        // If we don't have an interaction recorded, then we shouldn't show world map locations.
+        if(latestInteractionTime == -1) {
+            return false;
         }
-        return false;
+
+        // World map locations should be disabled if it's been long enough since the last interaction time
+        return client.getTickCount() - latestInteractionTime <= config.worldMapLocationsDisableTimer() * 100;
     }
 
     /**
