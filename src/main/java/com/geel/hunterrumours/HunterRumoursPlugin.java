@@ -290,8 +290,6 @@ public class HunterRumoursPlugin extends Plugin {
 
     @Subscribe
     public void onGameTick(GameTick event) {
-        final int currentTick = client.getTickCount();
-
         if (shouldInfoBoxBeDisabled()) {
             infoBoxManager.removeInfoBox(infoBox);
             isShowingInfoBox = false;
@@ -509,6 +507,10 @@ public class HunterRumoursPlugin extends Plugin {
         if (!message.contains("Your current rumour target is")) {
             return;
         }
+
+        // Update last interaction time -- checking the whistle indicates a clear intent to participate
+        // in Hunter Rumours.
+        updateLatestInteractionTime();
 
         // Determine which Rumour the message is referencing -- if none, bail out.
         Rumour referencedRumour = chatParser.getReferencedRumour(message);
