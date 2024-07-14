@@ -197,21 +197,19 @@ public class HunterRumoursPlugin extends Plugin {
                     return;
                 }
 
-                if(getHunterRumourState()) {
+                if (getHunterRumourState()) {
                     return;
                 }
 
                 // Find the first-declared location for this rumour
-                var firstLocationGroup = RumourLocation.getGroupedLocationsForRumour(currentRumour).findFirst();
-                if (firstLocationGroup.isEmpty()) {
+                var locationGroups = RumourLocation.getGroupedLocationsForRumour(currentRumour);
+                var firstLocationWithFairyRing = locationGroups.filter(g -> g.getValue().get(0).getFairyRingCode().length() == 3).findFirst();
+
+                if(firstLocationWithFairyRing.isEmpty()) {
                     return;
                 }
 
-                // Ensure location has a fairy ring code
-                var location = firstLocationGroup.get().getValue().get(0);
-                if (location.getFairyRingCode().length() != 3) {
-                    return;
-                }
+                var fairyRingCode = firstLocationWithFairyRing.get().getValue().get(0).getFairyRingCode();
 
                 // If we haven't interacted with hunter rumours in the last 2 minutes, bail out
                 if (latestInteractionTime == -1 || (client.getTickCount() - latestInteractionTime >= 200)) {
@@ -262,7 +260,7 @@ public class HunterRumoursPlugin extends Plugin {
                 var children = panelList.getDynamicChildren();
                 Widget codeChild = null;
                 for (var child : children) {
-                    if (!child.getText().replace(" ", "").contentEquals(location.getFairyRingCode())) {
+                    if (!child.getText().replace(" ", "").contentEquals(fairyRingCode)) {
                         continue;
                     }
 
