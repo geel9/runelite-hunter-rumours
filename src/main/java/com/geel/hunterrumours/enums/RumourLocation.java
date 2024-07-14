@@ -276,11 +276,6 @@ public enum RumourLocation
 	TECU_SALAMANDER_RALOS_RISE_4(TECU_SALAMANDER, "Ralos' Rise", "", new WorldPoint(1475, 3101, 0)),
 	TECU_SALAMANDER_RALOS_RISE_5(TECU_SALAMANDER, "Ralos' Rise", "", new WorldPoint(1477, 3099, 0)),
 
-	MOONLIGHT_MOTH_NEYPOTZLI_1(MOONLIGHT_MOTH, "Neypotzli", "", new WorldPoint(1554, 9433, 0)),
-	MOONLIGHT_MOTH_NEYPOTZLI_2(MOONLIGHT_MOTH, "Neypotzli", "", new WorldPoint(1349, 9574, 0)),
-	MOONLIGHT_MOTH_NEYPOTZLI_3(MOONLIGHT_MOTH, "Neypotzli", "", new WorldPoint(1481, 9690, 0)),
-	MOONLIGHT_MOTH_NEYPOTZLI_4(MOONLIGHT_MOTH, "Neypotzli", "", new WorldPoint(1507, 9677, 0)),
-
 	MOONLIGHT_MOTH_HUNTER_GUILD_1(MOONLIGHT_MOTH, "Hunters' Guild", "", new WorldPoint(1562, 9441, 0)),
 	MOONLIGHT_MOTH_HUNTER_GUILD_2(MOONLIGHT_MOTH, "Hunters' Guild", "", new WorldPoint(1573, 9441, 0)),
 	MOONLIGHT_MOTH_HUNTER_GUILD_3(MOONLIGHT_MOTH, "Hunters' Guild", "", new WorldPoint(1570, 9444, 0)),
@@ -289,6 +284,10 @@ public enum RumourLocation
 	MOONLIGHT_MOTH_HUNTER_GUILD_6(MOONLIGHT_MOTH, "Hunters' Guild", "", new WorldPoint(1568, 9439, 0)),
 	MOONLIGHT_MOTH_HUNTER_GUILD_7(MOONLIGHT_MOTH, "Hunters' Guild", "", new WorldPoint(1557, 9427, 0)),
 	MOONLIGHT_MOTH_HUNTER_GUILD_8(MOONLIGHT_MOTH, "Hunters' Guild", "", new WorldPoint(1565, 9432, 0)),
+	MOONLIGHT_MOTH_NEYPOTZLI_1(MOONLIGHT_MOTH, "Neypotzli", "", new WorldPoint(1554, 9433, 0)),
+	MOONLIGHT_MOTH_NEYPOTZLI_2(MOONLIGHT_MOTH, "Neypotzli", "", new WorldPoint(1349, 9574, 0)),
+	MOONLIGHT_MOTH_NEYPOTZLI_3(MOONLIGHT_MOTH, "Neypotzli", "", new WorldPoint(1481, 9690, 0)),
+	MOONLIGHT_MOTH_NEYPOTZLI_4(MOONLIGHT_MOTH, "Neypotzli", "", new WorldPoint(1507, 9677, 0)),
 
 	SUNLIGHT_ANTELOPE_AVIUM_SAVANNAH_1(SUNLIGHT_ANTELOPE, "Avium Savannah", "AJP", new WorldPoint(1735, 3008, 0)),
 	SUNLIGHT_ANTELOPE_AVIUM_SAVANNAH_2(SUNLIGHT_ANTELOPE, "Avium Savannah", "AJP", new WorldPoint(1738, 3003, 0)),
@@ -427,11 +426,11 @@ public enum RumourLocation
 
 		// I do not know Java very well and there is surely a better way to do this, but... I think it works, so, oh well.
 		// Group the locations by their name, then return those groups sorted by declaration order of their first location.
-		 return Arrays.stream(locations)
-				 .collect(Collectors.groupingBy(RumourLocation::getLocationName))
-				 .entrySet()
-				 .stream()
-				 .sorted(Comparator.comparingInt(a -> locationDeclarationOrder.get(a.getKey())));
+		return Arrays.stream(locations)
+				.collect(Collectors.groupingBy(RumourLocation::getLocationName))
+				.entrySet()
+				.stream()
+				.sorted(Comparator.comparingInt(a -> locationDeclarationOrder.get(a.getKey())));
 	}
 
 	private static Stream<RumourLocation> getLocationsStreamForRumour(Rumour rumour)
