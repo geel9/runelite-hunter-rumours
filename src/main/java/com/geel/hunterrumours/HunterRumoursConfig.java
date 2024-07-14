@@ -11,44 +11,54 @@ public interface HunterRumoursConfig extends Config {
     @ConfigSection(
             name = "Hunter Guild Display",
             description = "Configure the panel that displays information while underground in the Hunter Guild.",
-            position = 0
+            position = 1
     )
     String hunterGuildDisplaySection = "hunterGuildDisplaySection";
 
     @ConfigSection(
             name = "Current Rumour Infobox",
             description = "Configure the infobox that shows your current Rumour.",
-            position = 1
+            position = 2
     )
     String infoBoxSection = "infoBoxSection";
 
     @ConfigSection(
             name = "World Map",
             description = "Configure the hunter creature locations the plugin adds to the world map.",
-            position = 2
+            position = 3
     )
     String worldMapSection = "worldMapSection";
 
     @ConfigSection(
             name = "Chat Messages",
             description = "Configure various chat messages that the plugin creates.",
-            position = 3
+            position = 4
     )
     String messagesSection = "messagesSection";
 
     @ConfigSection(
             name = "Hunter Tiers",
             description = "The tiers of hunters that are enabled.",
-            position = 4
+            position = 5
     )
     String tiersSection = "tiersSection";
 
     @ConfigSection(
             name = "Highlights",
             description = "Highlights for Hunters and Hunter Targets.",
-            position = 5
+            position = 6
     )
     String highlightSection = "highlightSection";
+
+    @ConfigItem(
+            position = 0,
+            keyName = "autoJumpFairyRing",
+            name = "Auto-Scroll to Fairy Ring",
+            description = "Whether to automatically scroll to the appropriate fairy ring for your current rumour when opening the fairy ring interface"
+    )
+    default boolean autoJumpFairyring() {
+        return true;
+    }
 
     @ConfigItem(
             position = 0,
