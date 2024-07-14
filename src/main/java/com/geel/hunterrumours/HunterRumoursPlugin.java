@@ -14,6 +14,7 @@ import net.runelite.api.kit.KitType;
 import net.runelite.api.widgets.ComponentID;
 import net.runelite.api.widgets.InterfaceID;
 import net.runelite.api.widgets.JavaScriptCallback;
+import net.runelite.api.widgets.Widget;
 import net.runelite.client.callback.ClientThread;
 import net.runelite.client.config.ConfigManager;
 import net.runelite.client.eventbus.Subscribe;
@@ -186,14 +187,119 @@ public class HunterRumoursPlugin extends Plugin {
         }
     }
 
-
     @Subscribe
     public void onWidgetLoaded(WidgetLoaded event) {
-        if (!isInBurrows()) {
-            return;
+        if (event.getGroupId() == InterfaceID.FAIRY_RING_PANEL && config.autoJumpFairyring()) {
+            clientThread.invokeLater(() -> {
+                // Ensure we have a current, non-completed rumour
+                var currentRumour = getCurrentRumour();
+                if (currentRumour == Rumour.NONE) {
+                    return;
+                }
+
+                if(getHunterRumourState()) {
+                    return;
+                }
+
+                // Find the first-declared location for this rumour
+                var firstLocationGroup = RumourLocation.getGroupedLocationsForRumour(currentRumour).findFirst();
+                if (firstLocationGroup.isEmpty()) {
+                    return;
+                }
+
+                // Ensure location has a fairy ring code
+                var location = firstLocationGroup.get().getValue().get(0);
+                if (location.getFairyRingCode().length() != 3) {
+                    return;
+                }
+
+                // If we haven't interacted with hunter rumours in the last 2 minutes, bail out
+                if (latestInteractionTime == -1 || (client.getTickCount() - latestInteractionTime >= 200)) {
+                    return;
+                }
+
+                // Find all the necessary widgets
+                Widget panelList = client.getWidget(ComponentID.FAIRY_RING_PANEL_LIST);
+                Widget scrollBar = client.getWidget(ComponentID.FAIRY_RING_PANEL_SCROLLBAR);
+
+                if (panelList == null || scrollBar == null) {
+                    return;
+                }
+
+                Widget scrollBarContainer = null, scrollBarHandle = null, scrollBarHandleTop = null,
+                        scrollBarHandleBottom = null, scrollBarUpButton = null, scrollBarDownButton = null;
+                for (var scrollChild : scrollBar.getDynamicChildren()) {
+                    // This is stupid
+                    switch (scrollChild.getSpriteId()) {
+                        case SpriteID.SCROLLBAR_ARROW_DOWN:
+                            scrollBarDownButton = scrollChild;
+                            break;
+                        case SpriteID.SCROLLBAR_ARROW_UP:
+                            scrollBarUpButton = scrollChild;
+                            break;
+                        case SpriteID.SCROLLBAR_THUMB_MIDDLE:
+                            scrollBarHandle = scrollChild;
+                            break;
+                        case SpriteID.SCROLLBAR_THUMB_TOP:
+                            scrollBarHandleTop = scrollChild;
+                            break;
+                        case SpriteID.SCROLLBAR_THUMB_BOTTOM:
+                            scrollBarHandleBottom = scrollChild;
+                            break;
+                        case SpriteID.SCROLLBAR_THUMB_MIDDLE_DARK:
+                            scrollBarContainer = scrollChild; // Weird reuse of a sprite for the inset slider container
+                            break;
+                    }
+                }
+
+                // Lol
+                if (scrollBarContainer == null || scrollBarHandle == null || scrollBarHandleTop == null
+                        || scrollBarHandleBottom == null || scrollBarUpButton == null || scrollBarDownButton == null) {
+                    return;
+                }
+
+                // Find the widget corresponding to the fairy ring code
+                var children = panelList.getDynamicChildren();
+                Widget codeChild = null;
+                for (var child : children) {
+                    if (!child.getText().replace(" ", "").contentEquals(location.getFairyRingCode())) {
+                        continue;
+                    }
+
+                    codeChild = child;
+                    break;
+                }
+
+                // If no widget found, bail out
+                if (codeChild == null) {
+                    return;
+                }
+
+                // Scroll to the code entry and highlight it
+                int panelScrollY = Math.min(codeChild.getRelativeY(), panelList.getScrollHeight() - panelList.getHeight());
+                panelList.setScrollY(panelScrollY);
+                panelList.revalidateScroll();
+                codeChild.setTextColor(0x00FF00);
+                codeChild.setText("(Rumour) " + codeChild.getText());
+
+                // Determine scrollbar placement -- has to be done manually, I think, because just setting the panel
+                // scroll value doesn't actually adjust its scrollbar (which makes sense)
+                double codeEntryPlacement = (double) codeChild.getRelativeY() / (double) panelList.getScrollHeight();
+                int maxHandleY = scrollBarContainer.getHeight() - 4; // Not sure where the 4 comes from... just padding?
+                int handleY = (int) ((double) scrollBarContainer.getHeight() * codeEntryPlacement) + scrollBarUpButton.getHeight();
+                handleY = Math.min(handleY, maxHandleY);
+                int handleBottomY = handleY + (scrollBarHandle.getHeight() - scrollBarHandleBottom.getHeight());
+
+                scrollBarHandle.setOriginalY(handleY);
+                scrollBarHandleTop.setOriginalY(handleY);
+                scrollBarHandleBottom.setOriginalY(handleBottomY);
+                scrollBarHandle.revalidateScroll();
+                scrollBarHandleTop.revalidateScroll();
+                scrollBarHandleBottom.revalidateScroll();
+            });
         }
 
-        if (event.getGroupId() == InterfaceID.DIALOG_OPTION) {
+        if (event.getGroupId() == InterfaceID.DIALOG_OPTION && isInBurrows()) {
             backToBackDialogOpened = true;
         }
     }
@@ -667,16 +773,16 @@ public class HunterRumoursPlugin extends Plugin {
         var isShowing = infoBox != null;
         var shouldShow = shouldInfoBoxBeShown();
 
-        if(isShowing && !shouldShow) {
+        if (isShowing && !shouldShow) {
             removeInfoBox();
-        } else if(shouldShow && !isShowing) {
+        } else if (shouldShow && !isShowing) {
             infoBox = new RumourInfoBox(getCurrentRumour(), this, itemManager);
             infoBoxManager.addInfoBox(infoBox);
         }
     }
 
     private void removeInfoBox() {
-        if(infoBox != null) {
+        if (infoBox != null) {
             infoBoxManager.removeInfoBox(infoBox);
             infoBox = null;
         }
@@ -833,12 +939,12 @@ public class HunterRumoursPlugin extends Plugin {
         }
 
         // If "force info box" is enabled, then the infobox should always be shown (if infobox itself is enabled)
-        if(config.forceShowInfoBox()) {
+        if (config.forceShowInfoBox()) {
             return true;
         }
 
         // If we don't have an interaction recorded, then we shouldn't show the infobox.
-        if(latestInteractionTime == -1) {
+        if (latestInteractionTime == -1) {
             return false;
         }
 
@@ -862,12 +968,12 @@ public class HunterRumoursPlugin extends Plugin {
         }
 
         // If "force show world map locations" is enabled, then we should never disable world map locations.
-        if(config.forceShowWorldMapLocations()) {
+        if (config.forceShowWorldMapLocations()) {
             return true;
         }
 
         // If we don't have an interaction recorded, then we shouldn't show world map locations.
-        if(latestInteractionTime == -1) {
+        if (latestInteractionTime == -1) {
             return false;
         }
 
