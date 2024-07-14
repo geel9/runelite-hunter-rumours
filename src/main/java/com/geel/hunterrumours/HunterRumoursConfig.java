@@ -443,6 +443,6 @@ public interface HunterRumoursConfig extends Config {
     )
     default Color hunterNPCHighlightColor() {
 
-        return new Color(0x2A, 0xBE, 0x2A);
+        return new Color(0x4B, 0x9D, 0xDD);
     }
 }
