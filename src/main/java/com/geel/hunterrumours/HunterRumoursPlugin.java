@@ -334,11 +334,25 @@ public class HunterRumoursPlugin extends Plugin {
         boolean isPromptingToDisable = title.getText().contains("Disable back-to-back rumours?");
         boolean isPromptingToEnable = title.getText().contains("Enable back-to-back rumours?");
 
-        if ((!isPromptingToDisable && !isPromptingToEnable) || !option1.getText().equals("Yes") || !option2.getText().equals("No")) {
+        if ((!isPromptingToDisable && !isPromptingToEnable)) {
             return;
         }
 
         BackToBackState ifYesState = isPromptingToEnable ? BackToBackState.ENABLED : BackToBackState.DISABLED;
+
+        // HACK(ish): if the user is 2quick2fast, they can select the option before this callback fires,
+        // causing us to fail to attach a listener / cause the text to not be what we expect. So handle
+        // that here.
+        if(option1.getText().equals("Please wait...")) {
+            setBackToBackState(ifYesState, true);
+            return;
+        }
+
+        // Options should be "Yes" and "No"
+        if(!option1.getText().equals("Yes") || !option2.getText().equals("No"))
+        {
+            return;
+        }
 
         // Add a key listener to the title (a widget we know doesn't have a listener), to detect the '1'
         // key being pressed. We have to do this because the `onClickListener` doesn't fire if a number key is pressed
