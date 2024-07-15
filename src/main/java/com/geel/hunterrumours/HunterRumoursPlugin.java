@@ -1008,7 +1008,7 @@ public class HunterRumoursPlugin extends Plugin {
 
         currentHunter = Hunter.NONE;
         backToBackState = BackToBackState.UNKNOWN;
-        hunterKitItems = 1;
+        hunterKitItems = 0;
 
         refreshAllDisplays();
     }
