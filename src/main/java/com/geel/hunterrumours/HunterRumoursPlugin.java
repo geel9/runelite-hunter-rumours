@@ -632,17 +632,14 @@ public class HunterRumoursPlugin extends Plugin {
             return;
         }
 
-        // If the referenced Rumour is what we already thought the Rumour was, then return early.
-        if (referencedRumour == getCurrentRumour() && referencedHunter == currentHunter) {
-            return;
+        // If the Hunter or Rumour is different than what we thought it was, update state.
+        if (referencedRumour != getCurrentRumour() || referencedHunter != currentHunter) {
+            // TODO: too much manual state shit, abstract this away
+            setHunterRumour(referencedHunter, referencedRumour);
+            setCurrentHunter(referencedHunter);
+            setHunterRumourState(false);
+            setCaughtCreatures(0);
         }
-
-        // Hunter or Rumour is different than what we thought it was. Update state.
-        // TODO: too much manual state shit, abstract this away
-        setHunterRumour(referencedHunter, referencedRumour);
-        setCurrentHunter(referencedHunter);
-        setHunterRumourState(false);
-        setCaughtCreatures(0);
 
         refreshAllDisplays();
     }
