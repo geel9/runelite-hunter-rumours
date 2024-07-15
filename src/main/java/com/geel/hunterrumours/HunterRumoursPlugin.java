@@ -906,8 +906,7 @@ public class HunterRumoursPlugin extends Plugin {
         try {
             currentRumourFinished = configManager.getRSProfileConfiguration(HunterRumoursConfig.GROUP, "current.rumour.finished", boolean.class);
         } catch (NullPointerException ex) {
-            // Catch null pointer execption and set to false so it doesn't happen again
-            setHunterRumourState(false);
+            currentRumourFinished = false;
         }
 
         // Load back-to-back state
