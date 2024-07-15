@@ -430,9 +430,10 @@ public class HunterRumoursPlugin extends Plugin {
 
         // Find all the necessary widgets
         Widget panelList = client.getWidget(ComponentID.FAIRY_RING_PANEL_LIST);
+        Widget favoritesList = client.getWidget(ComponentID.FAIRY_RING_PANEL_FAVORITES);
         Widget scrollBar = client.getWidget(ComponentID.FAIRY_RING_PANEL_SCROLLBAR);
 
-        if (panelList == null || scrollBar == null) {
+        if (panelList == null || scrollBar == null || favoritesList == null) {
             return;
         }
 
@@ -468,33 +469,42 @@ public class HunterRumoursPlugin extends Plugin {
             return;
         }
 
+        // Construct a list of all widgets that are the fairy ring code texts
+        // Yes, this is slightly inefficient with memory. You should see what other plugins do!
+        var codeWidgets = new ArrayList<Widget>();
+
+        // Add in all children from the big list
+        codeWidgets.addAll(Arrays.asList(panelList.getDynamicChildren()));
+
+        // Add in all children from the favorites list
+        codeWidgets.addAll(Arrays.asList(favoritesList.getStaticChildren()));
+
         // Find the widget corresponding to the fairy ring code
-        var children = panelList.getDynamicChildren();
-        Widget codeChild = null;
-        for (var child : children) {
-            if (!child.getText().replace(" ", "").contentEquals(fairyRingCode)) {
+        Widget foundCodeWidget = null;
+        for (var codeWidget : codeWidgets) {
+            if (!codeWidget.getText().replace(" ", "").contentEquals(fairyRingCode)) {
                 continue;
             }
 
-            codeChild = child;
+            foundCodeWidget = codeWidget;
             break;
         }
 
         // If no widget found, bail out
-        if (codeChild == null) {
+        if (foundCodeWidget == null) {
             return;
         }
 
         // Scroll to the code entry and highlight it
-        int panelScrollY = Math.min(codeChild.getRelativeY(), panelList.getScrollHeight() - panelList.getHeight());
+        int panelScrollY = Math.min(foundCodeWidget.getRelativeY(), panelList.getScrollHeight() - panelList.getHeight());
         panelList.setScrollY(panelScrollY);
         panelList.revalidateScroll();
-        codeChild.setTextColor(0x00FF00);
-        codeChild.setText("(Rumour) " + codeChild.getText());
+        foundCodeWidget.setTextColor(0x00FF00);
+        foundCodeWidget.setText("(Rumour) " + foundCodeWidget.getText());
 
         // Determine scrollbar placement -- has to be done manually, I think, because just setting the panel
         // scroll value doesn't actually adjust its scrollbar (which makes sense)
-        double codeEntryPlacement = (double) codeChild.getRelativeY() / (double) panelList.getScrollHeight();
+        double codeEntryPlacement = (double) foundCodeWidget.getRelativeY() / (double) panelList.getScrollHeight();
         int maxHandleY = scrollBarContainer.getHeight() - 4; // Not sure where the 4 comes from... just padding?
         int handleY = (int) ((double) scrollBarContainer.getHeight() * codeEntryPlacement) + scrollBarUpButton.getHeight();
         handleY = Math.min(handleY, maxHandleY);
