@@ -53,7 +53,6 @@ public class HunterRumoursPlugin extends Plugin {
     private boolean currentRumourFinished = false;
     private BackToBackState backToBackState = BackToBackState.UNKNOWN;
     private final Set<HunterRumourWorldMapPoint> currentMapPoints = new HashSet<>();
-    boolean backToBackDialogOpened = false; // Tracking variable to hook into back-to-back dialog opening
     private int previousHunterExp = -1; // Tracks Hunter experience -- used to detect XP drops indicating a creature was caught
 
     @Getter
@@ -190,185 +189,12 @@ public class HunterRumoursPlugin extends Plugin {
     @Subscribe
     public void onWidgetLoaded(WidgetLoaded event) {
         if (event.getGroupId() == InterfaceID.FAIRY_RING_PANEL && config.autoJumpFairyring()) {
-            clientThread.invokeLater(() -> {
-                // Ensure we have a current, non-completed rumour
-                var currentRumour = getCurrentRumour();
-                if (currentRumour == Rumour.NONE) {
-                    return;
-                }
-
-                if (getHunterRumourState()) {
-                    return;
-                }
-
-                // Find the first-declared location for this rumour
-                var locationGroups = RumourLocation.getGroupedLocationsForRumour(currentRumour);
-                var firstLocationWithFairyRing = locationGroups.filter(g -> g.getValue().get(0).getFairyRingCode().length() == 3).findFirst();
-
-                if(firstLocationWithFairyRing.isEmpty()) {
-                    return;
-                }
-
-                var fairyRingCode = firstLocationWithFairyRing.get().getValue().get(0).getFairyRingCode();
-
-                // If we haven't interacted with hunter rumours in the last 2 minutes, bail out
-                if (!interactedRecently(200)) {
-                    return;
-                }
-
-                // Find all the necessary widgets
-                Widget panelList = client.getWidget(ComponentID.FAIRY_RING_PANEL_LIST);
-                Widget scrollBar = client.getWidget(ComponentID.FAIRY_RING_PANEL_SCROLLBAR);
-
-                if (panelList == null || scrollBar == null) {
-                    return;
-                }
-
-                Widget scrollBarContainer = null, scrollBarHandle = null, scrollBarHandleTop = null,
-                        scrollBarHandleBottom = null, scrollBarUpButton = null, scrollBarDownButton = null;
-                for (var scrollChild : scrollBar.getDynamicChildren()) {
-                    // This is stupid
-                    switch (scrollChild.getSpriteId()) {
-                        case SpriteID.SCROLLBAR_ARROW_DOWN:
-                            scrollBarDownButton = scrollChild;
-                            break;
-                        case SpriteID.SCROLLBAR_ARROW_UP:
-                            scrollBarUpButton = scrollChild;
-                            break;
-                        case SpriteID.SCROLLBAR_THUMB_MIDDLE:
-                            scrollBarHandle = scrollChild;
-                            break;
-                        case SpriteID.SCROLLBAR_THUMB_TOP:
-                            scrollBarHandleTop = scrollChild;
-                            break;
-                        case SpriteID.SCROLLBAR_THUMB_BOTTOM:
-                            scrollBarHandleBottom = scrollChild;
-                            break;
-                        case SpriteID.SCROLLBAR_THUMB_MIDDLE_DARK:
-                            scrollBarContainer = scrollChild; // Weird reuse of a sprite for the inset slider container
-                            break;
-                    }
-                }
-
-                // Lol
-                if (scrollBarContainer == null || scrollBarHandle == null || scrollBarHandleTop == null
-                        || scrollBarHandleBottom == null || scrollBarUpButton == null || scrollBarDownButton == null) {
-                    return;
-                }
-
-                // Find the widget corresponding to the fairy ring code
-                var children = panelList.getDynamicChildren();
-                Widget codeChild = null;
-                for (var child : children) {
-                    if (!child.getText().replace(" ", "").contentEquals(fairyRingCode)) {
-                        continue;
-                    }
-
-                    codeChild = child;
-                    break;
-                }
-
-                // If no widget found, bail out
-                if (codeChild == null) {
-                    return;
-                }
-
-                // Scroll to the code entry and highlight it
-                int panelScrollY = Math.min(codeChild.getRelativeY(), panelList.getScrollHeight() - panelList.getHeight());
-                panelList.setScrollY(panelScrollY);
-                panelList.revalidateScroll();
-                codeChild.setTextColor(0x00FF00);
-                codeChild.setText("(Rumour) " + codeChild.getText());
-
-                // Determine scrollbar placement -- has to be done manually, I think, because just setting the panel
-                // scroll value doesn't actually adjust its scrollbar (which makes sense)
-                double codeEntryPlacement = (double) codeChild.getRelativeY() / (double) panelList.getScrollHeight();
-                int maxHandleY = scrollBarContainer.getHeight() - 4; // Not sure where the 4 comes from... just padding?
-                int handleY = (int) ((double) scrollBarContainer.getHeight() * codeEntryPlacement) + scrollBarUpButton.getHeight();
-                handleY = Math.min(handleY, maxHandleY);
-                int handleBottomY = handleY + (scrollBarHandle.getHeight() - scrollBarHandleBottom.getHeight());
-
-                scrollBarHandle.setOriginalY(handleY);
-                scrollBarHandleTop.setOriginalY(handleY);
-                scrollBarHandleBottom.setOriginalY(handleBottomY);
-                scrollBarHandle.revalidateScroll();
-                scrollBarHandleTop.revalidateScroll();
-                scrollBarHandleBottom.revalidateScroll();
-            });
+            clientThread.invokeLater(this::handleFairyRingPanel);
         }
 
         if (event.getGroupId() == InterfaceID.DIALOG_OPTION && isInBurrows()) {
-            backToBackDialogOpened = true;
+            clientThread.invokeLater(this::handleBackToBackDialog);
         }
-    }
-
-    @Subscribe
-    public void onPostClientTick(PostClientTick event) {
-        // If the back-to-back chat dialog just opened, we will load the widget and parse it to
-        // A) determine if what's being offered is enabling or disabling of back-to-back and
-        // B) hook in to the dialog to detect when the user makes a choice and update our internal state
-        if (!backToBackDialogOpened) {
-            return;
-        }
-
-        backToBackDialogOpened = false;
-
-        var widget = client.getWidget(ComponentID.DIALOG_OPTION_OPTIONS);
-        if (widget == null) {
-            return;
-        }
-
-        var children = widget.getChildren();
-        if (children == null || children.length != 5) {
-            return;
-        }
-
-        var title = children[0];
-        var option1 = children[1];
-        var option2 = children[2];
-
-        if (title == null || option1 == null || option2 == null) {
-            return;
-        }
-
-        boolean isPromptingToDisable = title.getText().contains("Disable back-to-back rumours?");
-        boolean isPromptingToEnable = title.getText().contains("Enable back-to-back rumours?");
-
-        if ((!isPromptingToDisable && !isPromptingToEnable)) {
-            return;
-        }
-
-        BackToBackState ifYesState = isPromptingToEnable ? BackToBackState.ENABLED : BackToBackState.DISABLED;
-
-        // HACK(ish): if the user is 2quick2fast, they can select the option before this callback fires,
-        // causing us to fail to attach a listener / cause the text to not be what we expect. So handle
-        // that here.
-        if(option1.getText().equals("Please wait...")) {
-            setBackToBackState(ifYesState, true);
-            return;
-        }
-
-        // Options should be "Yes" and "No"
-        if(!option1.getText().equals("Yes") || !option2.getText().equals("No"))
-        {
-            return;
-        }
-
-        // Add a key listener to the title (a widget we know doesn't have a listener), to detect the '1'
-        // key being pressed. We have to do this because the `onClickListener` doesn't fire if a number key is pressed
-        // to activate the menu entry.
-        title.setOnKeyListener((JavaScriptCallback) ev -> {
-            if (ev.getTypedKeyChar() == '1') {
-                setBackToBackState(ifYesState, true);
-            }
-        });
-        title.setHasListener(true);
-
-        // Capture player choice if they click 'Yes'.
-        // We don't need to know if they click 'No' because we... don't care at all.
-        option1.setOnClickListener((JavaScriptCallback) ev -> {
-            setBackToBackState(ifYesState, true);
-        });
     }
 
     @Subscribe
@@ -568,6 +394,181 @@ public class HunterRumoursPlugin extends Plugin {
         int y = location.getY();
 
         return x >= 1549 && x <= 1565 && y >= 9449 && y <= 9464;
+    }
+
+    /**
+     * Called when the fairy ring dialog is opened.
+     * Responsible for scrolling to the relevant rumour code and highlighting it, if relevant.
+     */
+    private void handleFairyRingPanel() {
+        // TODO: Look into fairy ring plugin and steal its scroll code, which is allegedly much simpler than mine.
+
+        // Ensure we have a current, non-completed rumour
+        var currentRumour = getCurrentRumour();
+        if (currentRumour == Rumour.NONE) {
+            return;
+        }
+
+        if (getHunterRumourState()) {
+            return;
+        }
+
+        // Find the first-declared location for this rumour
+        var locationGroups = RumourLocation.getGroupedLocationsForRumour(currentRumour);
+        var firstLocationWithFairyRing = locationGroups.filter(g -> g.getValue().get(0).getFairyRingCode().length() == 3).findFirst();
+
+        if(firstLocationWithFairyRing.isEmpty()) {
+            return;
+        }
+
+        var fairyRingCode = firstLocationWithFairyRing.get().getValue().get(0).getFairyRingCode();
+
+        // If we haven't interacted with hunter rumours in the last 2 minutes, bail out
+        if (!interactedRecently(200)) {
+            return;
+        }
+
+        // Find all the necessary widgets
+        Widget panelList = client.getWidget(ComponentID.FAIRY_RING_PANEL_LIST);
+        Widget scrollBar = client.getWidget(ComponentID.FAIRY_RING_PANEL_SCROLLBAR);
+
+        if (panelList == null || scrollBar == null) {
+            return;
+        }
+
+        Widget scrollBarContainer = null, scrollBarHandle = null, scrollBarHandleTop = null,
+                scrollBarHandleBottom = null, scrollBarUpButton = null, scrollBarDownButton = null;
+        for (var scrollChild : scrollBar.getDynamicChildren()) {
+            // This is stupid
+            switch (scrollChild.getSpriteId()) {
+                case SpriteID.SCROLLBAR_ARROW_DOWN:
+                    scrollBarDownButton = scrollChild;
+                    break;
+                case SpriteID.SCROLLBAR_ARROW_UP:
+                    scrollBarUpButton = scrollChild;
+                    break;
+                case SpriteID.SCROLLBAR_THUMB_MIDDLE:
+                    scrollBarHandle = scrollChild;
+                    break;
+                case SpriteID.SCROLLBAR_THUMB_TOP:
+                    scrollBarHandleTop = scrollChild;
+                    break;
+                case SpriteID.SCROLLBAR_THUMB_BOTTOM:
+                    scrollBarHandleBottom = scrollChild;
+                    break;
+                case SpriteID.SCROLLBAR_THUMB_MIDDLE_DARK:
+                    scrollBarContainer = scrollChild; // Weird reuse of a sprite for the inset slider container
+                    break;
+            }
+        }
+
+        // Lol
+        if (scrollBarContainer == null || scrollBarHandle == null || scrollBarHandleTop == null
+                || scrollBarHandleBottom == null || scrollBarUpButton == null || scrollBarDownButton == null) {
+            return;
+        }
+
+        // Find the widget corresponding to the fairy ring code
+        var children = panelList.getDynamicChildren();
+        Widget codeChild = null;
+        for (var child : children) {
+            if (!child.getText().replace(" ", "").contentEquals(fairyRingCode)) {
+                continue;
+            }
+
+            codeChild = child;
+            break;
+        }
+
+        // If no widget found, bail out
+        if (codeChild == null) {
+            return;
+        }
+
+        // Scroll to the code entry and highlight it
+        int panelScrollY = Math.min(codeChild.getRelativeY(), panelList.getScrollHeight() - panelList.getHeight());
+        panelList.setScrollY(panelScrollY);
+        panelList.revalidateScroll();
+        codeChild.setTextColor(0x00FF00);
+        codeChild.setText("(Rumour) " + codeChild.getText());
+
+        // Determine scrollbar placement -- has to be done manually, I think, because just setting the panel
+        // scroll value doesn't actually adjust its scrollbar (which makes sense)
+        double codeEntryPlacement = (double) codeChild.getRelativeY() / (double) panelList.getScrollHeight();
+        int maxHandleY = scrollBarContainer.getHeight() - 4; // Not sure where the 4 comes from... just padding?
+        int handleY = (int) ((double) scrollBarContainer.getHeight() * codeEntryPlacement) + scrollBarUpButton.getHeight();
+        handleY = Math.min(handleY, maxHandleY);
+        int handleBottomY = handleY + (scrollBarHandle.getHeight() - scrollBarHandleBottom.getHeight());
+
+        scrollBarHandle.setOriginalY(handleY);
+        scrollBarHandleTop.setOriginalY(handleY);
+        scrollBarHandleBottom.setOriginalY(handleBottomY);
+        scrollBarHandle.revalidateScroll();
+        scrollBarHandleTop.revalidateScroll();
+        scrollBarHandleBottom.revalidateScroll();
+    }
+
+    /**
+     * Called when the dialog options to enable/disable back-to-back rumours are shown.
+     * Hooks in to dialog choice and updates state accordingly.
+     */
+    private void handleBackToBackDialog() {
+        var widget = client.getWidget(ComponentID.DIALOG_OPTION_OPTIONS);
+        if (widget == null) {
+            return;
+        }
+
+        var children = widget.getChildren();
+        if (children == null || children.length != 5) {
+            return;
+        }
+
+        var title = children[0];
+        var option1 = children[1];
+        var option2 = children[2];
+
+        if (title == null || option1 == null || option2 == null) {
+            return;
+        }
+
+        boolean isPromptingToDisable = title.getText().contains("Disable back-to-back rumours?");
+        boolean isPromptingToEnable = title.getText().contains("Enable back-to-back rumours?");
+
+        if ((!isPromptingToDisable && !isPromptingToEnable)) {
+            return;
+        }
+
+        BackToBackState ifYesState = isPromptingToEnable ? BackToBackState.ENABLED : BackToBackState.DISABLED;
+
+        // HACK(ish): if the user is 2quick2fast, they can select the option before this callback fires,
+        // causing us to fail to attach a listener / cause the text to not be what we expect. So handle
+        // that here.
+        if(option1.getText().equals("Please wait...")) {
+            setBackToBackState(ifYesState, true);
+            return;
+        }
+
+        // Options should be "Yes" and "No"
+        if(!option1.getText().equals("Yes") || !option2.getText().equals("No"))
+        {
+            return;
+        }
+
+        // Add a key listener to the title (a widget we know doesn't have a listener), to detect the '1'
+        // key being pressed. We have to do this because the `onClickListener` doesn't fire if a number key is pressed
+        // to activate the menu entry.
+        title.setOnKeyListener((JavaScriptCallback) ev -> {
+            if (ev.getTypedKeyChar() == '1') {
+                setBackToBackState(ifYesState, true);
+            }
+        });
+        title.setHasListener(true);
+
+        // Capture player choice if they click 'Yes'.
+        // We don't need to know if they click 'No' because we... don't care at all.
+        option1.setOnClickListener((JavaScriptCallback) ev -> {
+            setBackToBackState(ifYesState, true);
+        });
     }
 
     /**
