@@ -212,7 +212,7 @@ public class HunterRumoursPlugin extends Plugin {
                 var fairyRingCode = firstLocationWithFairyRing.get().getValue().get(0).getFairyRingCode();
 
                 // If we haven't interacted with hunter rumours in the last 2 minutes, bail out
-                if (latestInteractionTime == -1 || (client.getTickCount() - latestInteractionTime >= 200)) {
+                if (!interactedRecently(200)) {
                     return;
                 }
 
@@ -928,6 +928,13 @@ public class HunterRumoursPlugin extends Plugin {
     }
 
     /**
+     * Computes whether the player has interacted with Hunter Rumours in the last N ticks
+     */
+    private boolean interactedRecently(int tickThreshold) {
+        return latestInteractionTime != -1 && (client.getTickCount() - latestInteractionTime <= tickThreshold);
+    }
+
+    /**
      * Checks the configurations of the info box, returns true if the info box should be disabled.
      */
     private boolean shouldInfoBoxBeShown() {
@@ -941,11 +948,6 @@ public class HunterRumoursPlugin extends Plugin {
             return true;
         }
 
-        // If we don't have an interaction recorded, then we shouldn't show the infobox.
-        if (latestInteractionTime == -1) {
-            return false;
-        }
-
         // If we have no active rumour, don't show the info box.
         var rumour = getCurrentRumour();
         if (rumour == Rumour.NONE) {
@@ -953,7 +955,7 @@ public class HunterRumoursPlugin extends Plugin {
         }
 
         // Infobox should be disabled if it's been long enough since the last interaction time
-        return client.getTickCount() - latestInteractionTime <= config.infoBoxDisableTimer() * 100;
+        return interactedRecently(config.infoBoxDisableTimer() * 100);
     }
 
     /**
@@ -970,13 +972,8 @@ public class HunterRumoursPlugin extends Plugin {
             return true;
         }
 
-        // If we don't have an interaction recorded, then we shouldn't show world map locations.
-        if (latestInteractionTime == -1) {
-            return false;
-        }
-
         // World map locations should be disabled if it's been long enough since the last interaction time
-        return client.getTickCount() - latestInteractionTime <= config.worldMapLocationsDisableTimer() * 100;
+        return interactedRecently(config.worldMapLocationsDisableTimer() * 100);
     }
 
     /**
