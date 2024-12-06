@@ -229,7 +229,8 @@ public class HunterRumoursPlugin extends Plugin {
 
         final int xpDiff = currentXp - previousHunterExp;
         if (xpDiff > 0) {
-            if (Arrays.stream(getCurrentRumour().getTargetCreature().getPossibleXpDrops()).anyMatch(possibleXpDrop -> possibleXpDrop == xpDiff)) {
+
+            if (Arrays.stream(getCurrentRumour().getTargetCreature().getPossibleXpDrops()).anyMatch(possibleXpDrop -> possibleXpDrop * config.advancedXpMultiplier() == xpDiff)) {
                 incrementCaughtCreatures();
                 refreshAllDisplays();
             }

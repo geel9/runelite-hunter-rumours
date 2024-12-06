@@ -50,6 +50,13 @@ public interface HunterRumoursConfig extends Config {
     )
     String highlightSection = "highlightSection";
 
+    @ConfigSection(
+            name = "Advanced",
+            description = "Advanced settings",
+            position = 7
+    )
+    String advancedSection = "advancedSection";
+
     @ConfigItem(
             position = 0,
             keyName = "autoJumpFairyRing",
@@ -435,7 +442,7 @@ public interface HunterRumoursConfig extends Config {
     }
 
     @ConfigItem(
-            position = 7,
+            position = 0,
             keyName = "hunterNPCHighlightColor",
             name = "Hunter NPC Highlight Color",
             description = "Highlight color for Hunter targets.",
@@ -444,5 +451,17 @@ public interface HunterRumoursConfig extends Config {
     default Color hunterNPCHighlightColor() {
 
         return new Color(0x4B, 0x9D, 0xDD);
+    }
+
+    @ConfigItem(
+            position = 2,
+            keyName = "advancedXpMultiplier",
+            name = "Xp Multiplier",
+            description = "Bonus XP multiplier. (from seasonal gamemodes like leagues for example)",
+            section = advancedSection
+    )
+    @Range(min = 1)
+    default int advancedXpMultiplier() {
+        return 1;
     }
 }
