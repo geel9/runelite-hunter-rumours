@@ -442,7 +442,7 @@ public interface HunterRumoursConfig extends Config {
     }
 
     @ConfigItem(
-            position = 0,
+            position = 7,
             keyName = "hunterNPCHighlightColor",
             name = "Hunter NPC Highlight Color",
             description = "Highlight color for Hunter targets.",
@@ -454,7 +454,7 @@ public interface HunterRumoursConfig extends Config {
     }
 
     @ConfigItem(
-            position = 2,
+            position = 0,
             keyName = "advancedXpMultiplier",
             name = "Xp Multiplier",
             description = "Bonus XP multiplier. (from seasonal gamemodes like leagues for example)",
