@@ -1,9 +1,7 @@
 package com.geel.hunterrumours;
 
-import com.geel.hunterrumours.enums.BackToBackState;
-import com.geel.hunterrumours.enums.Hunter;
-import com.geel.hunterrumours.enums.Rumour;
-import com.geel.hunterrumours.enums.RumourLocation;
+import com.geel.hunterrumours.enums.*;
+import com.google.errorprone.annotations.Var;
 import com.google.inject.Provides;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
@@ -41,6 +39,10 @@ import java.util.*;
 )
 @Slf4j
 public class HunterRumoursPlugin extends Plugin {
+    // Varbit value corresponding to the Tier-1 relic Animal Wrangler.
+    // This is used because this relic gives double hunter XP for chinchompas, which we need to account for to track kills.
+    public static int RELIC_ANIMAL_WRANGLER = 3;
+
     public static final Map<Hunter, Rumour> hunterRumours = new HashMap<>() {
         {
             for (var hunter : Hunter.allValues()) {
@@ -228,45 +230,35 @@ public class HunterRumoursPlugin extends Plugin {
         }
 
         int xpDiff = (currentXp - previousHunterExp) / getLeaguesXpMultiplier();
+        if (xpDiff <= 0) {
+            return;
+        }
 
-        if (xpDiff > 0) {
-            if (Arrays.stream(getCurrentRumour().getTargetCreature().getPossibleXpDrops()).anyMatch(possibleXpDrop -> possibleXpDrop == xpDiff)) {
-                incrementCaughtCreatures();
-                refreshAllDisplays();
+        // RAGING ECHOES LEAGUE: We need to account for the possibility that the player just caught a chinchompa
+        // while using the Animal Wrangler relic, which will give them yet double the XP.
+        // This is a bit gross. I write good code in my actual job.
+        // Mostly.
+        if (hasDoubleChinchompaExperience()) {
+            final int preChincompaXpDiff = xpDiff;
+
+            if (Arrays.stream(Creature.GREY_CHINCHOMPA.getPossibleXpDrops()).anyMatch(possibleXpDrop -> possibleXpDrop == (preChincompaXpDiff / 2))
+                    || Arrays.stream(Creature.RED_CHINCHOMPA.getPossibleXpDrops()).anyMatch(possibleXpDrop -> possibleXpDrop == (preChincompaXpDiff / 2))) {
+                // If we just caught a chincompa, just divide xpDiff by 2 here so that the below code will correctly identify
+                // the catch as a chinchompa. Smart moves from a smart engineer (me).
+                xpDiff /= 2;
             }
-            previousHunterExp = currentXp;
-        }
-    }
-
-    private int getLeaguesXpMultiplier() {
-        // This code is specific to Raging Echoes league, so in case I don't patch this before future leagues, don't consider them
-        // Make sure current date is before January 23, 2025
-        if (System.currentTimeMillis() > (1737608400L * 1000L)) {
-            return 1;
         }
 
-        var tier1 = client.getVarbitValue(Varbits.LEAGUE_RELIC_1);
-        var tier2 = client.getVarbitValue(Varbits.LEAGUE_RELIC_2);
-        var tier5 = client.getVarbitValue(Varbits.LEAGUE_RELIC_5);
-        var tier7 = client.getVarbitValue(Varbits.LEAGUE_RELIC_7);
+        // Create a final int because Java requires that for lambda captures
+        final int finalXpDiff = xpDiff;
 
-        if(tier1 == 0) {
-            return 1; // No relic -- 1x
+        // Find the creature that corresponds to the XP drop and mark them as being fucking dead
+        if (Arrays.stream(getCurrentRumour().getTargetCreature().getPossibleXpDrops()).anyMatch(possibleXpDrop -> possibleXpDrop == finalXpDiff)) {
+            incrementCaughtCreatures();
+            refreshAllDisplays();
         }
 
-        if(tier2 == 0) {
-            return 5; // Only t1 relic -- 5x
-        }
-
-        if(tier5 == 0) {
-            return 8; // Only t1 and t2 relics -- 8x
-        }
-
-        if(tier7 == 0) {
-            return 12; // Only t1, t2, and t5 relics -- 10x
-        }
-
-        return 16; // Has t7 relic -- 16x
+        previousHunterExp = currentXp;
     }
 
     @Subscribe
@@ -428,6 +420,41 @@ public class HunterRumoursPlugin extends Plugin {
         return x >= 1549 && x <= 1565 && y >= 9449 && y <= 9464;
     }
 
+    private int getLeaguesXpMultiplier() {
+        // This code is specific to Raging Echoes league, so in case I don't patch this before future leagues, don't consider them
+        // Make sure current date is before January 23, 2025
+        if (System.currentTimeMillis() > (1737608400L * 1000L)) {
+            return 1;
+        }
+
+        var tier1 = client.getVarbitValue(Varbits.LEAGUE_RELIC_1);
+        var tier2 = client.getVarbitValue(Varbits.LEAGUE_RELIC_2);
+        var tier5 = client.getVarbitValue(Varbits.LEAGUE_RELIC_5);
+        var tier7 = client.getVarbitValue(Varbits.LEAGUE_RELIC_7);
+
+        if (tier1 == 0) {
+            return 1; // No relic -- 1x
+        }
+
+        if (tier2 == 0) {
+            return 5; // Only t1 relic -- 5x
+        }
+
+        if (tier5 == 0) {
+            return 8; // Only t1 and t2 relics -- 8x
+        }
+
+        if (tier7 == 0) {
+            return 12; // Only t1, t2, and t5 relics -- 10x
+        }
+
+        return 16; // Has t7 relic -- 16x
+    }
+
+    private boolean hasDoubleChinchompaExperience() {
+        return client.getVarbitValue(Varbits.LEAGUE_RELIC_1) == RELIC_ANIMAL_WRANGLER;
+    }
+
     /**
      * Called when the fairy ring dialog is opened.
      * Responsible for scrolling to the relevant rumour code and highlighting it, if relevant.
@@ -449,7 +476,7 @@ public class HunterRumoursPlugin extends Plugin {
         var locationGroups = RumourLocation.getGroupedLocationsForRumour(currentRumour);
         var firstLocationWithFairyRing = locationGroups.filter(g -> g.getValue().get(0).getFairyRingCode().length() == 3).findFirst();
 
-        if(firstLocationWithFairyRing.isEmpty()) {
+        if (firstLocationWithFairyRing.isEmpty()) {
             return;
         }
 
@@ -585,14 +612,13 @@ public class HunterRumoursPlugin extends Plugin {
         // HACK(ish): if the user is 2quick2fast, they can select the option before this callback fires,
         // causing us to fail to attach a listener / cause the text to not be what we expect. So handle
         // that here.
-        if(option1.getText().equals("Please wait...")) {
+        if (option1.getText().equals("Please wait...")) {
             setBackToBackState(ifYesState, true);
             return;
         }
 
         // Options should be "Yes" and "No"
-        if(!option1.getText().equals("Yes") || !option2.getText().equals("No"))
-        {
+        if (!option1.getText().equals("Yes") || !option2.getText().equals("No")) {
             return;
         }
 
