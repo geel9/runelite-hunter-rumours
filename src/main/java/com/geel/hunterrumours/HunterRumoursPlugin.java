@@ -227,7 +227,8 @@ public class HunterRumoursPlugin extends Plugin {
             return;
         }
 
-        final int xpDiff = currentXp - previousHunterExp;
+        int xpDiff = (currentXp - previousHunterExp) / getLeaguesXpMultiplier();
+
         if (xpDiff > 0) {
             if (Arrays.stream(getCurrentRumour().getTargetCreature().getPossibleXpDrops()).anyMatch(possibleXpDrop -> possibleXpDrop == xpDiff)) {
                 incrementCaughtCreatures();
@@ -235,6 +236,37 @@ public class HunterRumoursPlugin extends Plugin {
             }
             previousHunterExp = currentXp;
         }
+    }
+
+    private int getLeaguesXpMultiplier() {
+        // This code is specific to Raging Echoes league, so in case I don't patch this before future leagues, don't consider them
+        // Make sure current date is before January 23, 2025
+        if (System.currentTimeMillis() > (1737608400L * 1000L)) {
+            return 1;
+        }
+
+        var tier1 = client.getVarbitValue(Varbits.LEAGUE_RELIC_1);
+        var tier2 = client.getVarbitValue(Varbits.LEAGUE_RELIC_2);
+        var tier5 = client.getVarbitValue(Varbits.LEAGUE_RELIC_5);
+        var tier7 = client.getVarbitValue(Varbits.LEAGUE_RELIC_7);
+
+        if(tier1 == 0) {
+            return 1; // No relic -- 1x
+        }
+
+        if(tier2 == 0) {
+            return 5; // Only t1 relic -- 5x
+        }
+
+        if(tier5 == 0) {
+            return 8; // Only t1 and t2 relics -- 8x
+        }
+
+        if(tier7 == 0) {
+            return 12; // Only t1, t2, and t5 relics -- 10x
+        }
+
+        return 16; // Has t7 relic -- 16x
     }
 
     @Subscribe
