@@ -30,23 +30,30 @@ public interface HunterRumoursConfig extends Config {
     String worldMapSection = "worldMapSection";
 
     @ConfigSection(
+            name = "Fairy Rings",
+            description = "Configure the behavior of fairy rings while you have a rumour",
+            position = 4
+    )
+    String fairyRingSection = "fairyRingSection";
+
+    @ConfigSection(
             name = "Chat Messages",
             description = "Configure various chat messages that the plugin creates.",
-            position = 4
+            position = 5
     )
     String messagesSection = "messagesSection";
 
     @ConfigSection(
             name = "Hunter Tiers",
             description = "The tiers of hunters that are enabled.",
-            position = 5
+            position = 6
     )
     String tiersSection = "tiersSection";
 
     @ConfigSection(
             name = "Highlights",
             description = "Highlights for Hunters and Hunter Targets.",
-            position = 6
+            position = 7
     )
     String highlightSection = "highlightSection";
 
@@ -54,10 +61,34 @@ public interface HunterRumoursConfig extends Config {
             position = 0,
             keyName = "autoJumpFairyRing",
             name = "Auto-Scroll to Fairy Ring",
-            description = "Whether to automatically scroll to the appropriate fairy ring for your current rumour when opening the fairy ring interface"
+            description = "Whether to automatically scroll to the appropriate fairy ring for your current rumour when opening the fairy ring interface",
+            section = fairyRingSection
     )
     default boolean autoJumpFairyring() {
         return true;
+    }
+
+    @ConfigItem(
+            position = 1,
+            keyName = "autoJumpFairyRingDisableTimer",
+            name = "Auto-Scroll Disable Timer (minutes)",
+            description = "Stops auto-scrolling the fairy ring menu after a certain amount of time (in minutes) of no hunter rumour related activity.<br />Turn on 'Force Auto-Scroll Fairy Ring' if you want the fairy ring menu to auto-scroll at all times.",
+            section = fairyRingSection
+    )
+    @Range(min = 1)
+    default int autoJumpFairyRingDisableTimer() {
+        return 5;
+    }
+
+    @ConfigItem(
+            position = 2,
+            keyName = "forceAutoJumpFairyRing",
+            name = "Force Auto-Scroll to Fairy Ring",
+            description = "Forces the fairy ring interface to scroll to the appropriate fairy ring for your current rumour even after the time set above.<br />Only works if 'Auto-Scroll to Fairy Ring' is enabled.",
+            section = fairyRingSection
+    )
+    default boolean forceAutoJumpFairyRing() {
+        return false;
     }
 
     @ConfigItem(
