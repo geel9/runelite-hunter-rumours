@@ -1037,7 +1037,7 @@ public class HunterRumoursPlugin extends Plugin {
     }
 
     /**
-     * Checks the configurations of the world map locations, returns true if the world map locations should be disabled.
+     * Checks the configurations of the world map locations, returns true if the world map locations should be enabled.
      */
     private boolean shouldWorldMapLocationsBeShown() {
         // If world map locations aren't enabled, obviously they should not be enabled!
