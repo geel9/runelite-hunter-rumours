@@ -934,7 +934,7 @@ public class HunterRumoursPlugin extends Plugin {
         }
 
         // Highlight Rumour Target (hunter creature) if relevant
-        if (config.highlightHunterNPCs()) {
+        if (config.highlightHunterNPCs() != HunterRumoursConfig.HighlightType.NONE) {
             Rumour currentRumour = getCurrentRumour();
             if (currentRumour == Rumour.NONE
                     || currentRumour.getTargetCreature().getNpcId() == 0
@@ -944,12 +944,24 @@ public class HunterRumoursPlugin extends Plugin {
                 return null;
             }
 
-            return HighlightedNpc.builder()
+            HighlightedNpc.HighlightedNpcBuilder highlightedNpcBuilder = HighlightedNpc.builder()
                     .npc(npc)
                     .highlightColor(config.hunterNPCHighlightColor())
-                    .borderWidth(2)
-                    .outline(true)
-                    .build();
+                    .borderWidth(2);
+
+            switch (config.highlightHunterNPCs()) {
+                case TILE:
+                    highlightedNpcBuilder.tile(true);
+                    break;
+                case OUTLINE:
+                    highlightedNpcBuilder.outline(true);
+                    break;
+                case BOTH:
+                    highlightedNpcBuilder.tile(true);
+                    highlightedNpcBuilder.outline(true);
+            }
+
+            return highlightedNpcBuilder.build();
         }
 
         return null;

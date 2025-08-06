@@ -8,6 +8,13 @@ import java.awt.*;
 public interface HunterRumoursConfig extends Config {
     String GROUP = "hunterrumours";
 
+    enum HighlightType {
+        OUTLINE,
+        TILE,
+        BOTH,
+        NONE
+    }
+
     @ConfigSection(
             name = "Hunter Guild Display",
             description = "Configure the panel that displays information while underground in the Hunter Guild.",
@@ -426,8 +433,8 @@ public interface HunterRumoursConfig extends Config {
             description = "Whether your current rumour target should be highlighted.",
             section = highlightSection
     )
-    default boolean highlightHunterNPCs() {
-        return true;
+    default HighlightType highlightHunterNPCs() {
+        return HighlightType.OUTLINE;
     }
 
     @ConfigItem(
