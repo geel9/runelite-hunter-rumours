@@ -254,8 +254,10 @@ public class HunterRumoursPlugin extends Plugin {
 
         // Find the creature that corresponds to the XP drop and mark them as being fucking dead
         if (Arrays.stream(getCurrentRumour().getTargetCreature().getPossibleXpDrops()).anyMatch(possibleXpDrop -> possibleXpDrop == finalXpDiff)) {
-            incrementCaughtCreatures();
-            refreshAllDisplays();
+            if (!currentRumourFinished) {
+                incrementCaughtCreatures();
+                refreshAllDisplays();
+            }
         }
 
         previousHunterExp = currentXp;
