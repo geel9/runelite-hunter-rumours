@@ -484,8 +484,7 @@ public class HunterRumoursPlugin extends Plugin {
 
         var fairyRingCode = firstLocationWithFairyRing.get().getValue().get(0).getFairyRingCode();
 
-        // If we haven't interacted with hunter rumours in the last 2 minutes, bail out
-        if (!interactedRecently(200)) {
+        if (!shouldFairyRingAutoJump()) {
             return;
         }
 
@@ -1040,7 +1039,7 @@ public class HunterRumoursPlugin extends Plugin {
     }
 
     /**
-     * Checks the configurations of the world map locations, returns true if the world map locations should be disabled.
+     * Checks the configurations of the world map locations, returns true if the world map locations should be enabled.
      */
     private boolean shouldWorldMapLocationsBeShown() {
         // If world map locations aren't enabled, obviously they should not be enabled!
@@ -1055,6 +1054,24 @@ public class HunterRumoursPlugin extends Plugin {
 
         // World map locations should be disabled if it's been long enough since the last interaction time
         return interactedRecently(config.worldMapLocationsDisableTimer() * 100);
+    }
+
+    /**
+     * Checks the configurations for auto-scrolling the fairy ring interface, returns true if the fairy ring interface should auto-scroll.
+     */
+    private boolean shouldFairyRingAutoJump() {
+        // If auto jump isn't enabled, obviously it should not be enabled!
+        if (!config.autoJumpFairyring()) {
+            return false;
+        }
+
+        // If "force auto-scroll to fairy ring" is enabled, then we should never disable auto-scroll.
+        if (config.forceAutoJumpFairyRing()) {
+            return true;
+        }
+
+        // Fairy ring auto-scroll should be disabled if it's been long enough since the last interaction time
+        return interactedRecently(config.autoJumpFairyRingDisableTimer() * 100);
     }
 
     /**
