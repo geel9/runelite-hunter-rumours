@@ -15,6 +15,7 @@ import net.runelite.api.widgets.JavaScriptCallback;
 import net.runelite.api.widgets.Widget;
 import net.runelite.client.callback.ClientThread;
 import net.runelite.client.config.ConfigManager;
+import net.runelite.client.config.RuneLiteConfig;
 import net.runelite.client.eventbus.Subscribe;
 import net.runelite.client.events.ConfigChanged;
 import net.runelite.client.game.ItemManager;
@@ -90,6 +91,9 @@ public class HunterRumoursPlugin extends Plugin {
 
     @Inject
     private ChatParser chatParser;
+
+    @Inject
+    private RuneLiteConfig runeLiteConfig;
 
     @Inject
     private WorldMapPointManager worldMapPointManager;
@@ -861,7 +865,7 @@ public class HunterRumoursPlugin extends Plugin {
         if (isShowing && !shouldShow) {
             removeInfoBox();
         } else if (shouldShow && !isShowing) {
-            infoBox = new RumourInfoBox(getCurrentRumour(), this, itemManager);
+            infoBox = new RumourInfoBox(getCurrentRumour(), this, itemManager, runeLiteConfig);
             infoBoxManager.addInfoBox(infoBox);
         }
     }
