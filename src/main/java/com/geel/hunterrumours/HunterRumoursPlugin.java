@@ -1041,15 +1041,15 @@ public class HunterRumoursPlugin extends Plugin {
             return false;
         }
 
-        // If "force info box" is enabled, then the infobox should always be shown (if infobox itself is enabled)
-        if (config.forceShowInfoBox()) {
-            return true;
-        }
-
         // If we have no active rumour, don't show the info box.
         var rumour = getCurrentRumour();
         if (rumour == Rumour.NONE) {
             return false;
+        }
+
+        // If "force info box" is enabled, then the infobox should always be shown (if infobox itself is enabled)
+        if (config.forceShowInfoBox()) {
+            return true;
         }
 
         // Infobox should be disabled if it's been long enough since the last interaction time
