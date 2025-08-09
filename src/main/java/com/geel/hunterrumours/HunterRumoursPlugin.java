@@ -797,6 +797,12 @@ public class HunterRumoursPlugin extends Plugin {
             return;
         }
 
+        // During the introductory quest (At First Light), Guild Hunter Wolf has a line of dialogue which
+        // tricks the plugin into thinking that he's assigning a standard rumour. But he isn't! Ignore it!
+        if (actualMessage.contains("stopped off for a bit of hunting first")) {
+            return;
+        }
+
         // Determine what hunter and rumour are being talked about in this message
         Hunter dialogHunter = chatParser.getReferencedHunter(actualMessage);
         Rumour dialogRumour = chatParser.getReferencedRumour(actualMessage);
