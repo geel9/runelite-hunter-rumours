@@ -171,7 +171,7 @@ public enum RumourLocation
     ORANGE_SALAMANDER_THE_GREAT_CONCH_5(ORANGE_SALAMANDER, "The Great Conch (w/ Troubled Tortugans)", "CJQ", new WorldPoint(3123, 2530, 0)),
     ORANGE_SALAMANDER_THE_GREAT_CONCH_6(ORANGE_SALAMANDER, "The Great Conch (w/ Troubled Tortugans)", "CJQ", new WorldPoint(3125, 2530, 0)),
     ORANGE_SALAMANDER_THE_GREAT_CONCH_7(ORANGE_SALAMANDER, "The Great Conch (w/ Troubled Tortugans)", "CJQ", new WorldPoint(3123, 2533, 0)),
-    ORANGE_SALAMANDER_THE_GREAT_CONCH_8(ORANGE_SALAMANDER, "The Great Conch (w/ Troubled Tortugans)", "CJQ", new WorldPoint(3125,2534, 0)),
+    ORANGE_SALAMANDER_THE_GREAT_CONCH_8(ORANGE_SALAMANDER, "The Great Conch (w/ Troubled Tortugans)", "CJQ", new WorldPoint(3125, 2534, 0)),
 
 	RAZOR_BACKED_KEBBIT_PISCATORIS_HUNTER_AREA_1(RAZOR_BACKED_KEBBIT, "Piscatoris Hunter area", "AKQ", new WorldPoint(2353, 3595, 0)),
 	RAZOR_BACKED_KEBBIT_PISCATORIS_HUNTER_AREA_2(RAZOR_BACKED_KEBBIT, "Piscatoris Hunter area", "AKQ", new WorldPoint(2360, 3611, 0)),
