@@ -3,7 +3,6 @@ package com.geel.hunterrumours;
 import com.geel.hunterrumours.enums.*;
 import com.google.inject.Provides;
 import lombok.Getter;
-import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.*;
 import net.runelite.api.gameval.InterfaceID;
@@ -58,12 +57,6 @@ public class HunterRumoursPlugin extends Plugin {
     private final Set<HunterRumourWorldMapPoint> currentMapPoints = new HashSet<>();
     private int previousHunterExp = -1; // Tracks Hunter experience -- used to detect XP drops indicating a creature was caught
 
-    @Getter @Setter
-    private boolean fairyRingOpen = false;
-
-    @Getter @Setter
-    private String fairyRingCode = "";
-
     @Getter
     private int hunterKitItems = 0;
 
@@ -105,6 +98,14 @@ public class HunterRumoursPlugin extends Plugin {
     private WorldMapPointManager worldMapPointManager;
     private int latestInteractionTime = -1;
 
+    // Tracks whether the fairy ring panel is presently open.
+    // This tracker boolean exists because we need to make changes to the fairy ring panel,
+    // and recent(ish) updates by Jagex to how the fairy ring panel operates seem to have the consequence
+    // that there's a multi-client-tick "bootstrap" process to the fairy ring panel.
+    // So we need to run our code _every client tick that the fairy ring panel is open_.
+    private boolean fairyRingPanelOpen = false;
+    private boolean hasAlreadyAutoScrolledForCurrentFairyRingPanelLifetime = false;
+
     @Provides
     HunterRumoursConfig provideConfig(ConfigManager configManager) {
         return configManager.getConfig(HunterRumoursConfig.class);
@@ -115,6 +116,9 @@ public class HunterRumoursPlugin extends Plugin {
         overlayManager.add(overlay);
         npcOverlayService.registerHighlighter(this::highlighterFn);
         clientThread.invoke(this::loadFromConfig);
+
+        fairyRingPanelOpen = (client.getWidget(InterfaceID.FAIRYRINGS) != null);
+        hasAlreadyAutoScrolledForCurrentFairyRingPanelLifetime = false;
     }
 
     @Override
@@ -200,29 +204,43 @@ public class HunterRumoursPlugin extends Plugin {
 
     @Subscribe
     public void onWidgetLoaded(WidgetLoaded event) {
-        if (event.getGroupId() == InterfaceID.FAIRYRINGS  && shouldFairyRingAutoJump()) {
-            setFairyRingOpen(true);
-            clientThread.invokeLater(this::handleFairyRingPanel);
+        // For fairy rings, we need to run our auto-scroll/auto-highlight code multiple times,
+        // because the fairy ring panel has received updates over time by Jagex which has changed
+        // its behavior in unpredictable ways.
+        // Additionally, other plugins may interact with the fairy ring panel in the same way
+        // as this plugin, and we basically want to just... win the arms race, I suppose.
+        // SO: We just set this boolean, which is read by `onPostClientTick()` to run code every client tick.
+        if (event.getGroupId() == InterfaceID.FAIRYRINGS) {
+            fairyRingPanelOpen = true;
+            hasAlreadyAutoScrolledForCurrentFairyRingPanelLifetime = false;
         }
+
         if (event.getGroupId() == InterfaceID.CHATMENU && isInBurrows()) {
             clientThread.invokeLater(this::handleBackToBackDialog);
         }
     }
 
     @Subscribe
-    public void onPostClientTick(PostClientTick event){
-        if(isFairyRingOpen() && shouldFairyRingAutoJump()){
-            adjustFairyRingWidget();
+    public void onWidgetClosed(WidgetClosed event) {
+        if (event.getGroupId() == InterfaceID.FAIRYRINGS) {
+            fairyRingPanelOpen = false;
         }
     }
 
     @Subscribe
-    public void onWidgetClosed(WidgetClosed event){
-        if(event.getGroupId() == InterfaceID.FAIRYRINGS){
-            setFairyRingOpen(false);
+    public void onPostClientTick(PostClientTick event) {
+        // Ensure the game state is what we expect (typical "logged in, playing game" state)
+        // If it's not that state, then why would we run? This function only exists to
+        // fuck around with a native game interface, which won't be showing if we're not logged in.
+        if (client == null || client.getGameState() != GameState.LOGGED_IN) {
+            return;
+        }
+
+        // Do the only thing this callback does: mangle Jagex's interface design for our own ends, IF necessary
+        if (fairyRingPanelOpen) {
+            handleFairyRingPanel();
         }
     }
-
 
     @Subscribe
     public void onChatMessage(ChatMessage event) {
@@ -330,7 +348,7 @@ public class HunterRumoursPlugin extends Plugin {
     /**
      * Gets whether the user has completed their current rumour
      */
-    public boolean getHunterRumourState() {
+    public boolean getIsCurrentHunterRumourCompleted() {
         return this.currentRumourFinished;
     }
 
@@ -483,81 +501,134 @@ public class HunterRumoursPlugin extends Plugin {
     }
 
     /**
-     * Called when the fairy ring dialog is opened.
+     * Called each client tick that the fairy ring dialog is opened.
      * Responsible for scrolling to the relevant rumour code and highlighting it, if relevant.
      */
     private void handleFairyRingPanel() {
-        // Ensure we have a current, non-completed rumour
+        // TODO: Look into fairy ring plugin and steal its scroll code, which is allegedly much simpler than mine.
 
+        // If we shouldn't auto-jump to the fairy ring code, don't continue this function
         if (!shouldFairyRingAutoJump()) {
             return;
         }
 
-        // Find the first-declared location for this rumour
-        var currentRumour = getCurrentRumour();
-        var locationGroups = RumourLocation.getGroupedLocationsForRumour(currentRumour);
+        // Ensure the Fairy Ring widget is actually still open
+        Widget fairyRingWidget = client.getWidget(InterfaceID.FairyringsLog.CONTENTS);
+        if (fairyRingWidget == null || fairyRingWidget.isHidden()) {
+            return;
+        }
+
+        // Find the first-declared location for the currently-active rumour
+        var locationGroups = RumourLocation.getGroupedLocationsForRumour(getCurrentRumour());
         var firstLocationWithFairyRing = locationGroups.filter(g -> g.getValue().get(0).getFairyRingCode().length() == 3).findFirst();
 
         if (firstLocationWithFairyRing.isEmpty()) {
             return;
         }
-        setFairyRingCode(firstLocationWithFairyRing.get().getValue().get(0).getFairyRingCode());
 
-        Widget foundCodeWidget = findCodeWidget();
+        var fairyRingCode = firstLocationWithFairyRing.get().getValue().get(0).getFairyRingCode();
 
+        if (!shouldFairyRingAutoJump()) {
+            return;
+        }
+
+        // Find all the necessary widgets
+        Widget panelList = client.getWidget(ComponentID.FAIRY_RING_PANEL_LIST);
+        Widget favoritesList = client.getWidget(ComponentID.FAIRY_RING_PANEL_FAVORITES);
+        Widget scrollBar = client.getWidget(ComponentID.FAIRY_RING_PANEL_SCROLLBAR);
+
+        if (panelList == null || scrollBar == null || favoritesList == null) {
+            return;
+        }
+
+        Widget scrollBarContainer = null, scrollBarHandle = null, scrollBarHandleTop = null,
+                scrollBarHandleBottom = null, scrollBarUpButton = null, scrollBarDownButton = null;
+        for (var scrollChild : scrollBar.getDynamicChildren()) {
+            // This is stupid
+            switch (scrollChild.getSpriteId()) {
+                case SpriteID.SCROLLBAR_ARROW_DOWN:
+                    scrollBarDownButton = scrollChild;
+                    break;
+                case SpriteID.SCROLLBAR_ARROW_UP:
+                    scrollBarUpButton = scrollChild;
+                    break;
+                case SpriteID.SCROLLBAR_THUMB_MIDDLE:
+                    scrollBarHandle = scrollChild;
+                    break;
+                case SpriteID.SCROLLBAR_THUMB_TOP:
+                    scrollBarHandleTop = scrollChild;
+                    break;
+                case SpriteID.SCROLLBAR_THUMB_BOTTOM:
+                    scrollBarHandleBottom = scrollChild;
+                    break;
+                case SpriteID.SCROLLBAR_THUMB_MIDDLE_DARK:
+                    scrollBarContainer = scrollChild; // Weird reuse of a sprite for the inset slider container
+                    break;
+            }
+        }
+
+        // Lol
+        if (scrollBarContainer == null || scrollBarHandle == null || scrollBarHandleTop == null
+                || scrollBarHandleBottom == null || scrollBarUpButton == null || scrollBarDownButton == null) {
+            return;
+        }
+
+        // Construct a list of all widgets that are the fairy ring code texts
+        // Yes, this is slightly inefficient with memory. You should see what other plugins do!
+        var codeWidgets = new ArrayList<Widget>();
+
+        // Add in all children from the big list
+        codeWidgets.addAll(Arrays.asList(panelList.getDynamicChildren()));
+
+        // Add in all children from the favorites list
+        codeWidgets.addAll(Arrays.asList(favoritesList.getStaticChildren()));
+
+        // Find the widget corresponding to the fairy ring code
+        Widget foundCodeWidget = null;
+        for (var codeWidget : codeWidgets) {
+            if (!codeWidget.getText().replace(" ", "").contentEquals(fairyRingCode)) {
+                continue;
+            }
+
+            foundCodeWidget = codeWidget;
+            break;
+        }
+
+        // If no widget found, bail out
         if (foundCodeWidget == null) {
             return;
         }
 
-        // Scroll to the code entry and highlight it
-        int panelScrollY = (foundCodeWidget.getRelativeY())  ;
-        int scrollable = InterfaceID.FairyringsLog.CONTENTS;
-        int scrollbar = InterfaceID.FairyringsLog.SCROLLBAR;
+        // If the code entry widget has already been modified by this plugin, bail on this execution
+        // We use `contains()` instead of `startsWith()` because other plugins may be FUCKING with our SHIT.
+        var foundText = foundCodeWidget.getText();
+        if (foundText.contains("(Rumour)")) {
+            return;
+        }
 
+        // Highlight the fairy ring widget
+        foundCodeWidget.setTextColor(0x00FF00);
+        foundCodeWidget.setText("(Rumour) " + foundText);
+
+        // Now that we've prepended (Rumour) and highlighted the code entry itself,
+        // we need to auto-scroll the fairy wing widget.
+        // However, keep in mind: this function is running *every client tick*, which is necessary
+        // because Jamflex seems to *reset the fairy ring entry contents continuously*, which is dumb and they should stop doing that.
+        // So we need to update the contents of the fairy ring code widget every client tick.
+        // But!
+        // We don't need to SCROLL every client tick -- so we should only do that once.
+        if (hasAlreadyAutoScrolledForCurrentFairyRingPanelLifetime) {
+            return;
+        }
+
+
+        // Scroll fairy ring panel
+        hasAlreadyAutoScrolledForCurrentFairyRingPanelLifetime = true;
         client.runScript(
                 ScriptID.UPDATE_SCROLLBAR,
-                scrollbar,
-                scrollable,
-                panelScrollY);
-    }
-
-/**
-*@return  the Widget based on the giving fairyRingCode
-**/
-    private Widget findCodeWidget() {
-        Widget codeWidgets = client.getWidget(InterfaceID.FairyringsLog.CONTENTS);
-        if(codeWidgets == null) return null;
-
-        Widget[] codeWidgetDynamicChildren = codeWidgets.getDynamicChildren();
-        if(codeWidgetDynamicChildren == null) return null;
-
-        for (Widget codeWidget : codeWidgetDynamicChildren) {
-            String codeWidgetCode = codeWidget.getText().replace(" ","");
-
-            if(codeWidgetCode.equals(getFairyRingCode())
-                || codeWidgetCode.equals("(Rumour)"+getFairyRingCode())){
-                return codeWidget;
-            }
-        }
-        return null;
-    }
-
-    /**
-     * adjusts the color of the Fairy Ring to green and adds (Rumour) to it
-     */
-    private void adjustFairyRingWidget(){
-        Widget foundCodeWidget = findCodeWidget();
-
-        if(foundCodeWidget == null){
-            return;
-        }
-
-        foundCodeWidget.setTextColor(0x00FF00);
-
-        if(foundCodeWidget.getText().contains("(Rumour)")){
-            return;
-        }
-        foundCodeWidget.setText("(Rumour) " + foundCodeWidget.getText());
+                InterfaceID.FairyringsLog.SCROLLBAR,
+                InterfaceID.FairyringsLog.CONTENTS,
+                foundCodeWidget.getRelativeY());
     }
 
     /**
@@ -1069,10 +1140,14 @@ public class HunterRumoursPlugin extends Plugin {
         if (config.forceAutoJumpFairyRing()) {
             return true;
         }
+
+        // If we have no active rumour, why auto-scroll?
         if (getCurrentRumour() == Rumour.NONE) {
             return false;
         }
-        if (getHunterRumourState()) {
+
+        // If we DO have a current rumour but it's complete, why auto-scroll?
+        if (getIsCurrentHunterRumourCompleted()) {
             return false;
         }
 

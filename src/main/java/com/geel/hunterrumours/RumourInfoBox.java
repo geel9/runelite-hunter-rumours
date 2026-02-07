@@ -10,9 +10,6 @@ import net.runelite.client.util.ColorUtil;
 
 import javax.annotation.Nonnull;
 import java.awt.*;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
 
 public class RumourInfoBox extends InfoBox {
     private final HunterRumoursPlugin plugin;
@@ -49,7 +46,7 @@ public class RumourInfoBox extends InfoBox {
 
         final Trap trap = rumour.getTargetCreature().getTrap();
         final int pityThreshold = trap.calculatePityRateForItems(plugin.getHunterKitItems());
-        String hasFinishedRumourText = plugin.getHunterRumourState() ? "Yes" : "No";
+        String hasFinishedRumourText = plugin.getIsCurrentHunterRumourCompleted() ? "Yes" : "No";
 
         this.setTooltip(
                 ColorUtil.wrapWithColorTag("Rumour: ", Color.YELLOW) + rumour.getFullName() + "</br>" +
@@ -62,7 +59,7 @@ public class RumourInfoBox extends InfoBox {
 
     @Override
     public String getText() {
-        if (plugin.getHunterRumourState()) {
+        if (plugin.getIsCurrentHunterRumourCompleted()) {
             return "Done";
         }
 
@@ -78,7 +75,7 @@ public class RumourInfoBox extends InfoBox {
     @Override
     public Color getTextColor() {
         HunterRumoursConfig config = plugin.getConfig();
-        if (plugin.getHunterRumourState()) {
+        if (plugin.getIsCurrentHunterRumourCompleted()) {
             return config.completedRumourInfoBoxTextColor();
         } else if (!showNumUntilPity()) {
             return config.defaultInfoBoxTextColor();
