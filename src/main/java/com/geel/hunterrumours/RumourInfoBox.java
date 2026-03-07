@@ -25,7 +25,7 @@ public class RumourInfoBox extends InfoBox {
 
         // MacOS (and perhaps other platforms) cannot display the bullet point character we use.
         final char bulletPointCharacter;
-        if (runeLiteConfig.tooltipFontType().getFont().canDisplay('•')) {
+        if (runeLiteConfig.tooltipFont().getFont().canDisplay('•')) {
             bulletPointCharacter = '•';
         } else {
             bulletPointCharacter = '-';
