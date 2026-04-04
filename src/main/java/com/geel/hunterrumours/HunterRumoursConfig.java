@@ -12,6 +12,7 @@ public interface HunterRumoursConfig extends Config {
         OUTLINE,
         TILE,
         BOTH,
+        CLICKBOX,
         NONE
     }
 
