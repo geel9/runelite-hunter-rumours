@@ -520,13 +520,22 @@ public class HunterRumoursPlugin extends Plugin {
 
         // Find the first-declared location for the currently-active rumour
         var locationGroups = RumourLocation.getGroupedLocationsForRumour(getCurrentRumour());
-        var firstLocationWithFairyRing = locationGroups.filter(g -> g.getValue().get(0).getFairyRingCode().length() == 3).findFirst();
+        var locationsWithFairyRing = locationGroups.filter(g -> g.getValue().get(0).getFairyRingCode().length() == 3).toList();
 
-        if (firstLocationWithFairyRing.isEmpty()) {
+        if (locationsWithFairyRing.isEmpty()) {
             return;
         }
 
-        var fairyRingCode = firstLocationWithFairyRing.get().getValue().get(0).getFairyRingCode();
+        // Use the user's preferred fairy ring code if it matches one of the available codes, otherwise fall back to the first declared one
+        var preferredCode = config.preferredFairyRingCode().trim().toUpperCase();
+        var selectedLocation = (preferredCode.length() == 3)
+                ? locationsWithFairyRing.stream()
+                        .filter(g -> g.getValue().get(0).getFairyRingCode().equals(preferredCode))
+                        .findFirst()
+                        .orElse(locationsWithFairyRing.get(0))
+                : locationsWithFairyRing.get(0);
+
+        var fairyRingCode = selectedLocation.getValue().get(0).getFairyRingCode();
 
         if (!shouldFairyRingAutoJump()) {
             return;
