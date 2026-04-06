@@ -498,6 +498,8 @@ public interface HunterRumoursConfig extends Config {
             description = "Send a notification when you receive the rare piece that completes a rumour.",
             section = notificationSection
     )
-    default Notification notificationOnRumourDrop() { return Notification.OFF; }
+    default Notification notificationOnRumourDrop() {
 
+        return Notification.OFF;
+    }
 }
