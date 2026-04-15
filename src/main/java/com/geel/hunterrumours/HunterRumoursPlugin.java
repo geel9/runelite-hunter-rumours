@@ -467,8 +467,8 @@ public class HunterRumoursPlugin extends Plugin {
 
     private int getLeaguesXpMultiplier() {
         // This code is specific to Demonic Pacts league, so in case I don't patch this before future leagues, don't consider them
-        // Make sure current date is before April 15, 2026
-        if (System.currentTimeMillis() > (1776249900L * 1000L)) {
+        // Make sure current date is before June 11, 2026
+        if (System.currentTimeMillis() > (1781150400L * 1000L)) {
             return 1;
         }
 
