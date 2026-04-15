@@ -466,9 +466,9 @@ public class HunterRumoursPlugin extends Plugin {
     }
 
     private int getLeaguesXpMultiplier() {
-        // This code is specific to Raging Echoes league, so in case I don't patch this before future leagues, don't consider them
-        // Make sure current date is before January 23, 2025
-        if (System.currentTimeMillis() > (1737608400L * 1000L)) {
+        // This code is specific to Demonic Pacts league, so in case I don't patch this before future leagues, don't consider them
+        // Make sure current date is before June 11, 2026
+        if (System.currentTimeMillis() > (1781150400L * 1000L)) {
             return 1;
         }
 
@@ -490,7 +490,7 @@ public class HunterRumoursPlugin extends Plugin {
         }
 
         if (tier7 == 0) {
-            return 12; // Only t1, t2, and t5 relics -- 10x
+            return 12; // Only t1, t2, and t5 relics -- 12x
         }
 
         return 16; // Has t7 relic -- 16x
