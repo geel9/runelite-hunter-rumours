@@ -5,6 +5,7 @@ import com.google.inject.Provides;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.*;
+import net.runelite.api.gameval.VarbitID;
 import net.runelite.api.gameval.InterfaceID;
 import net.runelite.api.coords.WorldPoint;
 import net.runelite.api.events.*;
@@ -41,7 +42,7 @@ import java.util.*;
 public class HunterRumoursPlugin extends Plugin {
     // Varbit value corresponding to the Tier-1 relic Animal Wrangler.
     // This is used because this relic gives double hunter XP for chinchompas, which we need to account for to track kills.
-    public static int RELIC_ANIMAL_WRANGLER = 3;
+    public static int RELIC_WOODSMAN = 3;
 
     public static final Map<Hunter, Rumour> hunterRumours = new HashMap<>() {
         {
@@ -277,19 +278,12 @@ public class HunterRumoursPlugin extends Plugin {
             return;
         }
 
-        // RAGING ECHOES LEAGUE: We need to account for the possibility that the player just caught a chinchompa
-        // while using the Animal Wrangler relic, which will give them yet double the XP.
+        // DEMONIC PACTS LEAGUE: We need to account for the possibility that the player just got double XP for a trap
+        // while using the Woodsman relic.
         // This is a bit gross. I write good code in my actual job.
         // Mostly.
-        if (hasDoubleChinchompaExperience()) {
-            final int preChincompaXpDiff = xpDiff;
-
-            if (Arrays.stream(Creature.GREY_CHINCHOMPA.getPossibleXpDrops()).anyMatch(possibleXpDrop -> possibleXpDrop == (preChincompaXpDiff / 2))
-                    || Arrays.stream(Creature.RED_CHINCHOMPA.getPossibleXpDrops()).anyMatch(possibleXpDrop -> possibleXpDrop == (preChincompaXpDiff / 2))) {
-                // If we just caught a chincompa, just divide xpDiff by 2 here so that the below code will correctly identify
-                // the catch as a chinchompa. Smart moves from a smart engineer (me).
-                xpDiff /= 2;
-            }
+        if (hasDoubleTrapExperience()) {
+            xpDiff /= 2;
         }
 
         // Create a final int because Java requires that for lambda captures
@@ -472,10 +466,10 @@ public class HunterRumoursPlugin extends Plugin {
             return 1;
         }
 
-        var tier1 = client.getVarbitValue(Varbits.LEAGUE_RELIC_1);
-        var tier2 = client.getVarbitValue(Varbits.LEAGUE_RELIC_2);
-        var tier5 = client.getVarbitValue(Varbits.LEAGUE_RELIC_5);
-        var tier7 = client.getVarbitValue(Varbits.LEAGUE_RELIC_7);
+        var tier1 = client.getVarbitValue(VarbitID.LEAGUE_RELIC_SELECTION_0);
+        var tier2 = client.getVarbitValue(VarbitID.LEAGUE_RELIC_SELECTION_1);
+        var tier5 = client.getVarbitValue(VarbitID.LEAGUE_RELIC_SELECTION_4);
+        var tier7 = client.getVarbitValue(VarbitID.LEAGUE_RELIC_SELECTION_6);
 
         if (tier1 == 0) {
             return 1; // No relic -- 1x
@@ -496,8 +490,8 @@ public class HunterRumoursPlugin extends Plugin {
         return 16; // Has t7 relic -- 16x
     }
 
-    private boolean hasDoubleChinchompaExperience() {
-        return client.getVarbitValue(Varbits.LEAGUE_RELIC_1) == RELIC_ANIMAL_WRANGLER;
+    private boolean hasDoubleTrapExperience() {
+        return client.getVarbitValue(VarbitID.LEAGUE_RELIC_SELECTION_1) == RELIC_WOODSMAN;
     }
 
     /**
