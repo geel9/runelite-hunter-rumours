@@ -1012,6 +1012,10 @@ public class HunterRumoursPlugin extends Plugin {
                 case BOTH:
                     highlightedNpcBuilder.tile(true);
                     highlightedNpcBuilder.outline(true);
+                    break;
+                case CLICKBOX:
+                    highlightedNpcBuilder.hull(true);
+                    break;
             }
 
             return highlightedNpcBuilder.build();
