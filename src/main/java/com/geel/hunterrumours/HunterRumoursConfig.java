@@ -64,6 +64,13 @@ public interface HunterRumoursConfig extends Config {
     )
     String highlightSection = "highlightSection";
 
+    @ConfigSection(
+            name = "Notification",
+            description = "Settings for notifications triggered by rumour events.",
+            position = 8
+    )
+    String notificationSection = "notificationSection";
+
     @ConfigItem(
             position = 0,
             keyName = "autoJumpFairyRing",
@@ -482,5 +489,17 @@ public interface HunterRumoursConfig extends Config {
     default Color hunterNPCHighlightColor() {
 
         return new Color(0x4B, 0x9D, 0xDD);
+    }
+
+    @ConfigItem(
+            position = 0,
+            keyName = "notificationOnRumourDrop",
+            name = "Notification on Rumour Drop",
+            description = "Send a notification when you receive the rare piece that completes a rumour.",
+            section = notificationSection
+    )
+    default Notification notificationOnRumourDrop() {
+
+        return Notification.OFF;
     }
 }
