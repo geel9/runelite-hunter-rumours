@@ -468,7 +468,7 @@ public class HunterRumoursPlugin extends Plugin {
 
         var tier1 = client.getVarbitValue(VarbitID.LEAGUE_RELIC_SELECTION_0);
         var tier2 = client.getVarbitValue(VarbitID.LEAGUE_RELIC_SELECTION_1);
-        var tier4 = client.getVarbitValue(VarbitID.LEAGUE_RELIC_SELECTION_4);
+        var tier4 = client.getVarbitValue(VarbitID.LEAGUE_RELIC_SELECTION_3);
         var tier6 = client.getVarbitValue(VarbitID.LEAGUE_RELIC_SELECTION_5);
 
         if (tier1 == 0) {
