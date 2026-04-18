@@ -468,8 +468,8 @@ public class HunterRumoursPlugin extends Plugin {
 
         var tier1 = client.getVarbitValue(VarbitID.LEAGUE_RELIC_SELECTION_0);
         var tier2 = client.getVarbitValue(VarbitID.LEAGUE_RELIC_SELECTION_1);
-        var tier5 = client.getVarbitValue(VarbitID.LEAGUE_RELIC_SELECTION_4);
-        var tier7 = client.getVarbitValue(VarbitID.LEAGUE_RELIC_SELECTION_6);
+        var tier4 = client.getVarbitValue(VarbitID.LEAGUE_RELIC_SELECTION_3);
+        var tier6 = client.getVarbitValue(VarbitID.LEAGUE_RELIC_SELECTION_5);
 
         if (tier1 == 0) {
             return 1; // No relic -- 1x
@@ -479,15 +479,15 @@ public class HunterRumoursPlugin extends Plugin {
             return 5; // Only t1 relic -- 5x
         }
 
-        if (tier5 == 0) {
+        if (tier4 == 0) {
             return 8; // Only t1 and t2 relics -- 8x
         }
 
-        if (tier7 == 0) {
-            return 12; // Only t1, t2, and t5 relics -- 12x
+        if (tier6 == 0) {
+            return 12; // Only t1, t2, and t4 relics -- 12x
         }
 
-        return 16; // Has t7 relic -- 16x
+        return 16; // Has t6 relic -- 16x
     }
 
     private boolean hasDoubleTrapExperience() {
