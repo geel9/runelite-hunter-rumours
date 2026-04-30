@@ -99,6 +99,17 @@ public interface HunterRumoursConfig extends Config {
     }
 
     @ConfigItem(
+            position = 3,
+            keyName = "preferredFairyRingCode",
+            name = "Preferred Fairy Ring Code",
+            description = "When a rumour has multiple fairy ring options, auto-scroll to this code instead of the default.<br />Must be exactly 3 uppercase letters (e.g. CJQ). Leave blank to use the default (first declared) fairy ring.",
+            section = fairyRingSection
+    )
+    default String preferredFairyRingCode() {
+        return "";
+    }
+
+    @ConfigItem(
             position = 0,
             keyName = "showWorldMapLocations",
             name = "Show World Map Locations",
