@@ -13,7 +13,7 @@ public enum Trap {
     PIT("Pit Trap", ItemID.TEASING_STICK, 30, 28),
     BOX_TRAP("Box Trap", ItemID.BOX_TRAP, 100, 94),
     FALCONRY("Falconry", ItemID.FALCONERS_GLOVE, 20, 18),
-    BUTTERFLY("Butterfly Net", ItemID.BUTTERFLY_NET, 150, 142),
+    BUTTERFLY("Butterfly Net", ItemID.BUTTERFLY_NET, 80, 76), // might be 75 with outfit instead of 76
     NOOSE("Tracking", ItemID.NOOSE_WAND, 30, 28),
     NOOSE_HERBIBOAR("Tracking", ItemID.NOOSE_WAND, 14, 12);
 
