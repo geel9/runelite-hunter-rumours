@@ -294,7 +294,11 @@ public enum RumourLocation
     RED_CHINCHOMPA_2_TLATI_RAINFOREST_4(RED_CHINCHOMPA_2, "Tlati Rainforest (NE of Tal Teklan quetzal)", "", new WorldPoint(1317, 3166, 0)),
     RED_CHINCHOMPA_2_TLATI_RAINFOREST_5(RED_CHINCHOMPA_2, "Tlati Rainforest (NE of Tal Teklan quetzal)", "", new WorldPoint(1318, 3170, 0)),
     RED_CHINCHOMPA_2_TLATI_RAINFOREST_6(RED_CHINCHOMPA_2, "Tlati Rainforest (NE of Tal Teklan quetzal)", "", new WorldPoint(1316, 3170, 0)),
-    
+    RED_CHINCHOMPA_2_CHINCHOMPA_ISLAND_1(RED_CHINCHOMPA_2, "Chinchompa Island", "", new WorldPoint(1887, 3431, 0)),
+    RED_CHINCHOMPA_2_CHINCHOMPA_ISLAND_2(RED_CHINCHOMPA_2, "Chinchompa Island", "", new WorldPoint(1885, 3429, 0)),
+    RED_CHINCHOMPA_2_CHINCHOMPA_ISLAND_3(RED_CHINCHOMPA_2, "Chinchompa Island", "", new WorldPoint(1883, 3431, 0)),
+    RED_CHINCHOMPA_2_CHINCHOMPA_ISLAND_4(RED_CHINCHOMPA_2, "Chinchompa Island", "", new WorldPoint(1882, 3434, 0)),
+    RED_CHINCHOMPA_2_CHINCHOMPA_ISLAND_5(RED_CHINCHOMPA_2, "Chinchompa Island", "", new WorldPoint(1885, 3434, 0)),   
 
 	MOONLIGHT_ANTELOPE_HUNTERS_GUILD_1(MOONLIGHT_ANTELOPE, "Hunters' Guild", "", new WorldPoint(1555, 9416, 0)),
 	MOONLIGHT_ANTELOPE_HUNTERS_GUILD_2(MOONLIGHT_ANTELOPE, "Hunters' Guild", "", new WorldPoint(1562, 9417, 0)),
