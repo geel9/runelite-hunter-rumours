@@ -11,8 +11,10 @@ public interface HunterRumoursConfig extends Config {
     enum HighlightType {
         OUTLINE,
         TILE,
-        BOTH,
         CLICKBOX,
+        OUTLINE_TILE,
+        CLICKBOX_TILE,
+        ALL,
         NONE
     }
 
