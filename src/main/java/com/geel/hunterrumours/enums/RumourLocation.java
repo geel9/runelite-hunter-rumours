@@ -288,6 +288,12 @@ public enum RumourLocation
     RED_CHINCHOMPA_2_THE_GREAT_CONCH_6(RED_CHINCHOMPA_2, "The Great Conch (w/ Troubled Tortugans)", "CJQ", new WorldPoint(3261, 2376, 0)),
     RED_CHINCHOMPA_2_THE_GREAT_CONCH_7(RED_CHINCHOMPA_2, "The Great Conch (w/ Troubled Tortugans)", "CJQ", new WorldPoint(3256, 2373, 0)),
     RED_CHINCHOMPA_2_THE_GREAT_CONCH_8(RED_CHINCHOMPA_2, "The Great Conch (w/ Troubled Tortugans)", "CJQ", new WorldPoint(3260, 2373, 0)),
+    RED_CHINCHOMPA_2_TLATI_RAINFOREST_1(RED_CHINCHOMPA_2, "Tlati Rainforest (NE of Tal Teklan quetzal)", "", new WorldPoint(1316, 3168, 0)),
+    RED_CHINCHOMPA_2_TLATI_RAINFOREST_2(RED_CHINCHOMPA_2, "Tlati Rainforest (NE of Tal Teklan quetzal)", "", new WorldPoint(1319, 3167, 0)),
+    RED_CHINCHOMPA_2_TLATI_RAINFOREST_3(RED_CHINCHOMPA_2, "Tlati Rainforest (NE of Tal Teklan quetzal)", "", new WorldPoint(1318, 3168, 0)),
+    RED_CHINCHOMPA_2_TLATI_RAINFOREST_4(RED_CHINCHOMPA_2, "Tlati Rainforest (NE of Tal Teklan quetzal)", "", new WorldPoint(1317, 3166, 0)),
+    RED_CHINCHOMPA_2_TLATI_RAINFOREST_5(RED_CHINCHOMPA_2, "Tlati Rainforest (NE of Tal Teklan quetzal)", "", new WorldPoint(1318, 3170, 0)),
+    RED_CHINCHOMPA_2_TLATI_RAINFOREST_6(RED_CHINCHOMPA_2, "Tlati Rainforest (NE of Tal Teklan quetzal)", "", new WorldPoint(1316, 3170, 0)),
     
 
 	MOONLIGHT_ANTELOPE_HUNTERS_GUILD_1(MOONLIGHT_ANTELOPE, "Hunters' Guild", "", new WorldPoint(1555, 9416, 0)),
