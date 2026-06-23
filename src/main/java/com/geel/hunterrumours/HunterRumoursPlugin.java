@@ -28,6 +28,7 @@ import net.runelite.client.ui.overlay.infobox.InfoBoxManager;
 import net.runelite.client.ui.overlay.worldmap.WorldMapPointManager;
 import net.runelite.client.util.ColorUtil;
 import net.runelite.client.util.Text;
+import net.runelite.client.Notifier;
 
 import javax.inject.Inject;
 import java.awt.*;
@@ -94,6 +95,9 @@ public class HunterRumoursPlugin extends Plugin {
 
     @Inject
     private RuneLiteConfig runeLiteConfig;
+
+    @Inject
+    private Notifier notifier;
 
     @Inject
     private WorldMapPointManager worldMapPointManager;
@@ -702,6 +706,8 @@ public class HunterRumoursPlugin extends Plugin {
         if (!Text.standardize(message).equalsIgnoreCase("You find a rare piece of the creature! You should take it back to the Hunter Guild.")) {
             return;
         }
+
+        notifier.notify(config.notificationOnRumourDrop(), "Hunter Rumour completed! You found the rare piece.");
 
         if (config.endOfRumourMessage()) {
             final int caughtCreatures = getCaughtRumourCreatures();
