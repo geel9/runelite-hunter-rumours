@@ -37,30 +37,37 @@ public interface HunterRumoursConfig extends Config {
     String worldMapSection = "worldMapSection";
 
     @ConfigSection(
+            name = "Preferred Locations",
+            description = "Configure the preferred hunting location for each creature.",
+            position = 4
+    )
+    String preferredLocationsSection = "preferredLocationsSection";
+
+    @ConfigSection(
             name = "Fairy Rings",
             description = "Configure the behavior of fairy rings while you have a rumour",
-            position = 4
+            position = 5
     )
     String fairyRingSection = "fairyRingSection";
 
     @ConfigSection(
             name = "Chat Messages",
             description = "Configure various chat messages that the plugin creates.",
-            position = 5
+            position = 6
     )
     String messagesSection = "messagesSection";
 
     @ConfigSection(
             name = "Hunter Tiers",
             description = "The tiers of hunters that are enabled.",
-            position = 6
+            position = 7
     )
     String tiersSection = "tiersSection";
 
     @ConfigSection(
             name = "Highlights",
             description = "Highlights for Hunters and Hunter Targets.",
-            position = 7
+            position = 8
     )
     String highlightSection = "highlightSection";
 
@@ -99,14 +106,26 @@ public interface HunterRumoursConfig extends Config {
     }
 
     @ConfigItem(
-            position = 3,
-            keyName = "preferredFairyRingCode",
-            name = "Preferred Fairy Ring Code",
-            description = "When a rumour has multiple fairy ring options, auto-scroll to this code instead of the default.<br />Must be exactly 3 uppercase letters (e.g. CJQ). Leave blank to use the default (first declared) fairy ring.",
-            section = fairyRingSection
+            position = 0,
+            keyName = "showPreferredLocationSidebar",
+            name = "Preferred Locations Panel",
+            description = "Adds a sidebar panel for choosing a preferred hunting location for each rumour creature.",
+            section = preferredLocationsSection
     )
-    default String preferredFairyRingCode() {
-        return "";
+    default boolean showPreferredLocationSidebar() {
+        return true;
+    }
+
+    @ConfigItem(
+            position = 1,
+            keyName = "useShortestPath",
+            name = "Use 'Shortest Path' Plugin",
+            description = "Ask the Shortest Path plugin to route to the preferred location for the current rumour.",
+            warning = "This will only work if you have the 'Shortest Path' plugin installed and enabled.",
+            section = preferredLocationsSection
+    )
+    default boolean useShortestPath() {
+        return false;
     }
 
     @ConfigItem(

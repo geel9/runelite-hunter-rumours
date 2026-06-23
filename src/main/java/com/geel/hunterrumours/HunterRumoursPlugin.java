@@ -15,13 +15,17 @@ import net.runelite.api.widgets.Widget;
 import net.runelite.client.callback.ClientThread;
 import net.runelite.client.config.ConfigManager;
 import net.runelite.client.config.RuneLiteConfig;
+import net.runelite.client.eventbus.EventBus;
 import net.runelite.client.eventbus.Subscribe;
 import net.runelite.client.events.ConfigChanged;
+import net.runelite.client.events.PluginMessage;
 import net.runelite.client.game.ItemManager;
 import net.runelite.client.game.npcoverlay.HighlightedNpc;
 import net.runelite.client.game.npcoverlay.NpcOverlayService;
 import net.runelite.client.plugins.Plugin;
 import net.runelite.client.plugins.PluginDescriptor;
+import net.runelite.client.ui.ClientToolbar;
+import net.runelite.client.ui.NavigationButton;
 import net.runelite.client.ui.overlay.OverlayManager;
 import net.runelite.client.ui.overlay.infobox.InfoBoxManager;
 import net.runelite.client.ui.overlay.worldmap.WorldMapPointManager;
@@ -96,6 +100,23 @@ public class HunterRumoursPlugin extends Plugin {
 
     @Inject
     private WorldMapPointManager worldMapPointManager;
+
+    @Inject
+    private ClientToolbar clientToolbar;
+
+    @Inject
+    private PreferredLocationPreferences preferredLocationPreferences;
+
+    @Inject
+    private PreferredLocationPreferencesPanel preferredLocationPreferencesPanel;
+
+    @Inject
+    private EventBus eventBus;
+
+    private NavigationButton preferredLocationNavigationButton;
+    private boolean preferredLocationNavigationAdded;
+    private boolean shortestPathActive;
+    private WorldPoint shortestPathTarget;
     private int latestInteractionTime = -1;
 
     // Tracks whether the fairy ring panel is presently open.
@@ -113,6 +134,15 @@ public class HunterRumoursPlugin extends Plugin {
 
     @Override
     protected void startUp() throws Exception {
+        preferredLocationPreferences.initializeDefaults();
+        preferredLocationNavigationButton = NavigationButton.builder()
+                .tooltip("Hunter Rumour Locations")
+                .icon(PreferredLocationPreferencesPanel.createNavigationIcon())
+                .priority(6)
+                .panel(preferredLocationPreferencesPanel)
+                .build();
+        syncPreferredLocationNavigation();
+
         overlayManager.add(overlay);
         npcOverlayService.registerHighlighter(this::highlighterFn);
         clientThread.invoke(this::loadFromConfig);
@@ -123,6 +153,13 @@ public class HunterRumoursPlugin extends Plugin {
 
     @Override
     protected void shutDown() throws Exception {
+        if (preferredLocationNavigationAdded) {
+            clientToolbar.removeNavigation(preferredLocationNavigationButton);
+            preferredLocationNavigationAdded = false;
+        }
+
+        clearShortestPath();
+
         overlayManager.remove(overlay);
 
         removeInfoBox();
@@ -144,8 +181,33 @@ public class HunterRumoursPlugin extends Plugin {
             return;
         }
 
+        if (configChanged.getKey().equals("showPreferredLocationSidebar")) {
+            syncPreferredLocationNavigation();
+        }
+
+        if (configChanged.getKey().startsWith(PreferredLocationPreferences.CREATURE_KEY_PREFIX)
+                || configChanged.getKey().equals(PreferredLocationPreferences.INITIALIZED_KEY)) {
+            preferredLocationPreferences.refreshPreference(configChanged.getKey());
+            clientThread.invoke(this::handleShortestPath);
+            return;
+        }
+
         clientThread.invoke(this::loadFromConfig);
         clientThread.invoke(this::refreshAllDisplays);
+    }
+
+    private void syncPreferredLocationNavigation() {
+        if (preferredLocationNavigationButton == null) {
+            return;
+        }
+
+        if (config.showPreferredLocationSidebar() && !preferredLocationNavigationAdded) {
+            clientToolbar.addNavigation(preferredLocationNavigationButton);
+            preferredLocationNavigationAdded = true;
+        } else if (!config.showPreferredLocationSidebar() && preferredLocationNavigationAdded) {
+            clientToolbar.removeNavigation(preferredLocationNavigationButton);
+            preferredLocationNavigationAdded = false;
+        }
     }
 
     @Subscribe
@@ -518,26 +580,8 @@ public class HunterRumoursPlugin extends Plugin {
             return;
         }
 
-        // Find the first-declared location for the currently-active rumour
-        var locationGroups = RumourLocation.getGroupedLocationsForRumour(getCurrentRumour());
-        var locationsWithFairyRing = locationGroups.filter(g -> g.getValue().get(0).getFairyRingCode().length() == 3).toList();
-
-        if (locationsWithFairyRing.isEmpty()) {
-            return;
-        }
-
-        // Use the user's preferred fairy ring code if it matches one of the available codes, otherwise fall back to the first declared one
-        var preferredCode = config.preferredFairyRingCode().trim().toUpperCase();
-        var selectedLocation = (preferredCode.length() == 3)
-                ? locationsWithFairyRing.stream()
-                        .filter(g -> g.getValue().get(0).getFairyRingCode().equals(preferredCode))
-                        .findFirst()
-                        .orElse(locationsWithFairyRing.get(0))
-                : locationsWithFairyRing.get(0);
-
-        var fairyRingCode = selectedLocation.getValue().get(0).getFairyRingCode();
-
-        if (!shouldFairyRingAutoJump()) {
+        var fairyRingCode = preferredLocationPreferences.getPreferredLocation(getCurrentRumour()).getFairyRingCode();
+        if (fairyRingCode.length() != 3) {
             return;
         }
 
@@ -907,10 +951,45 @@ public class HunterRumoursPlugin extends Plugin {
     private void refreshAllDisplays() {
         npcOverlayService.rebuild();
         handleWorldMap();
+        handleShortestPath();
 
         // Remove the infobox -- then re-enable it if necessary.
         removeInfoBox();
         handleInfoBox();
+    }
+
+    private void handleShortestPath() {
+        Rumour rumour = getCurrentRumour();
+        if (!config.useShortestPath() || rumour == Rumour.NONE || currentRumourFinished) {
+            clearShortestPath();
+            return;
+        }
+
+        Player localPlayer = client.getLocalPlayer();
+        if (localPlayer == null) {
+            return;
+        }
+
+        WorldPoint start = localPlayer.getWorldLocation();
+        WorldPoint target = preferredLocationPreferences.getPreferredLocation(rumour).getWorldPoint();
+        if (start == null || target == null || target.equals(shortestPathTarget)) {
+            return;
+        }
+
+        Map<String, Object> data = new HashMap<>();
+        data.put("start", start);
+        data.put("target", target);
+        eventBus.post(new PluginMessage("shortestpath", "path", data));
+        shortestPathActive = true;
+        shortestPathTarget = target;
+    }
+
+    private void clearShortestPath() {
+        if (shortestPathActive) {
+            eventBus.post(new PluginMessage("shortestpath", "clear"));
+            shortestPathActive = false;
+            shortestPathTarget = null;
+        }
     }
 
     /**
@@ -1145,11 +1224,6 @@ public class HunterRumoursPlugin extends Plugin {
             return false;
         }
 
-        // If "force auto-scroll to fairy ring" is enabled, then we should never disable auto-scroll.
-        if (config.forceAutoJumpFairyRing()) {
-            return true;
-        }
-
         // If we have no active rumour, why auto-scroll?
         if (getCurrentRumour() == Rumour.NONE) {
             return false;
@@ -1158,6 +1232,11 @@ public class HunterRumoursPlugin extends Plugin {
         // If we DO have a current rumour but it's complete, why auto-scroll?
         if (getIsCurrentHunterRumourCompleted()) {
             return false;
+        }
+
+        // If "force auto-scroll to fairy ring" is enabled, then we should never disable auto-scroll for an active rumour.
+        if (config.forceAutoJumpFairyRing()) {
+            return true;
         }
 
         // Fairy ring auto-scroll should be disabled if it's been long enough since the last interaction time
