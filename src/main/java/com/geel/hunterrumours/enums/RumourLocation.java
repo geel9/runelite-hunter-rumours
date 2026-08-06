@@ -271,6 +271,18 @@ public enum RumourLocation
 	RED_SALAMANDER_OURANIA_HUNTER_AREA_8(RED_SALAMANDER, "Ourania Hunter area", "", new WorldPoint(2449, 3224, 0)),
 	RED_SALAMANDER_OURANIA_HUNTER_AREA_9(RED_SALAMANDER, "Ourania Hunter area", "", new WorldPoint(2453, 3221, 0)),
 
+	// Wyrmscraig has no fairy ring; Necklace of Passage (post Fallen From Grace) teleports nearby at (2591, 2221).
+	WYRMSCRAIG_GOAT_WYRMSCRAIG_1(WYRMSCRAIG_GOAT, "Wyrmscraig (Necklace of Passage)", "", new WorldPoint(2572, 2195, 0)),
+	WYRMSCRAIG_GOAT_WYRMSCRAIG_2(WYRMSCRAIG_GOAT, "Wyrmscraig (Necklace of Passage)", "", new WorldPoint(2563, 2193, 0)),
+	WYRMSCRAIG_GOAT_WYRMSCRAIG_3(WYRMSCRAIG_GOAT, "Wyrmscraig (Necklace of Passage)", "", new WorldPoint(2567, 2197, 0)),
+	WYRMSCRAIG_GOAT_WYRMSCRAIG_4(WYRMSCRAIG_GOAT, "Wyrmscraig (Necklace of Passage)", "", new WorldPoint(2575, 2200, 0)),
+	WYRMSCRAIG_GOAT_WYRMSCRAIG_5(WYRMSCRAIG_GOAT, "Wyrmscraig (Necklace of Passage)", "", new WorldPoint(2580, 2201, 0)),
+	WYRMSCRAIG_GOAT_WYRMSCRAIG_6(WYRMSCRAIG_GOAT, "Wyrmscraig (Necklace of Passage)", "", new WorldPoint(2583, 2195, 0)),
+	WYRMSCRAIG_GOAT_WYRMSCRAIG_7(WYRMSCRAIG_GOAT, "Wyrmscraig (Necklace of Passage)", "", new WorldPoint(2587, 2200, 0)),
+	WYRMSCRAIG_GOAT_WYRMSCRAIG_8(WYRMSCRAIG_GOAT, "Wyrmscraig (Necklace of Passage)", "", new WorldPoint(2564, 2186, 0)),
+	WYRMSCRAIG_GOAT_WYRMSCRAIG_9(WYRMSCRAIG_GOAT, "Wyrmscraig (Necklace of Passage)", "", new WorldPoint(2570, 2189, 0)),
+	WYRMSCRAIG_GOAT_WYRMSCRAIG_10(WYRMSCRAIG_GOAT, "Wyrmscraig (Necklace of Passage)", "", new WorldPoint(2578, 2192, 0)),
+
 	RED_CHINCHOMPA_GWENITH_HUNTER_AREA_1(RED_CHINCHOMPA, "Gwenith Hunter area", "", new WorldPoint(2266, 3411, 0)),
 	RED_CHINCHOMPA_GWENITH_HUNTER_AREA_2(RED_CHINCHOMPA, "Gwenith Hunter area", "", new WorldPoint(2268, 3409, 0)),
 	RED_CHINCHOMPA_GWENITH_HUNTER_AREA_3(RED_CHINCHOMPA, "Gwenith Hunter area", "", new WorldPoint(2269, 3413, 0)),

@@ -11,6 +11,8 @@ public enum Trap {
     DEADFALL("Deadfall", ItemID.LOGS, 30, 28),
     NET_TRAP("Net trap", ItemID.SMALL_FISHING_NET, 50, 46),
     PIT("Pit Trap", ItemID.TEASING_STICK, 30, 28),
+    // Goat Pit pity rates are not yet published; spiked pit rates are the closest published method.
+    GOAT_PIT("Goat Pit", ItemID.CATTLEPROD, 30, 28),
     BOX_TRAP("Box Trap", ItemID.BOX_TRAP, 100, 94),
     FALCONRY("Falconry", ItemID.FALCONERS_GLOVE, 20, 18),
     BUTTERFLY("Butterfly Net", ItemID.BUTTERFLY_NET, 150, 142),

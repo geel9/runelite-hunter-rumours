@@ -34,6 +34,7 @@ public enum Rumour
 	DARK_KEBBIT(Creature.DARK_KEBBIT, "Dark Kebbit", ItemID.KEBBITY_TUFT, true, true, true, false),
 	PYRE_FOX(Creature.PYRE_FOX, "Pyre Fox", ItemID.FOX_FLUFF, true, true, true, true),
 	RED_SALAMANDER(Creature.RED_SALAMANDER, "Red Salamander", ItemID.RED_SALAMANDER_CLAW, true, false, true, true),
+	WYRMSCRAIG_GOAT(Creature.WYRMSCRAIG_GOAT, "Wyrmscraig Goat", ItemID.WYRMSCRAIG_GOAT_HOOF, true, true, true, true),
 	RED_CHINCHOMPA(Creature.RED_CHINCHOMPA, "Carnivorous Chinchompa", ItemID.RED_CHINCHOMPA_TUFT, true, false, true, true),
 	RED_CHINCHOMPA_2(Creature.RED_CHINCHOMPA, "Red Chinchompa", ItemID.RED_CHINCHOMPA_TUFT, true, false, true, true),
 	SUNLIGHT_MOTH(Creature.SUNLIGHT_MOTH, "Sunlight Moth", ItemID.SUNLIGHT_MOTH_WING, true, false, false, true),
