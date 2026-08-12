@@ -219,6 +219,18 @@ public class HunterRumoursPlugin extends Plugin {
     }
 
     @Subscribe
+    public void onBeforeMenuRender(BeforeMenuRender event) {
+        if (!shouldFairyRingAutoJump()) {
+            return;
+        }
+
+        RumourLocation preferredLocation = preferredLocationPreferences.getPreferredLocation(getCurrentRumour());
+        FairyRingFavouriteMenuHighlighter.highlight(
+                client.getMenu().getMenuEntries(),
+                preferredLocation.getFairyRingCode());
+    }
+
+    @Subscribe
     public void onPlayerChanged(PlayerChanged event) {
         // We only care about ourselves
         if (event.getPlayer().getId() != client.getLocalPlayer().getId()) {
