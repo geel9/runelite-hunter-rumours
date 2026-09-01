@@ -752,7 +752,8 @@ public class HunterRumoursPlugin extends Plugin {
         }
 
         // Ensure that this is the right chat message
-        if (!Text.standardize(message).equalsIgnoreCase("You find a rare piece of the creature! You should take it back to the Hunter Guild.")) {
+        // The ingame color formatting prepends the message with @mes_hl_gre@
+        if (!Text.standardize(message).contains("you find a rare piece of the creature! you should take it back to the hunter guild.")) {
             return;
         }
 
