@@ -110,8 +110,8 @@ public interface HunterRumoursConfig extends Config {
     @ConfigItem(
             position = 0,
             keyName = "showPreferredLocationSidebar",
-            name = "Preferred Locations Panel",
-            description = "Adds a sidebar panel for choosing a preferred hunting location for each rumour creature.",
+            name = "Show Sidebar",
+            description = "Adds a sidebar for blocklists and preferred hunting locations.",
             section = preferredLocationsSection
     )
     default boolean showPreferredLocationSidebar() {
