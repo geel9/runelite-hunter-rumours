@@ -1095,8 +1095,8 @@ public class HunterRumoursPlugin extends Plugin {
         return null;
     }
 
-    static HighlightedNpc buildHunterNpcHighlight(NPC npc, Color color,
-                                                   Set<HunterRumoursConfig.HighlightType> highlightTypes) {
+    private static HighlightedNpc buildHunterNpcHighlight(NPC npc, Color color,
+                                                           Set<HunterRumoursConfig.HighlightType> highlightTypes) {
         return HighlightedNpc.builder()
                 .npc(npc)
                 .highlightColor(color)
