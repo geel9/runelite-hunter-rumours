@@ -3,6 +3,8 @@ package com.geel.hunterrumours;
 import net.runelite.client.config.*;
 
 import java.awt.*;
+import java.util.Collections;
+import java.util.Set;
 
 @ConfigGroup(HunterRumoursConfig.GROUP)
 public interface HunterRumoursConfig extends Config {
@@ -11,8 +13,8 @@ public interface HunterRumoursConfig extends Config {
     enum HighlightType {
         OUTLINE,
         TILE,
-        BOTH,
-        NONE
+        TRUE_TILE,
+        CLICKBOX
     }
 
     @ConfigSection(
@@ -470,13 +472,13 @@ public interface HunterRumoursConfig extends Config {
 
     @ConfigItem(
             position = 3,
-            keyName = "highlightHunterNPCs",
-            name = "Highlight Hunter NPCs",
-            description = "Whether your current rumour target should be highlighted.",
+            keyName = "highlightHunterNPCStyles",
+            name = "Hunter NPC highlight styles",
+            description = "How your current rumour target should be highlighted. Select multiple styles or leave empty to disable highlighting.",
             section = highlightSection
     )
-    default HighlightType highlightHunterNPCs() {
-        return HighlightType.OUTLINE;
+    default Set<HighlightType> highlightHunterNPCStyles() {
+        return Collections.singleton(HighlightType.OUTLINE);
     }
 
     @ConfigItem(
