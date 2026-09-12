@@ -113,6 +113,7 @@ public class HunterRumoursPlugin extends Plugin {
 
     @Override
     protected void startUp() throws Exception {
+        migrateHunterNpcHighlightConfig();
         overlayManager.add(overlay);
         npcOverlayService.registerHighlighter(this::highlighterFn);
         clientThread.invoke(this::loadFromConfig);
@@ -993,7 +994,8 @@ public class HunterRumoursPlugin extends Plugin {
         }
 
         // Highlight Rumour Target (hunter creature) if relevant
-        if (config.highlightHunterNPCs() != HunterRumoursConfig.HighlightType.NONE) {
+        Set<HunterRumoursConfig.HighlightType> highlightTypes = config.highlightHunterNPCStyles();
+        if (!highlightTypes.isEmpty()) {
             Rumour currentRumour = getCurrentRumour();
             if (currentRumour == Rumour.NONE
                     || currentRumour.getTargetCreature().getNpcId() == 0
@@ -1003,40 +1005,71 @@ public class HunterRumoursPlugin extends Plugin {
                 return null;
             }
 
-            HighlightedNpc.HighlightedNpcBuilder highlightedNpcBuilder = HighlightedNpc.builder()
-                    .npc(npc)
-                    .highlightColor(config.hunterNPCHighlightColor())
-                    .borderWidth(2);
-
-            switch (config.highlightHunterNPCs()) {
-                case TILE:
-                    highlightedNpcBuilder.tile(true);
-                    break;
-                case OUTLINE:
-                    highlightedNpcBuilder.outline(true);
-                    break;
-                case OUTLINE_TILE:
-                    highlightedNpcBuilder.tile(true);
-                    highlightedNpcBuilder.outline(true);
-                    break;
-                case CLICKBOX_TILE:
-                    highlightedNpcBuilder.tile(true);
-                    highlightedNpcBuilder.hull(true);
-                    break;
-                case CLICKBOX:
-                    highlightedNpcBuilder.hull(true);
-                    break;
-                case ALL:
-                    highlightedNpcBuilder.tile(true);
-                    highlightedNpcBuilder.outline(true);
-                    highlightedNpcBuilder.hull(true);
-                    break;
-            }
-
-            return highlightedNpcBuilder.build();
+            return buildHunterNpcHighlight(npc, config.hunterNPCHighlightColor(), highlightTypes);
         }
 
         return null;
+    }
+
+    static HighlightedNpc buildHunterNpcHighlight(NPC npc, Color color,
+                                                   Set<HunterRumoursConfig.HighlightType> highlightTypes) {
+        return HighlightedNpc.builder()
+                .npc(npc)
+                .highlightColor(color)
+                .borderWidth(2)
+                .outline(highlightTypes.contains(HunterRumoursConfig.HighlightType.OUTLINE))
+                .tile(highlightTypes.contains(HunterRumoursConfig.HighlightType.TILE))
+                .trueTile(highlightTypes.contains(HunterRumoursConfig.HighlightType.TRUE_TILE))
+                .hull(highlightTypes.contains(HunterRumoursConfig.HighlightType.CLICKBOX))
+                .build();
+    }
+
+    private void migrateHunterNpcHighlightConfig() {
+        String currentValue = configManager.getConfiguration(HunterRumoursConfig.GROUP, "highlightHunterNPCStyles");
+        if (currentValue != null) {
+            return;
+        }
+
+        String legacyValue = configManager.getConfiguration(HunterRumoursConfig.GROUP, "highlightHunterNPCs");
+        if (legacyValue == null) {
+            return;
+        }
+
+        Set<HunterRumoursConfig.HighlightType> highlightTypes;
+        switch (legacyValue) {
+            case "TILE":
+                highlightTypes = EnumSet.of(HunterRumoursConfig.HighlightType.TILE);
+                break;
+            case "BOTH":
+            case "OUTLINE_TILE":
+                highlightTypes = EnumSet.of(
+                        HunterRumoursConfig.HighlightType.OUTLINE,
+                        HunterRumoursConfig.HighlightType.TILE
+                );
+                break;
+            case "CLICKBOX":
+                highlightTypes = EnumSet.of(HunterRumoursConfig.HighlightType.CLICKBOX);
+                break;
+            case "CLICKBOX_TILE":
+                highlightTypes = EnumSet.of(
+                        HunterRumoursConfig.HighlightType.CLICKBOX,
+                        HunterRumoursConfig.HighlightType.TILE
+                );
+                break;
+            case "ALL":
+                highlightTypes = EnumSet.allOf(HunterRumoursConfig.HighlightType.class);
+                break;
+            case "NONE":
+                highlightTypes = Collections.emptySet();
+                break;
+            case "OUTLINE":
+            default:
+                highlightTypes = EnumSet.of(HunterRumoursConfig.HighlightType.OUTLINE);
+                break;
+        }
+
+        configManager.setConfiguration(HunterRumoursConfig.GROUP, "highlightHunterNPCStyles", highlightTypes);
+        configManager.unsetConfiguration(HunterRumoursConfig.GROUP, "highlightHunterNPCs");
     }
 
     /**
