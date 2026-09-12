@@ -530,6 +530,54 @@ public enum RumourLocation
 				.sorted(Comparator.comparingInt(a -> locationDeclarationOrder.get(a.getKey())));
 	}
 
+	public static RumourLocationInfo getLocationInfo(Map.Entry<String, List<RumourLocation>> locationGroup)
+	{
+		RumourLocation location = locationGroup.getValue().get(0);
+		Rumour rumour = location.getRumour();
+
+		if (rumour == HERBIBOAR)
+		{
+			return new RumourLocationInfo(LocationMetric.STARTING_AREAS, 5);
+		}
+
+		if (rumour == ORANGE_SALAMANDER && location.getLocationName().startsWith("Necropolis"))
+		{
+			return new RumourLocationInfo(LocationMetric.YOUNG_TREES, 5);
+		}
+
+		if (rumour == ORANGE_SALAMANDER && location.getLocationName().equals("Uzer Hunter area"))
+		{
+			return new RumourLocationInfo(LocationMetric.YOUNG_TREES, 3);
+		}
+
+		int count = locationGroup.getValue().size();
+		switch (rumour.getTrap())
+		{
+			case SNARE:
+				return new RumourLocationInfo(LocationMetric.BIRDS, count);
+			case DEADFALL:
+				return new RumourLocationInfo(LocationMetric.CREATURES, count);
+			case PIT:
+				return new RumourLocationInfo(LocationMetric.CREATURES, count);
+			case GOAT_PIT:
+				return new RumourLocationInfo(LocationMetric.GOATS, count);
+			case BOX_TRAP:
+				return new RumourLocationInfo(LocationMetric.CREATURES, count);
+			case FALCONRY:
+				return new RumourLocationInfo(LocationMetric.KEBBITS, count);
+			case BUTTERFLY:
+				LocationMetric metric = rumour == SUNLIGHT_MOTH || rumour == MOONLIGHT_MOTH
+						? LocationMetric.MOTHS : LocationMetric.BUTTERFLIES;
+				return new RumourLocationInfo(metric, count);
+			case NOOSE:
+				return new RumourLocationInfo(LocationMetric.TRACK_STARTS, count);
+			case NET_TRAP:
+				return new RumourLocationInfo(LocationMetric.CREATURES, count);
+			default:
+				return new RumourLocationInfo(LocationMetric.CREATURES, count);
+		}
+	}
+
 	private static Stream<RumourLocation> getLocationsStreamForRumour(Rumour rumour)
 	{
 		return Arrays.stream(RumourLocation.values()).filter(loc -> loc.getRumour() == rumour);
