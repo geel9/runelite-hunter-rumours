@@ -537,44 +537,44 @@ public enum RumourLocation
 
 		if (rumour == HERBIBOAR)
 		{
-			return new RumourLocationInfo(LocationMetric.STARTING_AREAS, 5, "");
+			return new RumourLocationInfo(LocationMetric.STARTING_AREAS, 5);
 		}
 
 		if (rumour == ORANGE_SALAMANDER && location.getLocationName().startsWith("Necropolis"))
 		{
-			return new RumourLocationInfo(LocationMetric.YOUNG_TREES, 5, "");
+			return new RumourLocationInfo(LocationMetric.YOUNG_TREES, 5);
 		}
 
 		if (rumour == ORANGE_SALAMANDER && location.getLocationName().equals("Uzer Hunter area"))
 		{
-			return new RumourLocationInfo(LocationMetric.YOUNG_TREES, 3, "compact southern cluster");
+			return new RumourLocationInfo(LocationMetric.YOUNG_TREES, 3);
 		}
 
 		int count = locationGroup.getValue().size();
 		switch (rumour.getTrap())
 		{
 			case SNARE:
-				return new RumourLocationInfo(LocationMetric.BIRDS, count, "density matters");
+				return new RumourLocationInfo(LocationMetric.BIRDS, count);
 			case DEADFALL:
-				return new RumourLocationInfo(LocationMetric.CREATURES, count, "deadfall-site proximity matters");
+				return new RumourLocationInfo(LocationMetric.CREATURES, count);
 			case PIT:
-				return new RumourLocationInfo(LocationMetric.CREATURES, count, "pit layout matters");
+				return new RumourLocationInfo(LocationMetric.CREATURES, count);
 			case GOAT_PIT:
-				return new RumourLocationInfo(LocationMetric.GOATS, count, "goat-pit layout matters");
+				return new RumourLocationInfo(LocationMetric.GOATS, count);
 			case BOX_TRAP:
-				return new RumourLocationInfo(LocationMetric.CREATURES, count, "density matters");
+				return new RumourLocationInfo(LocationMetric.CREATURES, count);
 			case FALCONRY:
-				return new RumourLocationInfo(LocationMetric.KEBBITS, count, "spawn layout matters");
+				return new RumourLocationInfo(LocationMetric.KEBBITS, count);
 			case BUTTERFLY:
 				LocationMetric metric = rumour == SUNLIGHT_MOTH || rumour == MOONLIGHT_MOTH
 						? LocationMetric.MOTHS : LocationMetric.BUTTERFLIES;
-				return new RumourLocationInfo(metric, count, "");
+				return new RumourLocationInfo(metric, count);
 			case NOOSE:
-				return new RumourLocationInfo(LocationMetric.TRACK_STARTS, count, "");
+				return new RumourLocationInfo(LocationMetric.TRACK_STARTS, count);
 			case NET_TRAP:
-				return new RumourLocationInfo(LocationMetric.CREATURES, count, "young-tree layout matters");
+				return new RumourLocationInfo(LocationMetric.CREATURES, count);
 			default:
-				return new RumourLocationInfo(LocationMetric.CREATURES, count, "");
+				return new RumourLocationInfo(LocationMetric.CREATURES, count);
 		}
 	}
 

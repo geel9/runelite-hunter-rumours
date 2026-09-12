@@ -26,13 +26,13 @@ public class RumourLocationTest {
     @Test
     public void usesMethodSpecificLocationInformation()
     {
-        assertEquals("4 birds, density matters", firstLocationInfo(Rumour.TROPICAL_WAGTAIL));
-        assertEquals("20 creatures, deadfall-site proximity matters", firstLocationInfo(Rumour.WILD_KEBBIT));
+        assertEquals("4 birds", firstLocationInfo(Rumour.TROPICAL_WAGTAIL));
+        assertEquals("20 creatures", firstLocationInfo(Rumour.WILD_KEBBIT));
         assertEquals("5 young trees", firstLocationInfo(Rumour.ORANGE_SALAMANDER));
-        assertEquals("5 creatures, pit layout matters", firstLocationInfo(Rumour.SPINED_LARUPIA));
-        assertEquals("10 goats, goat-pit layout matters", firstLocationInfo(Rumour.WYRMSCRAIG_GOAT));
-        assertEquals("11 creatures, density matters", firstLocationInfo(Rumour.EMBERTAILED_JERBOA));
-        assertEquals("7 kebbits, spawn layout matters", firstLocationInfo(Rumour.SPOTTED_KEBBIT));
+        assertEquals("5 creatures", firstLocationInfo(Rumour.SPINED_LARUPIA));
+        assertEquals("10 goats", firstLocationInfo(Rumour.WYRMSCRAIG_GOAT));
+        assertEquals("11 creatures", firstLocationInfo(Rumour.EMBERTAILED_JERBOA));
+        assertEquals("7 kebbits", firstLocationInfo(Rumour.SPOTTED_KEBBIT));
         assertEquals("7 butterflies", firstLocationInfo(Rumour.BLACK_WARLOCK));
         assertEquals("3 starting burrows", firstLocationInfo(Rumour.RAZOR_BACKED_KEBBIT));
         assertEquals("5 starting areas", firstLocationInfo(Rumour.HERBIBOAR));
