@@ -11,9 +11,10 @@ public enum Trap {
     DEADFALL("Deadfall", ItemID.LOGS, 30, 28),
     NET_TRAP("Net trap", ItemID.SMALL_FISHING_NET, 50, 46),
     PIT("Pit Trap", ItemID.TEASING_STICK, 30, 28),
+    GOAT_PIT("Goat Pit", ItemID.CATTLEPROD, 96, 90),
     BOX_TRAP("Box Trap", ItemID.BOX_TRAP, 100, 94),
     FALCONRY("Falconry", ItemID.FALCONERS_GLOVE, 20, 18),
-    BUTTERFLY("Butterfly Net", ItemID.BUTTERFLY_NET, 150, 142),
+    BUTTERFLY("Butterfly Net", ItemID.BUTTERFLY_NET, 80, 76),
     NOOSE("Tracking", ItemID.NOOSE_WAND, 30, 28),
     NOOSE_HERBIBOAR("Tracking", ItemID.NOOSE_WAND, 14, 12);
 
