@@ -129,6 +129,18 @@ public interface HunterRumoursConfig extends Config {
     }
 
     @ConfigItem(
+            position = 2,
+            keyName = "shortestPathDisableTimer",
+            name = "Shortest Path Disable Timer (minutes)",
+            description = "Clears the Shortest Path route after this many minutes of no hunter rumour related activity.",
+            section = preferredLocationsSection
+    )
+    @Range(min = 1)
+    default int shortestPathDisableTimer() {
+        return 5;
+    }
+
+    @ConfigItem(
             position = 0,
             keyName = "showWorldMapLocations",
             name = "Show World Map Locations",

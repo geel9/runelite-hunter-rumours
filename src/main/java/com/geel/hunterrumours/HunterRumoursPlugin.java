@@ -365,6 +365,7 @@ public class HunterRumoursPlugin extends Plugin {
     @Subscribe
     public void onGameTick(GameTick event) {
         handleInfoBox();
+        handleShortestPath();
 
         if (!shouldWorldMapLocationsBeShown()) {
             for (HunterRumourWorldMapPoint location : currentMapPoints) {
@@ -956,7 +957,10 @@ public class HunterRumoursPlugin extends Plugin {
 
     private void handleShortestPath() {
         Rumour rumour = getCurrentRumour();
-        if (!config.useShortestPath() || rumour == Rumour.NONE || currentRumourFinished) {
+        if (!config.useShortestPath()
+                || rumour == Rumour.NONE
+                || currentRumourFinished
+                || !interactedRecently(config.shortestPathDisableTimer() * 100)) {
             clearShortestPath();
             return;
         }
