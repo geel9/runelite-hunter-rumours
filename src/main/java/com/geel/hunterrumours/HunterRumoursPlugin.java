@@ -113,7 +113,10 @@ public class HunterRumoursPlugin extends Plugin {
     private PreferredLocationPreferences preferredLocationPreferences;
 
     @Inject
-    private PreferredLocationPreferencesPanel preferredLocationPreferencesPanel;
+    private HunterRumoursPanel hunterRumoursPanel;
+
+    @Inject
+    private BlocklistPanel blocklistPanel;
 
     @Inject
     private EventBus eventBus;
@@ -142,10 +145,10 @@ public class HunterRumoursPlugin extends Plugin {
         migrateHunterNpcHighlightConfig();
         preferredLocationPreferences.initializeDefaults();
         preferredLocationNavigationButton = NavigationButton.builder()
-                .tooltip("Hunter Rumour Locations")
+                .tooltip("Hunter Rumours")
                 .icon(PreferredLocationPreferencesPanel.createNavigationIcon())
                 .priority(6)
-                .panel(preferredLocationPreferencesPanel)
+                .panel(hunterRumoursPanel)
                 .build();
         syncPreferredLocationNavigation();
 
@@ -953,6 +956,7 @@ public class HunterRumoursPlugin extends Plugin {
     private RumourInfoBox infoBox = null;
 
     private void refreshAllDisplays() {
+        blocklistPanel.refresh(new EnumMap<>(hunterRumours));
         npcOverlayService.rebuild();
         handleWorldMap();
         handleShortestPath();
