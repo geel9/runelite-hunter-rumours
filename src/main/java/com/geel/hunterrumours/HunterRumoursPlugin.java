@@ -279,7 +279,10 @@ public class HunterRumoursPlugin extends Plugin {
         }
 
         if (event.getGroupId() == InterfaceID.CHATMENU && isInBurrows()) {
-            clientThread.invokeLater(this::handleBackToBackDialog);
+            clientThread.invokeLater(() -> {
+                handleBackToBackDialog();
+                handleGilmanFreshRumourDialog();
+            });
         }
     }
 
@@ -738,6 +741,65 @@ public class HunterRumoursPlugin extends Plugin {
         option1.setOnClickListener((JavaScriptCallback) ev -> {
             setBackToBackState(ifYesState, true);
         });
+    }
+
+    /**
+     * Resets all saved rumours when the player asks Gilman for a brand new rumour.
+     *
+     * Gilman's offer alone is not enough to identify a reset because the player can
+     * return to his old rumour or cancel. Hook the specific reset option instead.
+     */
+    private void handleGilmanFreshRumourDialog() {
+        var widget = client.getWidget(ComponentID.DIALOG_OPTION_OPTIONS);
+        if (widget == null) {
+            return;
+        }
+
+        var children = widget.getChildren();
+        if (children == null || children.length < 2) {
+            return;
+        }
+
+        var title = children[0];
+        if (title == null) {
+            return;
+        }
+
+        final String freshRumourOptionText = "Yes, but with a brand new one.";
+        int freshRumourOptionIndex = -1;
+        Widget freshRumourOption = null;
+
+        for (int i = 1; i < children.length; i++) {
+            Widget child = children[i];
+            if (child != null && freshRumourOptionText.equals(Text.removeTags(child.getText()))) {
+                freshRumourOptionIndex = i;
+                freshRumourOption = child;
+                break;
+            }
+        }
+
+        if (freshRumourOption == null || freshRumourOptionIndex > 9) {
+            return;
+        }
+
+        final char freshRumourOptionKey = Character.forDigit(freshRumourOptionIndex, 10);
+        final boolean[] resetHandled = {false};
+        Runnable handleReset = () -> {
+            if (!resetHandled[0]) {
+                resetHandled[0] = true;
+                resetConfig();
+            }
+        };
+
+        // Widget click listeners do not fire when a number key selects an option.
+        title.setOnKeyListener((JavaScriptCallback) ev -> {
+            if (ev.getTypedKeyChar() == freshRumourOptionKey) {
+                handleReset.run();
+            }
+        });
+        title.setHasListener(true);
+
+        freshRumourOption.setOnClickListener((JavaScriptCallback) ev -> handleReset.run());
     }
 
     /**
