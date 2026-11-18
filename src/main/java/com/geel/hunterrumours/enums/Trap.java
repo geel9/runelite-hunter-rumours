@@ -3,18 +3,18 @@ package com.geel.hunterrumours.enums;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import net.runelite.api.Item;
-import net.runelite.api.ItemID;
+import net.runelite.api.gameval.ItemID;
 
 @AllArgsConstructor
 public enum Trap {
-    SNARE("Bird snare", ItemID.BIRD_SNARE, 40, 38),
+    SNARE("Bird snare", ItemID.HUNTING_OJIBWAY_BIRD_SNARE, 40, 38),
     DEADFALL("Deadfall", ItemID.LOGS, 30, 28),
-    NET_TRAP("Net trap", ItemID.SMALL_FISHING_NET, 50, 46),
-    PIT("Pit Trap", ItemID.TEASING_STICK, 30, 28),
+    NET_TRAP("Net trap", ItemID.NET, 50, 46),
+    PIT("Pit Trap", ItemID.HUNTING_TEASING_STICK, 30, 28),
     GOAT_PIT("Goat Pit", ItemID.CATTLEPROD, 96, 90),
-    BOX_TRAP("Box Trap", ItemID.BOX_TRAP, 100, 94),
-    FALCONRY("Falconry", ItemID.FALCONERS_GLOVE, 20, 18),
-    BUTTERFLY("Butterfly Net", net.runelite.api.gameval.ItemID.HUNTING_BUTTERFLY_NET, 80, 76),
+    BOX_TRAP("Box Trap", ItemID.HUNTING_BOX_TRAP, 100, 94),
+    FALCONRY("Falconry", ItemID.FALCON_GLOVES, 20, 18),
+    BUTTERFLY("Butterfly Net", ItemID.HUNTING_BUTTERFLY_NET, 80, 76),
     NOOSE("Tracking", ItemID.NOOSE_WAND, 30, 28),
     NOOSE_HERBIBOAR("Tracking", ItemID.NOOSE_WAND, 14, 12);
 
