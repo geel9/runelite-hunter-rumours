@@ -41,7 +41,7 @@ public class RumourInfoBox extends InfoBox {
             if (!rumourLocation.getFairyRingCode().equals("")) {
                 locationsStringBuilder.append(rumourLocation.getFairyRingCode()).append(", ");
             }
-            locationsStringBuilder.append(entry.getValue().size()).append(" spawns)");
+            locationsStringBuilder.append(RumourLocation.getLocationInfo(entry).format()).append(')');
         });
 
         final Trap trap = rumour.getTargetCreature().getTrap();
