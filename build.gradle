@@ -49,3 +49,13 @@ test {
         showStackTraces true
     }
 }
+
+// Launch a RuneLite dev client with this plugin loaded: ./gradlew runClient
+tasks.register('runClient', JavaExec) {
+    group = 'application'
+    description = 'Runs RuneLite with the Hunter Rumours plugin loaded'
+    classpath = sourceSets.test.runtimeClasspath
+    mainClass = 'com.geel.hunterrumours.HunterRumoursPluginTest'
+    args = ['--developer-mode']
+    jvmArgs = ['-ea']
+}
