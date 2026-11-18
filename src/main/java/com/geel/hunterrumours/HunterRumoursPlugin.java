@@ -10,7 +10,7 @@ import net.runelite.api.gameval.InterfaceID;
 import net.runelite.api.coords.WorldPoint;
 import net.runelite.api.events.*;
 import net.runelite.api.kit.KitType;
-import net.runelite.api.widgets.ComponentID;
+import net.runelite.api.gameval.ItemID;
 import net.runelite.api.widgets.JavaScriptCallback;
 import net.runelite.api.widgets.Widget;
 import net.runelite.client.callback.ClientThread;
@@ -45,6 +45,14 @@ import java.util.*;
 )
 @Slf4j
 public class HunterRumoursPlugin extends Plugin {
+    // RuneLite gameval does not name these fairy ring scrollbar sprites.
+    private static final int SCROLLBAR_ARROW_UP = 773;
+    private static final int SCROLLBAR_ARROW_DOWN = 788;
+    private static final int SCROLLBAR_THUMB_TOP = 789;
+    private static final int SCROLLBAR_THUMB_MIDDLE = 790;
+    private static final int SCROLLBAR_THUMB_BOTTOM = 791;
+    private static final int SCROLLBAR_THUMB_MIDDLE_DARK = 792;
+
     // Varbit value corresponding to the Tier-1 relic Animal Wrangler.
     // This is used because this relic gives double hunter XP for chinchompas, which we need to account for to track kills.
     public static int RELIC_WOODSMAN = 3;
@@ -238,10 +246,10 @@ public class HunterRumoursPlugin extends Plugin {
         var legs = comp.getEquipmentId(KitType.LEGS);
         var boots = comp.getEquipmentId(KitType.BOOTS);
 
-        var isHead = head == ItemID.GUILD_HUNTER_HEADWEAR;
-        var isTop = top == ItemID.GUILD_HUNTER_TOP;
-        var isLegs = legs == ItemID.GUILD_HUNTER_LEGS;
-        var isBoots = boots == ItemID.GUILD_HUNTER_BOOTS;
+        var isHead = head == ItemID.HG_HUNTER_HOOD;
+        var isTop = top == ItemID.HG_HUNTER_TOP;
+        var isLegs = legs == ItemID.HG_HUNTER_LEGS;
+        var isBoots = boots == ItemID.HG_HUNTER_BOOTS;
 
         var items = 0;
 
@@ -589,9 +597,9 @@ public class HunterRumoursPlugin extends Plugin {
         }
 
         // Find all the necessary widgets
-        Widget panelList = client.getWidget(ComponentID.FAIRY_RING_PANEL_LIST);
-        Widget favoritesList = client.getWidget(ComponentID.FAIRY_RING_PANEL_FAVORITES);
-        Widget scrollBar = client.getWidget(ComponentID.FAIRY_RING_PANEL_SCROLLBAR);
+        Widget panelList = client.getWidget(InterfaceID.FairyringsLog.CONTENTS);
+        Widget favoritesList = client.getWidget(InterfaceID.FairyringsLog.FAVES);
+        Widget scrollBar = client.getWidget(InterfaceID.FairyringsLog.SCROLLBAR);
 
         if (panelList == null || scrollBar == null || favoritesList == null) {
             return;
@@ -602,22 +610,22 @@ public class HunterRumoursPlugin extends Plugin {
         for (var scrollChild : scrollBar.getDynamicChildren()) {
             // This is stupid
             switch (scrollChild.getSpriteId()) {
-                case SpriteID.SCROLLBAR_ARROW_DOWN:
+                case SCROLLBAR_ARROW_DOWN:
                     scrollBarDownButton = scrollChild;
                     break;
-                case SpriteID.SCROLLBAR_ARROW_UP:
+                case SCROLLBAR_ARROW_UP:
                     scrollBarUpButton = scrollChild;
                     break;
-                case SpriteID.SCROLLBAR_THUMB_MIDDLE:
+                case SCROLLBAR_THUMB_MIDDLE:
                     scrollBarHandle = scrollChild;
                     break;
-                case SpriteID.SCROLLBAR_THUMB_TOP:
+                case SCROLLBAR_THUMB_TOP:
                     scrollBarHandleTop = scrollChild;
                     break;
-                case SpriteID.SCROLLBAR_THUMB_BOTTOM:
+                case SCROLLBAR_THUMB_BOTTOM:
                     scrollBarHandleBottom = scrollChild;
                     break;
-                case SpriteID.SCROLLBAR_THUMB_MIDDLE_DARK:
+                case SCROLLBAR_THUMB_MIDDLE_DARK:
                     scrollBarContainer = scrollChild; // Weird reuse of a sprite for the inset slider container
                     break;
             }
@@ -692,7 +700,7 @@ public class HunterRumoursPlugin extends Plugin {
      * Hooks in to dialog choice and updates state accordingly.
      */
     private void handleBackToBackDialog() {
-        var widget = client.getWidget(ComponentID.DIALOG_OPTION_OPTIONS);
+        var widget = client.getWidget(InterfaceID.Chatmenu.OPTIONS);
         if (widget == null) {
             return;
         }
@@ -756,7 +764,7 @@ public class HunterRumoursPlugin extends Plugin {
      * return to his old rumour or cancel. Hook the specific reset option instead.
      */
     private void handleGilmanFreshRumourDialog() {
-        var widget = client.getWidget(ComponentID.DIALOG_OPTION_OPTIONS);
+        var widget = client.getWidget(InterfaceID.Chatmenu.OPTIONS);
         if (widget == null) {
             return;
         }
